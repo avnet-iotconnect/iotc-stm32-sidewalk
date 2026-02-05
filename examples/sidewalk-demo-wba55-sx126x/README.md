@@ -2,19 +2,14 @@
 
 This guide covers the **Sidewalk demo** application for **NUCLEO‑WBA55** with an **SX126x** sub‑GHz radio.
 
----
-
-## Images
-
-![NUCLEO‑WBA55 (example)](https://commons.wikimedia.org/wiki/Special:FilePath/Nucleo-board.jpg)
-![LoRa radio module (example)](https://commons.wikimedia.org/wiki/Special:FilePath/LoRa_Module_with_antenna_and_SPI_wires_attached.jpg)
-
----
-
 ## 1) Hardware
 
 - NUCLEO‑WBA55CG
 - SX126x radio shield
+
+![NUCLEO-WBA55CG + SX1262MB2CAS](https://raw.githubusercontent.com/stm32-hotspot/STM32-Sidewalk-SDK/main/pictures/Picture13.jpg)
+
+The SX126x stack is shown on the left side of the image.
 
 ---
 

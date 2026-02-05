@@ -4,12 +4,6 @@ This repository provides **IOTCONNECT** assets and documentation for **STM32 Sid
 
 ---
 
-## Images
-
-![NUCLEO board (example)](https://commons.wikimedia.org/wiki/Special:FilePath/Nucleo-board.jpg)
-
----
-
 ## Repository Layout
 
 - `device-templates`  
@@ -47,6 +41,10 @@ The **STM32 Sidewalk SDK** provides a collection of example applications for mul
   Demonstrations of Sidewalk Bulk Data Transfer (firmware update flows).
 
 Each example has different build targets and board definitions. Use the README under each example for exact build and provisioning steps.
+
+Typical STM32 Sidewalk hardware pairings (WBA55 with common radio options):
+
+![NUCLEO-WBA55CG example hardware pairings](https://raw.githubusercontent.com/stm32-hotspot/STM32-Sidewalk-SDK/main/pictures/Picture12.jpg)
 
 ---
 

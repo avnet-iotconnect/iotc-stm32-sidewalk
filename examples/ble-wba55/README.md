@@ -9,19 +9,15 @@ This guide documents a **BLE‑only Sidewalk demo** on **Nucleo‑WBA55** using 
 
 Everything below assumes you have cloned **STM32‑Sidewalk‑SDK**. If your paths differ, adjust accordingly.
 
----
-
-## Images
-
-![NUCLEO‑WBA55 (example)](https://commons.wikimedia.org/wiki/Special:FilePath/Nucleo-board.jpg)
-
----
-
 ## 1) Prerequisites
 
 ### Hardware
 - NUCLEO‑WBA55CG board
 - SWD connection via onboard ST‑LINK (default on Nucleo)
+
+![NUCLEO-WBA55CG board (left)](https://raw.githubusercontent.com/stm32-hotspot/STM32-Sidewalk-SDK/main/pictures/Picture38.jpg)
+
+BLE-only uses only the NUCLEO‑WBA55CG (left in the image). The WL55 board shown is only required for dual‑link demos.
 
 ### Software
 - STM32CubeIDE (for building)

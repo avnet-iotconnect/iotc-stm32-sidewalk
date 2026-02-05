@@ -7,21 +7,16 @@ It assumes:
 - You have a **NUCLEO‑WBA55** and a **Teseo GNSS module**
 - You want to decode GNSS position uplinks in IOTCONNECT
 
----
-
-## Images
-
-![NUCLEO‑WBA55 (example)](https://commons.wikimedia.org/wiki/Special:FilePath/Nucleo-board.jpg)
-![GNSS antenna (example)](https://commons.wikimedia.org/wiki/Special:FilePath/GNSS_antenna.jpg)
-
----
-
 ## 1) Hardware
 
 - NUCLEO‑WBA55CG
 - Teseo GNSS module connected per ST demo wiring
 - Sub‑GHz radio shield required for Sidewalk dual‑link demos
   - Choose one: **SX126x**, **S2‑LP**, or **STM32WL55**
+
+![NUCLEO-WBA55CG with radio shield options](https://raw.githubusercontent.com/stm32-hotspot/STM32-Sidewalk-SDK/main/pictures/Picture12.jpg)
+
+The Teseo GNSS module connects to the NUCLEO‑WBA55CG per ST demo wiring; the image shows common Sub‑GHz shield options.
 
 ---
 

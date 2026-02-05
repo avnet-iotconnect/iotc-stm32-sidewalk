@@ -2,19 +2,12 @@
 
 This guide covers the **Sidewalk demo** application for **NUCLEO‑WBA55** with an **STM32WL55** used as the sub‑GHz radio.
 
----
-
-## Images
-
-![NUCLEO‑WBA55 (example)](https://commons.wikimedia.org/wiki/Special:FilePath/Nucleo-board.jpg)
-![LoRa radio module (example)](https://commons.wikimedia.org/wiki/Special:FilePath/LoRa_Module_with_antenna_and_SPI_wires_attached.jpg)
-
----
-
 ## 1) Hardware
 
 - NUCLEO‑WBA55CG
 - STM32WL55 board/shield acting as the sub‑GHz radio
+
+![NUCLEO-WBA55CG + NUCLEO-WL55JC1](https://raw.githubusercontent.com/stm32-hotspot/STM32-Sidewalk-SDK/main/pictures/Picture38.jpg)
 
 ---
 
