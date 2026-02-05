@@ -1,0 +1,48 @@
+{
+  "code": "STsidewlk2",
+  "name": "Sidewalk ST Demo 2",
+  "authType": 2,
+  "attributes": [
+    { "name": "sensor_data", "displayName": "", "type": "INTEGER", "description": "Temperature (raw int16 C)", "unit": "", "aggregateTypes": [] },
+    { "name": "Temperature", "displayName": "", "type": "DECIMAL", "description": "Temperature (C)", "unit": "C", "aggregateTypes": [] },
+    { "name": "gps_time", "displayName": "", "type": "LONG", "description": "GPS time in seconds", "unit": "", "aggregateTypes": [] },
+    { "name": "link_type", "displayName": "", "type": "STRING", "description": "BLE/FSK/LORA", "unit": "", "aggregateTypes": [] },
+    { "name": "Version", "displayName": "", "type": "STRING", "description": "SDK version if reported", "unit": "", "aggregateTypes": [] },
+    { "name": "ota_percent", "displayName": "", "type": "INTEGER", "description": "OTA progress percent", "unit": "%", "aggregateTypes": [] },
+    { "name": "ota_completed_bytes", "displayName": "", "type": "LONG", "description": "OTA completed bytes", "unit": "bytes", "aggregateTypes": [] },
+    { "name": "ota_total_bytes", "displayName": "", "type": "LONG", "description": "OTA total bytes", "unit": "bytes", "aggregateTypes": [] },
+    { "name": "ota_status", "displayName": "", "type": "INTEGER", "description": "OTA status enum", "unit": "", "aggregateTypes": [] },
+    { "name": "ota_file_id", "displayName": "", "type": "LONG", "description": "OTA file id", "unit": "", "aggregateTypes": [] },
+    { "name": "num_buttons", "displayName": "", "type": "INTEGER", "description": "Number of buttons", "unit": "", "aggregateTypes": [] },
+    { "name": "button_ids", "displayName": "", "type": "STRING", "description": "Button ids (CSV)", "unit": "", "aggregateTypes": [] },
+    { "name": "num_leds", "displayName": "", "type": "INTEGER", "description": "Number of LEDs", "unit": "", "aggregateTypes": [] },
+    { "name": "led_ids", "displayName": "", "type": "STRING", "description": "LED ids (CSV)", "unit": "", "aggregateTypes": [] },
+    { "name": "button_pressed", "displayName": "", "type": "STRING", "description": "Pressed button ids (CSV)", "unit": "", "aggregateTypes": [] },
+    { "name": "button_pressed_resp", "displayName": "", "type": "STRING", "description": "Button response ids (CSV)", "unit": "", "aggregateTypes": [] },
+    { "name": "led_on_req", "displayName": "", "type": "STRING", "description": "LED on request ids (CSV)", "unit": "", "aggregateTypes": [] },
+    { "name": "led_off_req", "displayName": "", "type": "STRING", "description": "LED off request ids (CSV)", "unit": "", "aggregateTypes": [] },
+    { "name": "led_on_resp", "displayName": "", "type": "STRING", "description": "LED on response ids (CSV)", "unit": "", "aggregateTypes": [] },
+    { "name": "led_off_resp", "displayName": "", "type": "STRING", "description": "LED off response ids (CSV)", "unit": "", "aggregateTypes": [] },
+    { "name": "downlink_latency_s", "displayName": "", "type": "LONG", "description": "Downlink latency (s)", "unit": "s", "aggregateTypes": [] },
+    { "name": "temp_sensor_units", "displayName": "", "type": "INTEGER", "description": "Temp sensor units enum", "unit": "", "aggregateTypes": [] },
+    { "name": "ota_supported", "displayName": "", "type": "INTEGER", "description": "OTA supported (0/1)", "unit": "", "aggregateTypes": [] },
+    { "name": "ota_trigger", "displayName": "", "type": "INTEGER", "description": "OTA trigger", "unit": "", "aggregateTypes": [] }
+  ],
+  "commands": [
+    { "name": "led-on", "command": "led_on", "requiredParam": false, "requiredAck": false, "isOTACommand": false },
+    { "name": "led-off", "command": "led_off", "requiredParam": false, "requiredAck": false, "isOTACommand": false }
+  ],
+  "messageVersion": "2.1",
+  "msgCode": "XG4ESTD",
+  "capability": "24",
+  "enableCSR": "false",
+  "c2dOnDemand": 0,
+  "properties": {
+    "description": null,
+    "dataFrequency": "15",
+    "fileSupport": false,
+    "certRenewalDay": 0,
+    "enableCSR": false
+  },
+  "_meta": { "version": "2.0" }
+}

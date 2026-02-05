@@ -1,0 +1,26 @@
+{
+  "code": "sidewalk_lr11xx_geo",
+  "name": "Sidewalk LR11xx Geolocation",
+  "authType": 2,
+  "attributes": [
+    { "name": "wifi_scans", "displayName": "", "type": "STRING", "description": "WiFi scan results (JSON)", "unit": "", "aggregateTypes": [] },
+    { "name": "nav3_messages", "displayName": "", "type": "STRING", "description": "NAV3 messages (JSON)", "unit": "", "aggregateTypes": [] },
+    { "name": "assist_position_lat", "displayName": "", "type": "DECIMAL", "description": "Assist latitude", "unit": "deg", "aggregateTypes": [] },
+    { "name": "assist_position_lon", "displayName": "", "type": "DECIMAL", "description": "Assist longitude", "unit": "deg", "aggregateTypes": [] },
+    { "name": "mcu_temperature", "displayName": "", "type": "INTEGER", "description": "MCU temperature", "unit": "C", "aggregateTypes": [] },
+    { "name": "demo_counter", "displayName": "", "type": "LONG", "description": "Demo counter", "unit": "", "aggregateTypes": [] }
+  ],
+  "messageVersion": "2.1",
+  "msgCode": "XG4ELR1",
+  "capability": "24",
+  "enableCSR": "false",
+  "c2dOnDemand": 0,
+  "properties": {
+    "description": null,
+    "dataFrequency": "60",
+    "fileSupport": false,
+    "certRenewalDay": 0,
+    "enableCSR": false
+  },
+  "_meta": { "version": "2.0" }
+}

@@ -1,0 +1,29 @@
+{
+  "code": "sidewalk_teseo_geo",
+  "name": "Sidewalk Teseo Geolocation",
+  "authType": 2,
+  "attributes": [
+    { "name": "position_time", "displayName": "", "type": "STRING", "description": "GNSS time (ISO8601 UTC)", "unit": "", "aggregateTypes": [] },
+    { "name": "position_time_epoch", "displayName": "", "type": "LONG", "description": "GNSS time (epoch seconds)", "unit": "s", "aggregateTypes": [] },
+    { "name": "latitude", "displayName": "", "type": "DECIMAL", "description": "Latitude", "unit": "deg", "aggregateTypes": [] },
+    { "name": "longitude", "displayName": "", "type": "DECIMAL", "description": "Longitude", "unit": "deg", "aggregateTypes": [] },
+    { "name": "elevation", "displayName": "", "type": "DECIMAL", "description": "Elevation", "unit": "m", "aggregateTypes": [] },
+    { "name": "horizontal_accuracy", "displayName": "", "type": "DECIMAL", "description": "Horizontal accuracy", "unit": "m", "aggregateTypes": [] },
+    { "name": "vertical_accuracy", "displayName": "", "type": "DECIMAL", "description": "Vertical accuracy", "unit": "m", "aggregateTypes": [] },
+    { "name": "mcu_temperature", "displayName": "", "type": "INTEGER", "description": "MCU temperature", "unit": "C", "aggregateTypes": [] },
+    { "name": "demo_counter", "displayName": "", "type": "LONG", "description": "Demo counter", "unit": "", "aggregateTypes": [] }
+  ],
+  "messageVersion": "2.1",
+  "msgCode": "XG4ETEO",
+  "capability": "24",
+  "enableCSR": "false",
+  "c2dOnDemand": 0,
+  "properties": {
+    "description": null,
+    "dataFrequency": "60",
+    "fileSupport": false,
+    "certRenewalDay": 0,
+    "enableCSR": false
+  },
+  "_meta": { "version": "2.0" }
+}
