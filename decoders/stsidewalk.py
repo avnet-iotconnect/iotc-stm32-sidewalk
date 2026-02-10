@@ -84,7 +84,12 @@ def _parse_demo_msg(data):
 
     payload = data[offset:]
 
-    result = {}
+    # Provide defaults for template-required fields so IOTCONNECT doesn't drop the record
+    result = {
+        "id": f"{opc}-{cmd_class}-{cmd_id}",
+        "Sequence": int(cmd_id),
+        "Sinewave": 0,
+    }
 
     # Parse TLV payload
     tlv_offset = 0
