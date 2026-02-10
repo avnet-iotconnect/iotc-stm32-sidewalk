@@ -1,5 +1,6 @@
 import base64
 import json
+import os
 
 # Sidewalk demo TLV tags (apps/common/sid_demo_parser/include/sid_demo_types.h)
 TAG_NUMBER_OF_BUTTONS = 0x01
@@ -64,7 +65,7 @@ def _list_to_csv(values):
     return ",".join(str(v) for v in values)
 
 
-def _parse_demo_msg(data):
+def _parse_demo_msg(data, debug=False):
     if len(data) < 1:
         raise ValueError("Decoded data must be at least 1 byte.")
 
@@ -91,10 +92,22 @@ def _parse_demo_msg(data):
         "Sinewave": 0,
     }
 
+    tlv_dump = []
+    unknown_tags = []
+
     # Parse TLV payload
     tlv_offset = 0
     while tlv_offset < len(payload):
         tag, length, value, tlv_offset = _read_tlv(payload, tlv_offset)
+
+        if debug:
+            tlv_dump.append(
+                {
+                    "tag": tag,
+                    "length": length,
+                    "value_hex": value.hex(),
+                }
+            )
 
         if tag == TAG_TEMPERATURE_SENSOR_DATA_NOTIFY:
             temp_raw = int.from_bytes(value[:2], byteorder="little", signed=False)
@@ -154,17 +167,26 @@ def _parse_demo_msg(data):
             result["ota_trigger"] = int(value[0]) if value else 0
         elif tag == TAG_BUTTON_PRESSED_RESP:
             result["button_pressed_resp"] = _list_to_csv(list(value))
+        else:
+            unknown_tags.append(tag)
+
+    if debug:
+        result["_raw_hex"] = data.hex()
+        result["_tlv_dump"] = tlv_dump
+        if unknown_tags:
+            result["_unknown_tags"] = unknown_tags
 
     return result
 
 
 def dict_from_payload(base64_input: str, fport: int = None):
+    debug = os.getenv("SID_DECODER_DEBUG", "").lower() in ("1", "true", "yes", "on")
     try:
         data = base64.b64decode(base64_input)
     except Exception as e:
         raise ValueError(f"Invalid base64 input: {e}")
 
-    payload = _parse_demo_msg(data)
+    payload = _parse_demo_msg(data, debug=debug)
     return {"payload": payload}
 
 # Example usage
