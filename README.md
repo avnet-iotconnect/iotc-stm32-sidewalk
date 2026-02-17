@@ -4,6 +4,35 @@ This repository provides **IOTCONNECT** assets and documentation for **STM32 Sid
 
 ---
 
+## Important: Prototype Flow Only
+
+The provisioning steps documented in this repository are for the **Amazon Sidewalk prototyping flow**.
+
+This means:
+
+- Devices are provisioned using per-device certificate JSON and flashed individually.
+- This flow is intended for development, validation, and demos.
+- This flow is **not** the Sidewalk factory manufacturing flow for mass production.
+
+### Prototype restrictions
+
+- Sidewalk prototyping supports up to **1,000 prototype devices**.
+- Provisioning is **one device at a time** (no bulk onboarding/import-task flow).
+- Not intended for high-volume factory lines.
+
+### Production / manufacturing customers
+
+Production customers must use the **Amazon Sidewalk manufacturing flow** (HSM + control logs + SMSN + import tasks).
+
+For production onboarding, work with the **IOTCONNECT team** to integrate the Sidewalk manufacturing flow into your **own AWS account and environment**.
+
+- Manufacturing setup and workflow: https://docs.sidewalk.amazon/manufacturing/sidewalk-manufacturing-setup-works.html
+- Sidewalk device lifecycle (prototype vs production): https://docs.sidewalk.amazon/manufacturing/sidewalk-device-lifecycle.html
+- Sidewalk bulk provisioning workflow: https://docs.aws.amazon.com/iot-wireless/latest/developerguide/sidewalk-bulk-provisioning-workflow.html
+- Provisioning using import tasks: https://docs.aws.amazon.com/iot-wireless/latest/developerguide/sidewalk-provision-bulk-import.html
+
+---
+
 ## Repository Layout
 
 - `device-templates`  

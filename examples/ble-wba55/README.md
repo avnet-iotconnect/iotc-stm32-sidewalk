@@ -7,6 +7,26 @@ This guide documents a **BLE‑only Sidewalk demo** on **Nucleo‑WBA55** using 
 - Flashing firmware + manufacturing data
 - IOTCONNECT decoder + device template aligned with the demo payload
 
+## Scope: Prototype Flow (Not Mass Production)
+
+This guide uses the **Amazon Sidewalk prototyping flow**.
+
+- It provisions devices with per-device JSON and flashes devices one at a time.
+- It is intended for development/demo validation.
+- It is **not** the Sidewalk factory manufacturing flow.
+
+Prototype restrictions:
+
+- Up to **1,000** prototype devices.
+- No bulk factory onboarding/import-task provisioning in this flow.
+
+For production manufacturing integration, work with the **IOTCONNECT team** to integrate the Amazon Sidewalk manufacturing flow into your account:
+
+- https://docs.sidewalk.amazon/manufacturing/sidewalk-manufacturing-setup-works.html
+- https://docs.sidewalk.amazon/manufacturing/sidewalk-device-lifecycle.html
+- https://docs.aws.amazon.com/iot-wireless/latest/developerguide/sidewalk-bulk-provisioning-workflow.html
+- https://docs.aws.amazon.com/iot-wireless/latest/developerguide/sidewalk-provision-bulk-import.html
+
 Everything below assumes you have cloned **STM32‑Sidewalk‑SDK**. If your paths differ, adjust accordingly.
 
 ## 1) Prerequisites
@@ -157,11 +177,11 @@ do a **full erase** and re‑flash firmware + MFG.
 ## 7) IOTCONNECT decoder (payload parsing)
 
 Decoder file:
-Use the decoder file provided with your IOTCONNECT integration (this repo includes an example at `decoders/stsidewalk.py`).
+Use the decoder file provided with your IOTCONNECT integration (this repo includes an example at `decoders/sidblecounter.py`).
 
 The decoder:
-- Parses the Sidewalk **demo TLV payload**
-- Outputs the fields expected by the device template
+- Parses the `sid_ble` uplink payload (`uint8_t` counter)
+- Outputs counter telemetry fields (`counter`, `Sequence`, `payload_size`, `raw_hex`)
 - Uses the IOTCONNECT required signature:
 
 ```python
@@ -173,13 +193,13 @@ def dict_from_payload(base64_input: str, fport: int = None):
 
 ## 8) /IOTCONNECT device template
 
-Use a device template aligned with the demo payload + decoder (this repo includes an example at `device-templates/sidewalk_st_demo_template.json`).
+Use a device template aligned with the demo payload + decoder (this repo includes an example at `device-templates/sidewalk_ble_counter_template.json`).
 
 It includes:
-- `sensor_data`, `Temperature`
-- `gps_time`, `link_type`
-- button/LED metadata and actions
-- OTA fields (optional, reported by demo)
+- `counter`, `Sequence`
+- `Sinewave`, `id`
+- `payload_size`, `raw_hex`
+- `extra_bytes_hex`, `fport` (optional)
 
 ---
 
