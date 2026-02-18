@@ -1,11 +1,17 @@
-# STM32 Sidewalk BLE Demo (WBA55 + IOTCONNECT)
+# STM32 Sidewalk BLE Demo (WBA55 + /IOTCONNECT)
 
-This guide documents a **BLE‑only Sidewalk demo** on **Nucleo‑WBA55** using **ST’s STM32‑Sidewalk‑SDK** and **IOTCONNECT**. It includes:
+This guide documents a **BLE‑only Sidewalk demo** on **Nucleo‑WBA55** using **ST’s STM32‑Sidewalk‑SDK** and **/IOTCONNECT**. It includes:
 
-- Manufacturing data generation from IOTCONNECT JSON
+- Manufacturing data generation from /IOTCONNECT JSON
 - STM32CubeIDE build steps for `sid_ble`
 - Flashing firmware + manufacturing data
-- IOTCONNECT decoder + device template aligned with the demo payload
+- /IOTCONNECT decoder + device template aligned with the demo payload
+
+## Production Support in /IOTCONNECT
+
+Production is supported in customer **/IOTCONNECT** instances.
+
+Before production rollout, engage **AWS and the /IOTCONNECT team first** to coordinate Amazon Sidewalk manufacturing-flow enablement in your AWS account/environment.
 
 ## Scope: Prototype Flow (Not Mass Production)
 
@@ -20,16 +26,12 @@ Prototype restrictions:
 - Up to **1,000** prototype devices.
 - No bulk factory onboarding/import-task provisioning in this flow.
 
-For production manufacturing integration, work with the **IOTCONNECT team** to integrate the Amazon Sidewalk manufacturing flow into your account:
+For production manufacturing integration, work with the **/IOTCONNECT team** to integrate the Amazon Sidewalk manufacturing flow into your account:
 
 - https://docs.sidewalk.amazon/manufacturing/sidewalk-manufacturing-setup-works.html
 - https://docs.sidewalk.amazon/manufacturing/sidewalk-device-lifecycle.html
 - https://docs.aws.amazon.com/iot-wireless/latest/developerguide/sidewalk-bulk-provisioning-workflow.html
 - https://docs.aws.amazon.com/iot-wireless/latest/developerguide/sidewalk-provision-bulk-import.html
-
-Everything below assumes you have cloned **STM32‑Sidewalk‑SDK**. If your paths differ, adjust accordingly.
-
-## 1) Prerequisites
 
 ### Hardware
 - NUCLEO‑WBA55CG board
@@ -94,9 +96,9 @@ STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55
 
 ---
 
-## 4) Generate manufacturing data from IOTCONNECT JSON
+## 4) Generate manufacturing data from /IOTCONNECT JSON
 
-When you create a Sidewalk device in IOTCONNECT, you receive a JSON file such as:
+When you create a Sidewalk device in /IOTCONNECT, you receive a JSON file such as:
 
 ```
 <DEVICE_JSON>.json
@@ -120,7 +122,7 @@ Generated .../mfg_wba55.bin
 Generated .../mfg_wba55.hex
 ```
 
-**Important:** Do **not** use the raw `mfg.bin` from IOTCONNECT directly.  
+**Important:** Do **not** use the raw `mfg.bin` from /IOTCONNECT directly.  
 You must generate the WBA55‑specific MFG image as above.
 
 ---
@@ -174,15 +176,15 @@ do a **full erase** and re‑flash firmware + MFG.
 
 ---
 
-## 7) IOTCONNECT decoder (payload parsing)
+## 7) /IOTCONNECT decoder (payload parsing)
 
 Decoder file:
-Use the decoder file provided with your IOTCONNECT integration (this repo includes an example at `decoders/sidblecounter.py`).
+Use the decoder file provided with your /IOTCONNECT integration (this repo includes an example at `decoders/sidblecounter.py`).
 
 The decoder:
 - Parses the `sid_ble` uplink payload (`uint8_t` counter)
 - Outputs counter telemetry fields (`counter`, `Sequence`, `payload_size`, `raw_hex`)
-- Uses the IOTCONNECT required signature:
+- Uses the /IOTCONNECT required signature:
 
 ```python
 def dict_from_payload(base64_input: str, fport: int = None):
@@ -206,10 +208,10 @@ It includes:
 ## 9) End‑to‑end checklist
 
 1. Build `sid_ble` in CubeIDE.
-2. Generate `mfg_wba55.hex` from IOTCONNECT JSON.
+2. Generate `mfg_wba55.hex` from /IOTCONNECT JSON.
 3. Erase → flash firmware → flash MFG.
 4. Confirm `MFG storage: validation passed`.
-5. Use decoder + template in IOTCONNECT.
+5. Use decoder + template in /IOTCONNECT.
 
 ---
 
@@ -229,6 +231,12 @@ Do **full erase** before flashing firmware + MFG.
 ## 11) BLE‑only notes
 
 `sid_ble` uses **Link Type 1 (BLE)** only. It will not use Sub‑GHz links.  
-This is suitable for **demo/validation** and IOTCONNECT integration.
+This is suitable for **demo/validation** and /IOTCONNECT integration.
 
 For full Sidewalk (BLE + Sub‑GHz), switch to `sid_demo` and add a supported sub‑GHz radio board.
+
+---
+
+## Next Step for Production
+
+- [ ] Engage the **/IOTCONNECT team** to integrate the **Amazon Sidewalk** manufacturing flow into your AWS account/environment before production rollout.

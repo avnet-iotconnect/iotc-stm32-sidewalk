@@ -1,11 +1,32 @@
 # Geolocation Demo: LR11xx (STM32WBA + Wi‑Fi/GNSS Scans)
 
-This guide covers the **LR11xx geolocation demo** in the STM32 Sidewalk SDK and its integration with **IOTCONNECT**.
+This guide covers the **LR11xx geolocation demo** in the STM32 Sidewalk SDK and its integration with **/IOTCONNECT**.
 
-It assumes:
-- You cloned **STM32‑Sidewalk‑SDK**
-- You have a **NUCLEO‑WBA55** and an **LR11xx** transceiver
-- You want to decode Wi‑Fi/GNSS scan uplinks in IOTCONNECT
+## Production Support in /IOTCONNECT
+
+Production is supported in customer **/IOTCONNECT** instances.
+
+Before production rollout, engage **AWS and the /IOTCONNECT team first** to coordinate Amazon Sidewalk manufacturing-flow enablement in your AWS account/environment.
+
+## Scope: Prototype Flow (Not Mass Production)
+
+This guide uses the **Amazon Sidewalk prototyping flow**.
+
+- It provisions devices with per-device JSON and flashes devices one at a time.
+- It is intended for development/demo validation.
+- It is **not** the Sidewalk factory manufacturing flow.
+
+Prototype restrictions:
+
+- Up to **1,000** prototype devices.
+- No bulk factory onboarding/import-task provisioning in this flow.
+
+For production manufacturing integration, work with the **/IOTCONNECT team** to integrate the Amazon Sidewalk manufacturing flow into your account:
+
+- https://docs.sidewalk.amazon/manufacturing/sidewalk-manufacturing-setup-works.html
+- https://docs.sidewalk.amazon/manufacturing/sidewalk-device-lifecycle.html
+- https://docs.aws.amazon.com/iot-wireless/latest/developerguide/sidewalk-bulk-provisioning-workflow.html
+- https://docs.aws.amazon.com/iot-wireless/latest/developerguide/sidewalk-provision-bulk-import.html
 
 ## 1) Hardware
 
@@ -34,7 +55,7 @@ Import in STM32CubeIDE:
 
 ---
 
-## 3) Generate Manufacturing Data from IOTCONNECT JSON
+## 3) Generate Manufacturing Data from /IOTCONNECT JSON
 
 ```
 python3 <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/tools/provision/provision.py \
@@ -66,7 +87,7 @@ Flash manufacturing data:
 
 ---
 
-## 5) IOTCONNECT Decoder
+## 5) /IOTCONNECT Decoder
 
 Use:
 ```
@@ -99,3 +120,9 @@ device-templates/sidewalk_lr11xx_geolocation_template.json
 - `assist_position_lon`
 - `mcu_temperature`
 - `demo_counter`
+
+---
+
+## Next Step for Production
+
+- [ ] Engage the **/IOTCONNECT team** to integrate the **Amazon Sidewalk** manufacturing flow into your AWS account/environment before production rollout.
