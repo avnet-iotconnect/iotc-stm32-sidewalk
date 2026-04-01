@@ -112,11 +112,4 @@ Typical STM32 Sidewalk hardware pairings (WBA55 with common radio options):
 - **Sidewalk Demo: WBA55 + STM32WL55**  
   [examples/sidewalk-demo-wba55-stm32wl55/README.md](examples/sidewalk-demo-wba55-stm32wl55/README.md)
 
----
 
-## Next Additions
-
-As more examples are validated, add:
-- A decoder under `decoders/`
-- A device template under `device-templates/`
-- A per‑example README under `examples/`
