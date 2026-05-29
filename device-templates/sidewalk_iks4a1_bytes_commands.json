@@ -1,0 +1,47 @@
+{
+  "_comment": [
+    "Companion file to sidewalk_iks4a1_template.json.",
+    "Each element below is the JSON body to POST to:",
+    "  POST /api/v2.1/WirelessDevice/{templateGuid}/bytesCommand",
+    "(see /IOTCONNECT REST API spec, WirelessDevice section, AddBytesCommandRequest).",
+    "",
+    "The 'command' field is the leading hex bytes; /IOTCONNECT appends each",
+    "bytesCommandParameter (in seqNo order) using its 'dtName' encoding.",
+    "Look up the exact dtName values supported by your /IOTCONNECT instance via",
+    "  GET /api/v2.1/device-template/datatype/{templateGuid}?hasBytesSupport=true",
+    "If your instance uses a different name (e.g. 'INT' vs 'INTEGER'), update",
+    "the dtName fields below before POSTing.",
+    "",
+    "Wire format produced for each command (firmware-side spec):",
+    "  led_on        -> 01",
+    "  led_off       -> 02",
+    "  set_interval  -> 10 <BE uint32 seconds>"
+  ],
+  "bytesCommands": [
+    {
+      "commandName": "led-on",
+      "command": "01",
+      "isHex": true,
+      "bytesCommandParameter": []
+    },
+    {
+      "commandName": "led-off",
+      "command": "02",
+      "isHex": true,
+      "bytesCommandParameter": []
+    },
+    {
+      "commandName": "set-interval",
+      "command": "10",
+      "isHex": true,
+      "bytesCommandParameter": [
+        {
+          "parameter": "interval_seconds",
+          "dtName": "LONG",
+          "rg": "60-3600",
+          "seqNo": 1
+        }
+      ]
+    }
+  ]
+}
