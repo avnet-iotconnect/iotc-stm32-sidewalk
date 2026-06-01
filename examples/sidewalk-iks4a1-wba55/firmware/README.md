@@ -44,6 +44,13 @@ each guarded by `SID_APP_IKS4A1_ENABLED` so the stock build is unaffected.
 /* Cleared on link teardown so each new session re-runs the sid_demo
  * capability handshake, like the Nordic reference firmware. */
 static volatile bool s_iks_cap_response_received = false;
+
+/* Max capability-discovery attempts before falling back to action frames
+ * even without a 0xE0 response. Keeps decode-only backends (those that
+ * don't run the sid_demo capability responder) from getting stuck in the
+ * handshake forever. */
+#define IKS4A1_CAP_ATTEMPTS_MAX  6u
+static uint8_t s_iks_cap_attempts = 0u;
 ```
 
 **3. In `on_sidewalk_msg_received()`** — detect the cloud's `0xE0` capability
@@ -69,18 +76,27 @@ response and route every downlink to the command dispatcher:
 ```c
 #if defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)
     s_iks_cap_response_received = false;   /* re-do capability handshake */
+    s_iks_cap_attempts = 0u;
 #endif
 ```
 
-**5. In `send_ping()`** — emit a capability frame until acknowledged, then a
-packed sensor (action) frame. Replaces the stock 1-byte counter uplink:
+**5. In `send_ping()`** — emit a capability frame until acknowledged *or*
+`IKS4A1_CAP_ATTEMPTS_MAX` attempts are spent, then a packed sensor (action)
+frame. Replaces the stock 1-byte counter uplink:
 
 ```c
 #if defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)
     static uint8_t iks_payload[SENSORS_IKS4A1_PAYLOAD_MAX_SIZE];
     uint32_t payload_len;
-    if (!s_iks_cap_response_received) {
+    const bool in_cap_phase = !s_iks_cap_response_received &&
+                              (s_iks_cap_attempts < IKS4A1_CAP_ATTEMPTS_MAX);
+    if (in_cap_phase) {
         payload_len = sensors_iks4a1_pack_capability(iks_payload, sizeof(iks_payload));
+        s_iks_cap_attempts++;
+        SID_PAL_LOG_INFO("IKS4A1 capability discovery uplink (len=%lu, attempt=%u/%u)",
+                         (unsigned long)payload_len,
+                         (unsigned)s_iks_cap_attempts,
+                         (unsigned)IKS4A1_CAP_ATTEMPTS_MAX);
     } else {
         sensors_iks4a1_reading_t reading;
         (void)sensors_iks4a1_read(&reading);
@@ -99,20 +115,23 @@ interval afterwards:
 
 ```c
 #if defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)
-    const uint32_t interval_ms = s_iks_cap_response_received
-                               ? commands_iks4a1_get_interval_ms()
-                               : 5000u;
+    const bool in_cap_phase = !s_iks_cap_response_received &&
+                              (s_iks_cap_attempts < IKS4A1_CAP_ATTEMPTS_MAX);
+    const uint32_t interval_ms = in_cap_phase ? 5000u : commands_iks4a1_get_interval_ms();
     osDelay(interval_ms);
 #endif
 ```
 
-> **Capability handshake — operational note.** As written, the device keeps
-> sending capability-discovery frames until the cloud replies with `0xE0`
-> (this mirrors Amazon's `sid_app_demo` reference). A backend that does not run
-> the sid_demo capability responder (e.g. a plain decode-only /IOTCONNECT
-> pipeline) never sends `0xE0`, so the device stays in capability discovery and
-> never emits sensor data. If your backend doesn't respond, change `send_ping()`
-> to fall back to action frames after a few unanswered attempts (or unconditionally).
+> **Capability handshake — operational note.** The device sends up to
+> `IKS4A1_CAP_ATTEMPTS_MAX` (6) capability-discovery frames at 5 s intervals,
+> then proceeds to action frames whether or not the cloud has replied with
+> `0xE0`. A sid_demo cloud sample app will respond and the device transitions
+> earlier; a decode-only /IOTCONNECT pipeline never sends `0xE0` and the
+> device transitions on the fallback. The default action interval
+> (`CMD_IKS4A1_INTERVAL_DFLT_S = 15 s`) is tuned for Sidewalk BLE: the Echo
+> tears the link down ~60 s after each connect, so action frames need to fire
+> inside that window. Adjust via the `SET_INTERVAL` downlink command if your
+> use case allows longer intervals.
 
 `init` is wired in `sensors_iks4a1_init()` (called once at app start, after
 `BSP_I2C1_Init()`), invoked from the app's bring-up alongside the other init.

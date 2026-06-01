@@ -161,7 +161,19 @@ Patched file:
 
 ### Headless / CLI build
 
-A headless `stm32cubeide -application org.eclipse.cdt.managedbuilder.core.headlessbuild` invocation **does not work** on this project — CubeIDE 1.18's CubeMX integration trips a known NPE (`IocGeneratorAdapter` from `MCUCubeProjectNature`) regardless of whether the project actually has an `.ioc` file. Use the GUI build above. Once the `.hex` is produced you can flash from the CLI (see Section 6).
+A headless build works once the project's CubeMX natures have been removed from `.project` (already done in this repo). With CubeIDE 1.18+ installed at `/opt/st/stm32cubeide_1.18.0/` (adjust to your install path):
+
+```
+/opt/st/stm32cubeide_1.18.0/headless-build.sh \
+  -data /tmp/cubeide-ws \
+  -import <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55 \
+  -cleanBuild "sid_ble_wba55/Debug_Nucleo-WBA55" \
+  -no-indexer
+```
+
+Use `-build` (not `-cleanBuild`) for incremental rebuilds. The hex lands in the same `Debug_Nucleo-WBA55/sid_ble_wba55.hex` path as the GUI build.
+
+> If you forget to remove the CubeMX natures (`MCUCubeProjectNature`, `MCUCubeIdeServicesRevAev2ProjectNature`) from `.project`, the headless invocation trips an `IocGeneratorAdapter` NPE — use the GUI build until that's fixed.
 
 ### What's already wired up for you (for transparency)
 
@@ -246,13 +258,13 @@ Expected after reset:
 [INFO]: Sidewalk registration status: Registered        # or: Not registered -> Sidewalk Device Registration done
 [INFO]: Established BLE connection (0x0001) with 46:A7:5B:D1:E4:F5 (RPA addr) ...
 [INFO]: Updated time: 1464112804.760711                  # time sync via the gateway
-[INFO]: IKS4A1 capability discovery uplink (len=14)      # repeats every ~5 s until the cloud replies
+[INFO]: IKS4A1 capability discovery uplink (len=14, attempt=1/6)   # repeats every 5 s; up to 6 attempts
 [INFO]: IKS4A1: capability-discovery response received; switching to action notifications
 [INFO]: IKS4A1 action uplink seq=0 gps=1464112810 stts22h=2345 cC sht40_t=2350 cC sht40_rh=4250 cRH lps22df=101325 cPa
 ```
 
 - `IKS4A1: ... init failed` → check the I²C wiring, that the IKS4A1 jumpers are at default, and that `iks4a1_conf.h` enables the four sensors used in this demo.
-- The device stays on `IKS4A1 capability discovery uplink` and never reaches the `action uplink` line if the cloud never sends the `0xE0` capability response — see the handshake note in Section 8.
+- If the cloud never sends the `0xE0` capability response, the device transitions to `IKS4A1 action uplink` automatically after `IKS4A1_CAP_ATTEMPTS_MAX` (6) attempts — see the handshake note in Section 8.
 - `LittleFS: Corrupted dir pair` on the first boot after a full erase is benign (the filesystem is created on first run).
 
 ---
@@ -308,14 +320,15 @@ value  (length bytes, little-endian for multi-byte ints)
 
 Tags 0x20–0x27 sit safely above sid_demo's reserved range (0x01–0x13), so any decoder that follows the sid_demo convention will silently skip them (per `_read_tlv` semantics) rather than fail.
 
-> **Capability handshake — important.** Following Amazon's `sid_app_demo` reference,
-> the device sends `0x40` capability frames and only switches to `0x41` action
-> frames after the cloud replies with a `0xE0` capability response. A decode-only
-> backend (a plain /IOTCONNECT pipeline that does not run the sid_demo capability
-> responder) never sends `0xE0`, so the device stays in capability discovery and
-> no sensor data is emitted. If your backend doesn't respond, patch `send_ping()`
-> to fall back to action frames after a few unanswered capability attempts — see
-> [`firmware/README.md`](firmware/README.md).
+> **Capability handshake.** Following Amazon's `sid_app_demo` reference, the
+> device first emits `0x40` capability frames; the cloud is supposed to reply
+> with `0xE0` to flip the device into action mode. Because a decode-only
+> /IOTCONNECT pipeline does not run the sid_demo capability responder, the
+> firmware also falls back to action frames after `IKS4A1_CAP_ATTEMPTS_MAX`
+> (6) unanswered capability attempts — so sensor data always flows. The
+> action-frame interval defaults to **15 s** (`CMD_IKS4A1_INTERVAL_DFLT_S`),
+> tuned to fit inside the ~60 s Sidewalk BLE connection window. See
+> [`firmware/README.md`](firmware/README.md) for the integration code.
 
 Total action-uplink size with all sensors present: **54 bytes** (`SENSORS_IKS4A1_PAYLOAD_MAX_SIZE` is 64). The capability-discovery frame is **14 bytes**. Sidewalk BLE cloud‑mode supports up to 255 bytes, so both fit with comfortable headroom.
 

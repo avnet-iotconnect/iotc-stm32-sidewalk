@@ -179,11 +179,12 @@ def _maybe_unwrap_hex_string(data: bytes) -> bytes:
     """AWS IoT Wireless delivers Sidewalk payloads as
        base64(hex_ascii_string_of_raw_bytes), so the first base64 decode
        lands us at an ASCII hex string rather than the raw payload. Detect
-       that case (all printable hex characters and even length starting with
-       the expected msg_desc byte 0x40 spelled as the ASCII "40") and apply
-       the second decode. /IOTCONNECT's ingestion pipeline normalizes this
-       before invoking the decoder, so a single decode suffices there.
-       Either way we end up with the raw payload bytes."""
+       that case (all printable hex characters, even length, first decoded
+       byte in the sid_demo NOTIFY msg_desc range 0x40-0x5F — covering
+       capability (0x40), action (0x41), and any future cmd_id variants)
+       and apply the second decode. /IOTCONNECT's ingestion pipeline
+       normalizes this before invoking the decoder, so a single decode
+       suffices there. Either way we end up with the raw payload bytes."""
     if len(data) < 2 or len(data) % 2 != 0:
         return data
     try:
@@ -192,8 +193,14 @@ def _maybe_unwrap_hex_string(data: bytes) -> bytes:
         return data
     if not all(c in "0123456789abcdefABCDEF" for c in text):
         return data
-    # Looks like a hex ASCII string; expect leading "40" for sid_demo msg_desc.
-    if not text.lower().startswith("40"):
+    # Looks like an even-length hex ASCII string. Confirm the first decoded
+    # byte is a plausible sid_demo NOTIFY msg_desc before unwrapping, so a
+    # coincidentally hex-looking binary payload isn't mis-unwrapped.
+    try:
+        first_byte = int(text[:2], 16)
+    except ValueError:
+        return data
+    if not (0x40 <= first_byte <= 0x5F):
         return data
     return bytes.fromhex(text)
 
