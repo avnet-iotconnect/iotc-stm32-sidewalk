@@ -6,10 +6,11 @@ It builds on top of the existing [`ble-wba55`](../ble-wba55/README.md) example: 
 
 What you get end‑to‑end:
 
-- LSM6DSV16X — 6‑axis IMU (accel + gyro)
+- LSM6DSV16X — 6‑axis IMU (accel + gyro) **+ native 6D orientation** (face_up / face_down / portrait / landscape)
 - LPS22DF — barometric pressure
 - SHT40AD1B — humidity + temperature
 - STTS22H — temperature
+- **LIS2DUXS12 — Qvar (capacitive sensing)** — touch the silver pads on the IKS4A1 edge to swing the `qvar` field
 - /IOTCONNECT decoder + device template aligned with the demo payload
 
 ---
@@ -49,7 +50,7 @@ For production manufacturing integration, work with the **/IOTCONNECT team**:
 
 The expansion shield communicates via the Arduino I²C connector (PB6 = SCL, PB7 = SDA → STM32WBA55 I2C1). No jumpers or additional wiring are required for the four sensors used in this demo.
 
-> X‑NUCLEO‑IKS4A1 also exposes LIS2DUXS12 and LIS2MDL. They are present on the bus but **not** sampled by this demo to keep the BLE payload short.
+> X‑NUCLEO‑IKS4A1 also exposes LIS2MDL (3-axis magnetometer); it's present on the bus but not sampled here.
 
 ### Software
 
@@ -85,6 +86,7 @@ X-CUBE-MEMS1/Drivers/BSP/IKS4A1/iks4a1_env_sensors.h
 X-CUBE-MEMS1/Drivers/BSP/IKS4A1/iks4a1_conf_template.h    -> rename to iks4a1_conf.h
 X-CUBE-MEMS1/Drivers/BSP/IKS4A1/iks4a1_bus.{c,h}          (or the equivalent BSP I2C glue)
 X-CUBE-MEMS1/Drivers/BSP/Components/lsm6dsv16x/
+X-CUBE-MEMS1/Drivers/BSP/Components/lis2duxs12/         (Qvar capacitive front-end)
 X-CUBE-MEMS1/Drivers/BSP/Components/lps22df/
 X-CUBE-MEMS1/Drivers/BSP/Components/sht40ad1b/
 X-CUBE-MEMS1/Drivers/BSP/Components/stts22h/
@@ -102,7 +104,7 @@ STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/Drivers/BSP/Components/...
 
 ### Configure `iks4a1_conf.h`
 
-Open the renamed `iks4a1_conf.h` and enable **only** the four sensors used here (set `USE_…` macros to 1 for LSM6DSV16X, LPS22DF, SHT40AD1B, STTS22H; leave the others at 0 to keep flash usage down). Confirm the I²C bus mapping macros target **I2C1** on the STM32WBA55.
+Open the renamed `iks4a1_conf.h` and enable the **five sensors** used here (set `USE_…` macros to 1 for LSM6DSV16X, LIS2DUXS12, LPS22DF, SHT40AD1B, STTS22H; leave LIS2MDL and LSM6DSO16IS at 0 to keep flash usage down). Confirm the I²C bus mapping macros target **I2C1** on the STM32WBA55.
 
 ### Wire up I²C in the HAL config
 
@@ -134,7 +136,7 @@ Plus the BSP glue under `firmware/Drivers/BSP/` (`iks4a1_conf.h`,
 
 Patched file:
 
-- `app_sidewalk.c` — when `SID_APP_IKS4A1_ENABLED == 1`, the demo task replaces the 1‑byte counter uplink with the sid_demo capability/action handshake and a packed sensor payload (54 bytes with all sensors present). The hook blocks are listed in `firmware/README.md`.
+- `app_sidewalk.c` — when `SID_APP_IKS4A1_ENABLED == 1`, the demo task replaces the 1‑byte counter uplink with the sid_demo capability/action handshake and a packed sensor payload (61 bytes with all sensors present). The hook blocks are listed in `firmware/README.md`.
 
 ---
 
@@ -317,8 +319,10 @@ value  (length bytes, little-endian for multi-byte ints)
 | `0x25` | IKS4A1_TEMP_SHT40_X100    | 2 B  | int16 LE (°C × 100)     | — | ✅ → `temp_sht40_c` |
 | `0x26` | IKS4A1_HUMIDITY_X100      | 2 B  | uint16 LE (%RH × 100)   | — | ✅ → `humidity_sht40_pct` |
 | `0x27` | IKS4A1_PRESSURE_X100      | 4 B  | uint32 LE (hPa × 100)   | — | ✅ → `pressure_hpa` |
+| `0x28` | IKS4A1_ORIENTATION        | 1 B  | uint8 (LSM6DSV16X 6D enum: 0=unknown, 1=landscape_right, 2=landscape_left, 3=portrait_up, 4=portrait_down, 5=face_up, 6=face_down) | — | ✅ → `orientation` (string) |
+| `0x29` | IKS4A1_QVAR_RAW           | 2 B  | int16 LE (LIS2DUXS12 Qvar count — capacitive) | — | ✅ → `qvar` |
 
-Tags 0x20–0x27 sit safely above sid_demo's reserved range (0x01–0x13), so any decoder that follows the sid_demo convention will silently skip them (per `_read_tlv` semantics) rather than fail.
+Tags 0x20–0x29 sit safely above sid_demo's reserved range (0x01–0x13), so any decoder that follows the sid_demo convention will silently skip them (per `_read_tlv` semantics) rather than fail.
 
 > **Capability handshake.** Following Amazon's `sid_app_demo` reference, the
 > device first emits `0x40` capability frames; the cloud is supposed to reply
@@ -330,7 +334,7 @@ Tags 0x20–0x27 sit safely above sid_demo's reserved range (0x01–0x13), so an
 > tuned to fit inside the ~60 s Sidewalk BLE connection window. See
 > [`firmware/README.md`](firmware/README.md) for the integration code.
 
-Total action-uplink size with all sensors present: **54 bytes** (`SENSORS_IKS4A1_PAYLOAD_MAX_SIZE` is 64). The capability-discovery frame is **14 bytes**. Sidewalk BLE cloud‑mode supports up to 255 bytes, so both fit with comfortable headroom.
+Total action-uplink size with all sensors present: **61 bytes** (`SENSORS_IKS4A1_PAYLOAD_MAX_SIZE` is 64). The capability-discovery frame is **14 bytes**. Sidewalk BLE cloud‑mode supports up to 255 bytes, so both fit with comfortable headroom.
 
 Sensible normal‑office values (for sanity‑checking the decoder): accel ≈ (0, 0, 1000) mg, gyro ≈ (0, 0, 0) dps, temps ≈ 22–25 °C, humidity ≈ 30–60 %RH, pressure ≈ 1000–1015 hPa.
 

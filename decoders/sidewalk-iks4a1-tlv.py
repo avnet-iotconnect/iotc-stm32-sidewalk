@@ -50,6 +50,21 @@ TAG_IKS4A1_TEMP_STTS22H    = 0x24
 TAG_IKS4A1_TEMP_SHT40      = 0x25
 TAG_IKS4A1_HUMIDITY        = 0x26
 TAG_IKS4A1_PRESSURE        = 0x27
+TAG_IKS4A1_ORIENTATION     = 0x28
+TAG_IKS4A1_QVAR_RAW        = 0x29
+
+# Maps sensors_iks4a1_orient_t (firmware enum) -> human-readable string for the
+# IOTCONNECT dashboard. UNKNOWN = mid-tilt (no axis aligned with gravity above
+# the 6D threshold).
+ORIENT_MAP = {
+    0: "unknown",
+    1: "landscape_right",   # +X face up
+    2: "landscape_left",    # -X face up
+    3: "portrait_up",       # +Y face up
+    4: "portrait_down",     # -Y face up
+    5: "face_up",           # +Z face up
+    6: "face_down",         # -Z face up
+}
 
 
 def _read_tlv(data, offset):
@@ -155,6 +170,12 @@ def _parse(data):
         elif tag == TAG_IKS4A1_PRESSURE and len(value) >= 4:
             p = int.from_bytes(value[0:4], byteorder="little", signed=False)
             result["pressure_hpa"] = round(p / 100.0, 2)
+
+        elif tag == TAG_IKS4A1_ORIENTATION and len(value) >= 1:
+            result["orientation"] = ORIENT_MAP.get(int(value[0]), f"orient_{int(value[0])}")
+
+        elif tag == TAG_IKS4A1_QVAR_RAW and len(value) >= 2:
+            result["qvar"] = _i16_le(value[0:2])
 
         elif tag == TAG_TEMPERATURE_SENSOR_DATA_NOTIFY and len(value) >= 2:
             # Whole-degree STTS22H temperature. We also expose it as

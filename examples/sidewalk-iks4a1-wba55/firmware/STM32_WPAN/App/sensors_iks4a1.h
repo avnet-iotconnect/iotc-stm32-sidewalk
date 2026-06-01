@@ -49,7 +49,7 @@ extern "C" {
  *   IKS_PRESSURE_X100  : 1 + 1 + 4 = 6
  *   ----------------------------- = 45  (rounded up below)
  */
-#define SENSORS_IKS4A1_PAYLOAD_MAX_SIZE    (64u)
+#define SENSORS_IKS4A1_PAYLOAD_MAX_SIZE    (96u)
 
 /* sid_demo TLV tags (apps/common/sid_demo_parser/include/sid_demo_types.h).
  * Re-using these lets the /IOTCONNECT-approved sid_demo decoder surface the
@@ -73,6 +73,8 @@ extern "C" {
 #define TAG_IKS4A1_TEMP_SHT40_X100         (0x25u)
 #define TAG_IKS4A1_HUMIDITY_X100           (0x26u)
 #define TAG_IKS4A1_PRESSURE_X100           (0x27u)
+#define TAG_IKS4A1_ORIENTATION             (0x28u)  /* u8 enum, see sensors_iks4a1_orient_t */
+#define TAG_IKS4A1_QVAR_RAW                (0x29u)  /* i16le, raw LIS2DUXS12 Qvar count */
 
 /* msg_desc bytes per sid_demo encoding:
  *   bit 7    : status_hdr_ind
@@ -90,6 +92,18 @@ extern "C" {
 /* Backward-compat alias for older callers that referenced the bare name. */
 #define SENSORS_IKS4A1_MSG_DESC                SENSORS_IKS4A1_MSG_DESC_NOTIFY_ACTION
 
+/* 6D orientation enum, matches the LSM6DSV16X native D6D_SRC bit positions
+ * (face that is currently up). UNKNOWN = no face detected above threshold. */
+typedef enum {
+    SENSORS_IKS4A1_ORIENT_UNKNOWN     = 0,
+    SENSORS_IKS4A1_ORIENT_X_POS_UP    = 1,   /* +X face up — landscape right */
+    SENSORS_IKS4A1_ORIENT_X_NEG_UP    = 2,   /* -X face up — landscape left  */
+    SENSORS_IKS4A1_ORIENT_Y_POS_UP    = 3,   /* +Y face up — portrait up     */
+    SENSORS_IKS4A1_ORIENT_Y_NEG_UP    = 4,   /* -Y face up — portrait down   */
+    SENSORS_IKS4A1_ORIENT_Z_POS_UP    = 5,   /* +Z face up — face-up         */
+    SENSORS_IKS4A1_ORIENT_Z_NEG_UP    = 6,   /* -Z face up — face-down       */
+} sensors_iks4a1_orient_t;
+
 typedef struct {
     int16_t  acc_mg[3];          /* mg                 */
     int16_t  gyr_dps_x10[3];     /* dps * 10           */
@@ -97,6 +111,8 @@ typedef struct {
     int16_t  sht40_temp_c_x100;  /* deg C * 100        */
     uint16_t sht40_rh_x100;      /* %RH * 100          */
     uint32_t lps22df_pa_x100;    /* hPa * 100 (cPa)    */
+    uint8_t  orientation;        /* sensors_iks4a1_orient_t */
+    int16_t  qvar_raw;           /* LIS2DUXS12 Qvar raw count (signed) */
 } sensors_iks4a1_reading_t;
 
 /* Returns 0 on success, negative on error. Safe to call from a FreeRTOS task. */

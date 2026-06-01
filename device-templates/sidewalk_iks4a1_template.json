@@ -3,25 +3,182 @@
   "name": "Sidewalk WBA55 + IKS4A1",
   "authType": 2,
   "attributes": [
-    { "name": "version", "displayName": "Payload Version", "type": "INTEGER", "description": "Wire format version", "unit": "", "aggregateTypes": [] },
-    { "name": "Sequence", "displayName": "Sequence", "type": "INTEGER", "description": "Uplink sequence (uint8 wrap)", "unit": "", "aggregateTypes": [] },
-    { "name": "Sinewave", "displayName": "Sinewave", "type": "INTEGER", "description": "Reserved (0)", "unit": "", "aggregateTypes": [] },
-    { "name": "payload_size", "displayName": "Payload Size", "type": "INTEGER", "description": "Bytes received", "unit": "bytes", "aggregateTypes": [] },
-
-    { "name": "acc_x_g", "displayName": "Accel X", "type": "DECIMAL", "description": "LSM6DSV16X accel X", "unit": "g", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-    { "name": "acc_y_g", "displayName": "Accel Y", "type": "DECIMAL", "description": "LSM6DSV16X accel Y", "unit": "g", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-    { "name": "acc_z_g", "displayName": "Accel Z", "type": "DECIMAL", "description": "LSM6DSV16X accel Z", "unit": "g", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-
-    { "name": "gyr_x_dps", "displayName": "Gyro X", "type": "DECIMAL", "description": "LSM6DSV16X gyro X", "unit": "dps", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-    { "name": "gyr_y_dps", "displayName": "Gyro Y", "type": "DECIMAL", "description": "LSM6DSV16X gyro Y", "unit": "dps", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-    { "name": "gyr_z_dps", "displayName": "Gyro Z", "type": "DECIMAL", "description": "LSM6DSV16X gyro Z", "unit": "dps", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-
-    { "name": "temp_stts22h_c", "displayName": "STTS22H Temp", "type": "DECIMAL", "description": "STTS22H temperature", "unit": "C", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-    { "name": "temp_sht40_c", "displayName": "SHT40 Temp", "type": "DECIMAL", "description": "SHT40AD1B temperature", "unit": "C", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-    { "name": "humidity_sht40_pct", "displayName": "SHT40 Humidity", "type": "DECIMAL", "description": "SHT40AD1B relative humidity", "unit": "%RH", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-    { "name": "pressure_hpa", "displayName": "LPS22DF Pressure", "type": "DECIMAL", "description": "LPS22DF barometric pressure", "unit": "hPa", "aggregateTypes": ["MIN", "MAX", "AVG"] },
-
-    { "name": "extra_bytes_hex", "displayName": "Extra Bytes", "type": "STRING", "description": "Bytes beyond fixed payload (hex)", "unit": "", "aggregateTypes": [] }
+    {
+      "name": "version",
+      "displayName": "Payload Version",
+      "type": "INTEGER",
+      "description": "Wire format version",
+      "unit": "",
+      "aggregateTypes": []
+    },
+    {
+      "name": "Sequence",
+      "displayName": "Sequence",
+      "type": "INTEGER",
+      "description": "Uplink sequence (uint8 wrap)",
+      "unit": "",
+      "aggregateTypes": []
+    },
+    {
+      "name": "Sinewave",
+      "displayName": "Sinewave",
+      "type": "INTEGER",
+      "description": "Reserved (0)",
+      "unit": "",
+      "aggregateTypes": []
+    },
+    {
+      "name": "payload_size",
+      "displayName": "Payload Size",
+      "type": "INTEGER",
+      "description": "Bytes received",
+      "unit": "bytes",
+      "aggregateTypes": []
+    },
+    {
+      "name": "acc_x_g",
+      "displayName": "Accel X",
+      "type": "DECIMAL",
+      "description": "LSM6DSV16X accel X",
+      "unit": "g",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "acc_y_g",
+      "displayName": "Accel Y",
+      "type": "DECIMAL",
+      "description": "LSM6DSV16X accel Y",
+      "unit": "g",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "acc_z_g",
+      "displayName": "Accel Z",
+      "type": "DECIMAL",
+      "description": "LSM6DSV16X accel Z",
+      "unit": "g",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "gyr_x_dps",
+      "displayName": "Gyro X",
+      "type": "DECIMAL",
+      "description": "LSM6DSV16X gyro X",
+      "unit": "dps",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "gyr_y_dps",
+      "displayName": "Gyro Y",
+      "type": "DECIMAL",
+      "description": "LSM6DSV16X gyro Y",
+      "unit": "dps",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "gyr_z_dps",
+      "displayName": "Gyro Z",
+      "type": "DECIMAL",
+      "description": "LSM6DSV16X gyro Z",
+      "unit": "dps",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "temp_stts22h_c",
+      "displayName": "STTS22H Temp",
+      "type": "DECIMAL",
+      "description": "STTS22H temperature",
+      "unit": "C",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "temp_sht40_c",
+      "displayName": "SHT40 Temp",
+      "type": "DECIMAL",
+      "description": "SHT40AD1B temperature",
+      "unit": "C",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "humidity_sht40_pct",
+      "displayName": "SHT40 Humidity",
+      "type": "DECIMAL",
+      "description": "SHT40AD1B relative humidity",
+      "unit": "%RH",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "pressure_hpa",
+      "displayName": "LPS22DF Pressure",
+      "type": "DECIMAL",
+      "description": "LPS22DF barometric pressure",
+      "unit": "hPa",
+      "aggregateTypes": [
+        "MIN",
+        "MAX",
+        "AVG"
+      ]
+    },
+    {
+      "name": "extra_bytes_hex",
+      "displayName": "Extra Bytes",
+      "type": "STRING",
+      "description": "Bytes beyond fixed payload (hex)",
+      "unit": "",
+      "aggregateTypes": []
+    },
+    {
+      "aggregateTypes": [],
+      "description": "LSM6DSV16X native 6D orientation (face_up / face_down / portrait_up / portrait_down / landscape_left / landscape_right / unknown)",
+      "displayName": "Orientation",
+      "name": "orientation",
+      "type": "STRING",
+      "unit": ""
+    },
+    {
+      "aggregateTypes": [],
+      "description": "LIS2DUXS12 Qvar raw count (signed int16). Swings sharply when the IKS4A1 edge pads are touched.",
+      "displayName": "Qvar",
+      "name": "qvar",
+      "type": "INTEGER",
+      "unit": ""
+    }
   ],
   "commands": [
     {
@@ -58,5 +215,7 @@
     "certRenewalDay": 0,
     "enableCSR": false
   },
-  "_meta": { "version": "2.0" }
+  "_meta": {
+    "version": "2.0"
+  }
 }

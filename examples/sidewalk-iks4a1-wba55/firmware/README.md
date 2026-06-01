@@ -17,12 +17,18 @@ The folder layout here mirrors the SDK so you can copy paths verbatim. Root is
 |---|---|---|
 | `STM32_WPAN/App/sensors_iks4a1.c` / `.h` | `STM32_WPAN/App/` | Sensor read + sid_demo TLV packing (action + capability frames) |
 | `STM32_WPAN/App/commands_iks4a1.c` / `.h` | `STM32_WPAN/App/` | Downlink opcode dispatch (LED on/off, set-interval) |
-| `Drivers/BSP/IKS4A1/iks4a1_conf.h` | `Drivers/BSP/IKS4A1/` | BSP config — enables only LSM6DSV16X, LPS22DF, SHT40AD1B, STTS22H; I²C macros → `BSP_I2C1_*` |
+| `Drivers/BSP/IKS4A1/iks4a1_conf.h` | `Drivers/BSP/IKS4A1/` | BSP config — enables LSM6DSV16X, LIS2DUXS12, LPS22DF, SHT40AD1B, STTS22H; I²C macros → `BSP_I2C1_*` |
 | `Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.c` / `.h` | `Drivers/BSP/STM32WBAxx_Nucleo/` | I2C1 bus glue (PB1=SDA/PB2=SCL AF4, 100 kHz) the BSP calls |
 
 > Not included (ST-owned): the X-CUBE-MEMS1 PID component drivers
-> (`Drivers/BSP/Components/{lsm6dsv16x,lps22df,sht40ad1b,stts22h,Common}`).
+> (`Drivers/BSP/Components/{lsm6dsv16x,lis2duxs12,lps22df,sht40ad1b,stts22h,Common}`).
 > Copy those from your X-CUBE-MEMS1 release as described in the parent README.
+> The LIS2DUXS12 driver provides the Qvar capacitive front-end used for the
+> `qvar` field; the LSM6DSV16X driver provides the native 6D orientation
+> engine used for the `orientation` field. Both are enabled via the existing
+> BSP wrappers (`IKS4A1_MOTION_SENSOR_Enable_6D_Orientation`,
+> `IKS4A1_MOTION_SENSOR_Read_Register` for direct Qvar register access) —
+> no UCF / MLC blob required.
 
 ## Integration into `app_sidewalk.c`
 

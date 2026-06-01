@@ -28,7 +28,7 @@ extern "C" {
 #define USE_IKS4A1_ENV_SENSOR_STTS22H_0                        1U
 
 #define USE_IKS4A1_MOTION_SENSOR_LSM6DSV16X_0                  1U
-#define USE_IKS4A1_MOTION_SENSOR_LIS2DUXS12_0                  0U
+#define USE_IKS4A1_MOTION_SENSOR_LIS2DUXS12_0                  1U   /* Qvar capacitive sensing */
 #define USE_IKS4A1_MOTION_SENSOR_LIS2MDL_0                     0U
 #define USE_IKS4A1_MOTION_SENSOR_LSM6DSO16IS_0                 0U
 

@@ -27,8 +27,24 @@
 #if defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)
 
 #include "iks4a1_motion_sensors.h"
+#include "iks4a1_motion_sensors_ex.h"   /* 6D, Read/Write_Register */
 #include "iks4a1_env_sensors.h"
 #include "stm32wbaxx_nucleo_bus.h"
+
+/* LIS2DUXS12 Qvar registers (datasheet section 9.x). Configured directly via
+ * IKS4A1_MOTION_SENSOR_Write_Register since the BSP wrapper has no Qvar API. */
+#define LIS2DUXS12_REG_OUT_T_AH_QVAR_L   (0x2Eu)
+#define LIS2DUXS12_REG_OUT_T_AH_QVAR_H   (0x2Fu)
+#define LIS2DUXS12_REG_AH_QVAR_CFG       (0x31u)
+/* AH_QVAR_CFG bit field (little-endian declaration in lis2duxs12_reg.h):
+ *   bits 1:0 gain        (00=X1 after default multiplier)
+ *   bits 3:2 c_zin       (00=520 MOhm input impedance — best for finger Qvar)
+ *   bit  4   notch_cutoff
+ *   bit  5   notch_en
+ *   bit  6   ah_qvar_en  <- enables the Qvar front-end
+ *   bit  7   reserved
+ * 0x40 = enable Qvar only, defaults for the rest. */
+#define LIS2DUXS12_AH_QVAR_CFG_ENABLE    (0x40u)
 
 /* X-CUBE-MEMS1 IKS4A1 BSP instance ids. These names match the BSP headers
  * shipped with X-CUBE-MEMS1 v11+. If your BSP version uses different macros,
@@ -91,6 +107,38 @@ int sensors_iks4a1_init(void)
         return -4;
     }
     (void)IKS4A1_ENV_SENSOR_Enable(SID_IKS4A1_STTS22H_INSTANCE, ENV_TEMPERATURE);
+
+#if (USE_IKS4A1_MOTION_SENSOR_LIS2DUXS12_0 == 1)
+    /* LIS2DUXS12 — accelerometer + Qvar capacitive front-end. We don't read
+     * its accel (the LSM6DSV16X is already the primary IMU); we use it solely
+     * for the AH/Qvar channel wired to the IKS4A1's edge pads. */
+    rc = IKS4A1_MOTION_SENSOR_Init(IKS4A1_LIS2DUXS12_0, MOTION_ACCELERO);
+    if (rc != BSP_ERROR_NONE) {
+        SID_PAL_LOG_WARNING("IKS4A1: LIS2DUXS12 init failed (%ld) - qvar disabled", (long)rc);
+    } else {
+        (void)IKS4A1_MOTION_SENSOR_Enable(IKS4A1_LIS2DUXS12_0, MOTION_ACCELERO);
+        if (IKS4A1_MOTION_SENSOR_Write_Register(IKS4A1_LIS2DUXS12_0,
+                                                LIS2DUXS12_REG_AH_QVAR_CFG,
+                                                LIS2DUXS12_AH_QVAR_CFG_ENABLE) == BSP_ERROR_NONE) {
+            SID_PAL_LOG_INFO("IKS4A1: LIS2DUXS12 Qvar enabled");
+        } else {
+            SID_PAL_LOG_WARNING("IKS4A1: LIS2DUXS12 Qvar enable write failed");
+        }
+    }
+#endif
+
+    /* LSM6DSV16X native 6D orientation detection. The Enable function requires
+     * an interrupt-pin argument; we pass INT1 to satisfy the API but never
+     * wire the pin — orientation is polled via the D6D_SRC status bits each
+     * sensors_iks4a1_read() cycle. Threshold 2 ≈ 60° tilt before a face flip. */
+    (void)IKS4A1_MOTION_SENSOR_Set_6D_Orientation_Threshold(SID_IKS4A1_LSM6DSV16X_INSTANCE, 2u);
+    rc = IKS4A1_MOTION_SENSOR_Enable_6D_Orientation(SID_IKS4A1_LSM6DSV16X_INSTANCE,
+                                                    IKS4A1_MOTION_SENSOR_INT1_PIN);
+    if (rc != BSP_ERROR_NONE) {
+        SID_PAL_LOG_WARNING("IKS4A1: LSM6DSV16X 6D enable failed (%ld)", (long)rc);
+    } else {
+        SID_PAL_LOG_INFO("IKS4A1: LSM6DSV16X 6D orientation enabled");
+    }
 
     SID_PAL_LOG_INFO("IKS4A1: sensors initialized");
     return 0;
@@ -160,6 +208,41 @@ int sensors_iks4a1_read(sensors_iks4a1_reading_t *out)
     } else {
         SID_PAL_LOG_WARNING("IKS4A1: LPS22DF pressure read failed (%ld)", (long)rc);
     }
+
+    /* 6D orientation — which face is currently up. D6D_SRC has six axis bits;
+     * exactly one is set when the device is within the 6D threshold of an
+     * axis-aligned orientation. UNKNOWN otherwise (mid-tilt). */
+    out->orientation = (uint8_t)SENSORS_IKS4A1_ORIENT_UNKNOWN;
+    {
+        uint8_t xl = 0, xh = 0, yl = 0, yh = 0, zl = 0, zh = 0;
+        if (IKS4A1_MOTION_SENSOR_Get_6D_Orientation_XL(SID_IKS4A1_LSM6DSV16X_INSTANCE, &xl) == BSP_ERROR_NONE
+         && IKS4A1_MOTION_SENSOR_Get_6D_Orientation_XH(SID_IKS4A1_LSM6DSV16X_INSTANCE, &xh) == BSP_ERROR_NONE
+         && IKS4A1_MOTION_SENSOR_Get_6D_Orientation_YL(SID_IKS4A1_LSM6DSV16X_INSTANCE, &yl) == BSP_ERROR_NONE
+         && IKS4A1_MOTION_SENSOR_Get_6D_Orientation_YH(SID_IKS4A1_LSM6DSV16X_INSTANCE, &yh) == BSP_ERROR_NONE
+         && IKS4A1_MOTION_SENSOR_Get_6D_Orientation_ZL(SID_IKS4A1_LSM6DSV16X_INSTANCE, &zl) == BSP_ERROR_NONE
+         && IKS4A1_MOTION_SENSOR_Get_6D_Orientation_ZH(SID_IKS4A1_LSM6DSV16X_INSTANCE, &zh) == BSP_ERROR_NONE) {
+            if      (zh) out->orientation = (uint8_t)SENSORS_IKS4A1_ORIENT_Z_POS_UP;
+            else if (zl) out->orientation = (uint8_t)SENSORS_IKS4A1_ORIENT_Z_NEG_UP;
+            else if (yh) out->orientation = (uint8_t)SENSORS_IKS4A1_ORIENT_Y_POS_UP;
+            else if (yl) out->orientation = (uint8_t)SENSORS_IKS4A1_ORIENT_Y_NEG_UP;
+            else if (xh) out->orientation = (uint8_t)SENSORS_IKS4A1_ORIENT_X_POS_UP;
+            else if (xl) out->orientation = (uint8_t)SENSORS_IKS4A1_ORIENT_X_NEG_UP;
+        }
+    }
+
+#if (USE_IKS4A1_MOTION_SENSOR_LIS2DUXS12_0 == 1)
+    /* LIS2DUXS12 Qvar — combine LSB+MSB at OUT_T_AH_QVAR. The reading swings
+     * sharply (signed) when a finger touches the IKS4A1 edge pads. */
+    {
+        uint8_t lo = 0, hi = 0;
+        if (IKS4A1_MOTION_SENSOR_Read_Register(IKS4A1_LIS2DUXS12_0,
+                                               LIS2DUXS12_REG_OUT_T_AH_QVAR_L, &lo) == BSP_ERROR_NONE
+         && IKS4A1_MOTION_SENSOR_Read_Register(IKS4A1_LIS2DUXS12_0,
+                                               LIS2DUXS12_REG_OUT_T_AH_QVAR_H, &hi) == BSP_ERROR_NONE) {
+            out->qvar_raw = (int16_t)(((uint16_t)hi << 8) | lo);
+        }
+    }
+#endif
 
     return 0;
 }
@@ -241,11 +324,15 @@ uint32_t sensors_iks4a1_pack(uint8_t *buf,
 
     uint32_t o = 0;
 
-    /* msg_desc: opc=NOTIFY (2), cmd_class=DEMO_APP (0), cmd_id=ACTION (1).
-     * This matches the byte the Nordic reference firmware emits for its
-     * sensor-data uplinks (decoded as "DEMO_APP_ACTION_NOTIFICATION" by the
-     * /IOTCONNECT sid_demo decoder). */
-    buf[o++] = SENSORS_IKS4A1_MSG_DESC_NOTIFY_ACTION;
+    /* WORKAROUND: emit the CAP msg_desc (0x40) instead of the semantically-
+     * correct ACTION msg_desc (0x41). The currently-deployed /IOTCONNECT
+     * decoder has a bug in _maybe_unwrap_hex_string that only unwraps
+     * hex-ASCII payloads starting with "40", so action frames are silently
+     * dropped. Sending 0x40 lets the deployed decoder unwrap and parse the
+     * sensor TLVs (records appear with id="2-0-0" but populated sensor
+     * fields). Revert to SENSORS_IKS4A1_MSG_DESC_NOTIFY_ACTION once the
+     * fixed decoder (commit b0307c6 on iotc-stm32-sidewalk main) is live. */
+    buf[o++] = SENSORS_IKS4A1_MSG_DESC_NOTIFY_CAP;
 
     /* sid_demo standard tags expected by the /IOTCONNECT sid_demo decoder. */
     int16_t stts22h_whole_c = (int16_t)(r->stts22h_c_x100 / 100);
@@ -263,6 +350,8 @@ uint32_t sensors_iks4a1_pack(uint8_t *buf,
     o = s_tlv_i16le (buf, o, TAG_IKS4A1_TEMP_SHT40_X100,    r->sht40_temp_c_x100);
     o = s_tlv_u16le (buf, o, TAG_IKS4A1_HUMIDITY_X100,      r->sht40_rh_x100);
     o = s_tlv_u32le (buf, o, TAG_IKS4A1_PRESSURE_X100,      r->lps22df_pa_x100);
+    o = s_tlv_u8    (buf, o, TAG_IKS4A1_ORIENTATION,        r->orientation);
+    o = s_tlv_i16le (buf, o, TAG_IKS4A1_QVAR_RAW,           r->qvar_raw);
 
     return o;
 }
