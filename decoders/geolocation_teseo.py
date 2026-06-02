@@ -43,11 +43,31 @@ def _parse_gnss_position(value):
     }
 
 
+def _maybe_unwrap_hex_string(data: bytes) -> bytes:
+    """AWS IoT Wireless delivers Sidewalk payloads as base64(hex_ascii_string),
+       so a single base64 decode lands at an ASCII hex string rather than the
+       raw payload. If the bytes are even-length and all printable hex
+       characters, decode them once more via bytes.fromhex(). Real Teseo
+       payloads contain non-hex bytes (length fields, raw IEEE-754 floats),
+       so the heuristic is safe."""
+    if len(data) < 2 or len(data) % 2 != 0:
+        return data
+    try:
+        text = data.decode("ascii")
+    except UnicodeDecodeError:
+        return data
+    if not all(c in "0123456789abcdefABCDEF" for c in text):
+        return data
+    return bytes.fromhex(text)
+
+
 def dict_from_payload(base64_input: str, fport: int = None):
     try:
         data = base64.b64decode(base64_input)
     except Exception as e:
         raise ValueError(f"Invalid base64 input: {e}")
+
+    data = _maybe_unwrap_hex_string(data)
 
     payload = {}
     offset = 0
