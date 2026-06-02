@@ -1,221 +1,230 @@
 {
-  "code": "STsidiks4",
-  "name": "Sidewalk WBA55 + IKS4A1",
-  "authType": 2,
-  "attributes": [
-    {
-      "name": "version",
-      "displayName": "Payload Version",
-      "type": "INTEGER",
-      "description": "Wire format version",
-      "unit": "",
-      "aggregateTypes": []
+    "code": "STsidiks4",
+    "name": "Sidewalk WBA55 + IKS4A1",
+    "authType": 2,
+    "attributes": [
+        {
+            "name": "payload",
+            "displayName": "",
+            "type": "OBJECT",
+            "description": "Decoded sid_demo TLV uplink (see decoders/sidewalk-iks4a1-tlv.py). Fields populate from on-board sensors on each action notification.",
+            "childs": [
+                {
+                    "name": "id",
+                    "displayName": "Frame ID",
+                    "type": "STRING",
+                    "description": "sid_demo msg_desc decoded as \"opc-cmd_class-cmd_id\". 2-0-0 = capability frame, 2-0-1 = action frame. (Currently both arrive as 2-0-0 while the firmware msg_desc=0x40 workaround is in place; flips to 2-0-1 once the fixed decoder is live in /IOTCONNECT.)",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "Sequence",
+                    "displayName": "Sequence",
+                    "type": "INTEGER",
+                    "description": "Uplink sequence counter from the firmware (tag 0x21). Wraps at 256.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "Sinewave",
+                    "displayName": "Sinewave",
+                    "type": "INTEGER",
+                    "description": "Reserved sid_demo template field, always 0 for this firmware. Kept for /IOTCONNECT dashboard compatibility.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "version",
+                    "displayName": "Payload Version",
+                    "type": "INTEGER",
+                    "description": "IKS4A1 firmware payload schema version (tag 0x20). Bumped when the TLV wire format changes incompatibly.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "payload_size",
+                    "displayName": "Payload Size",
+                    "type": "INTEGER",
+                    "description": "Total uplink size in bytes (msg_desc + TLV stream). ~14 bytes for capability frames, ~61 bytes for action frames with all sensors present.",
+                    "unit": "bytes",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "sensor_data",
+                    "displayName": "STTS22H Temperature (whole)",
+                    "type": "INTEGER",
+                    "description": "Whole-degree STTS22H temperature from sid_demo tag 0x06. Same physical value as temp_stts22h_c but rounded to int, kept for sid_demo-decoder compatibility.",
+                    "unit": "C",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "Temperature",
+                    "displayName": "Temperature",
+                    "type": "DECIMAL",
+                    "description": "Whole-degree STTS22H temperature as a decimal (same value as sensor_data). Surfaced for the standard /IOTCONNECT Temperature widget.",
+                    "unit": "C",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "gps_time",
+                    "displayName": "GPS Time",
+                    "type": "INTEGER",
+                    "description": "GPS time at uplink (tag 0x07), seconds since the Sidewalk GPS epoch. Set from sid_get_time(SID_GET_GPS_TIME). 0 if the device has not yet time-synced.",
+                    "unit": "seconds",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "link_type",
+                    "displayName": "Link Type",
+                    "type": "STRING",
+                    "description": "Sidewalk link the uplink traversed (tag 0x0C). Always \"BLE\" for the sid_ble app.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "acc_x_g",
+                    "displayName": "Accel X",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X X-axis acceleration in g (tag 0x22, mg / 1000). +1 g on the +X axis when the board is sitting flat with the +X edge down.",
+                    "unit": "g",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "acc_y_g",
+                    "displayName": "Accel Y",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X Y-axis acceleration in g (tag 0x22).",
+                    "unit": "g",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "acc_z_g",
+                    "displayName": "Accel Z",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X Z-axis acceleration in g (tag 0x22). ~+1 g when the board is face-up flat on a desk.",
+                    "unit": "g",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "gyr_x_dps",
+                    "displayName": "Gyro X",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X X-axis angular rate (tag 0x23, dps*10 on the wire). Near-zero when the board is still.",
+                    "unit": "dps",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "gyr_y_dps",
+                    "displayName": "Gyro Y",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X Y-axis angular rate (tag 0x23).",
+                    "unit": "dps",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "gyr_z_dps",
+                    "displayName": "Gyro Z",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X Z-axis angular rate (tag 0x23).",
+                    "unit": "dps",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "temp_stts22h_c",
+                    "displayName": "STTS22H Temp",
+                    "type": "DECIMAL",
+                    "description": "High-resolution STTS22H temperature (tag 0x24, 0.01 C resolution). The IKS4A1's dedicated temperature die - most accurate temp on the board.",
+                    "unit": "C",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "temp_sht40_c",
+                    "displayName": "SHT40 Temp",
+                    "type": "DECIMAL",
+                    "description": "SHT40AD1B temperature (tag 0x25, 0.01 C resolution). Co-located with the humidity sensor; compare against STTS22H for sanity.",
+                    "unit": "C",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "humidity_sht40_pct",
+                    "displayName": "Humidity",
+                    "type": "DECIMAL",
+                    "description": "SHT40AD1B relative humidity (tag 0x26, 0.01 %RH resolution).",
+                    "unit": "%RH",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "pressure_hpa",
+                    "displayName": "Pressure",
+                    "type": "DECIMAL",
+                    "description": "LPS22DF barometric pressure (tag 0x27, 0.01 hPa resolution). Typical sea-level value ~1013 hPa; drops with altitude.",
+                    "unit": "hPa",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "orientation",
+                    "displayName": "Orientation",
+                    "type": "STRING",
+                    "description": "LSM6DSV16X native 6D engine output (tag 0x28). One of: face_up / face_down / portrait_up / portrait_down / landscape_left / landscape_right / unknown. Flip the board to change it.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "qvar",
+                    "displayName": "Qvar",
+                    "type": "INTEGER",
+                    "description": "LIS2DUXS12 Qvar raw count (tag 0x29, signed int16). Capacitive variation measured on the IKS4A1 edge pads. Near-zero baseline; swings hundreds-to-thousands when a finger touches a pad.",
+                    "unit": "",
+                    "attributeColor": ""
+                }
+            ],
+            "aggregateTypes": []
+        },
+        {
+            "name": "decoder_name",
+            "displayName": "Decoder",
+            "type": "STRING",
+            "description": "Name of the /IOTCONNECT decoder that produced this record. Should always be \"sidewalk-iks4a1-tlv\" for this template.",
+            "unit": "",
+            "aggregateTypes": []
+        }
+    ],
+    "commands": [
+        {
+            "name": "LED_ON",
+            "command": "{\n    \"command\": \"IKS4A1_LED_ON\"\n}",
+            "requiredParam": false,
+            "requiredAck": false,
+            "isOTACommand": false
+        },
+        {
+            "name": "LED_OFF",
+            "command": "{\n    \"command\": \"IKS4A1_LED_OFF\"\n}",
+            "requiredParam": false,
+            "requiredAck": false,
+            "isOTACommand": false
+        },
+        {
+            "name": "SET_INTERVAL",
+            "command": "{ \"command\": \"IKS4A1_SET_INTERVAL\", \"interval_seconds\": <%PARAM%> }",
+            "requiredParam": true,
+            "requiredAck": false,
+            "isOTACommand": false
+        }
+    ],
+    "messageVersion": "2.1",
+    "msgCode": "XG4E0YK",
+    "capability": "24",
+    "enableCSR": "false",
+    "c2dOnDemand": 0,
+    "properties": {
+        "description": "WBA55 + X-NUCLEO-IKS4A1 sensor uplink over Sidewalk BLE. Surfaces 6-axis IMU, environmental sensors, 6D orientation, and Qvar capacitive sensing via a sid_demo-style TLV payload. See examples/sidewalk-iks4a1-wba55 in the repo.",
+        "dataFrequency": "120",
+        "fileSupport": false,
+        "certRenewalDay": 0,
+        "enableCSR": false
     },
-    {
-      "name": "Sequence",
-      "displayName": "Sequence",
-      "type": "INTEGER",
-      "description": "Uplink sequence (uint8 wrap)",
-      "unit": "",
-      "aggregateTypes": []
-    },
-    {
-      "name": "Sinewave",
-      "displayName": "Sinewave",
-      "type": "INTEGER",
-      "description": "Reserved (0)",
-      "unit": "",
-      "aggregateTypes": []
-    },
-    {
-      "name": "payload_size",
-      "displayName": "Payload Size",
-      "type": "INTEGER",
-      "description": "Bytes received",
-      "unit": "bytes",
-      "aggregateTypes": []
-    },
-    {
-      "name": "acc_x_g",
-      "displayName": "Accel X",
-      "type": "DECIMAL",
-      "description": "LSM6DSV16X accel X",
-      "unit": "g",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "acc_y_g",
-      "displayName": "Accel Y",
-      "type": "DECIMAL",
-      "description": "LSM6DSV16X accel Y",
-      "unit": "g",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "acc_z_g",
-      "displayName": "Accel Z",
-      "type": "DECIMAL",
-      "description": "LSM6DSV16X accel Z",
-      "unit": "g",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "gyr_x_dps",
-      "displayName": "Gyro X",
-      "type": "DECIMAL",
-      "description": "LSM6DSV16X gyro X",
-      "unit": "dps",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "gyr_y_dps",
-      "displayName": "Gyro Y",
-      "type": "DECIMAL",
-      "description": "LSM6DSV16X gyro Y",
-      "unit": "dps",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "gyr_z_dps",
-      "displayName": "Gyro Z",
-      "type": "DECIMAL",
-      "description": "LSM6DSV16X gyro Z",
-      "unit": "dps",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "temp_stts22h_c",
-      "displayName": "STTS22H Temp",
-      "type": "DECIMAL",
-      "description": "STTS22H temperature",
-      "unit": "C",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "temp_sht40_c",
-      "displayName": "SHT40 Temp",
-      "type": "DECIMAL",
-      "description": "SHT40AD1B temperature",
-      "unit": "C",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "humidity_sht40_pct",
-      "displayName": "SHT40 Humidity",
-      "type": "DECIMAL",
-      "description": "SHT40AD1B relative humidity",
-      "unit": "%RH",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "pressure_hpa",
-      "displayName": "LPS22DF Pressure",
-      "type": "DECIMAL",
-      "description": "LPS22DF barometric pressure",
-      "unit": "hPa",
-      "aggregateTypes": [
-        "MIN",
-        "MAX",
-        "AVG"
-      ]
-    },
-    {
-      "name": "extra_bytes_hex",
-      "displayName": "Extra Bytes",
-      "type": "STRING",
-      "description": "Bytes beyond fixed payload (hex)",
-      "unit": "",
-      "aggregateTypes": []
-    },
-    {
-      "aggregateTypes": [],
-      "description": "LSM6DSV16X native 6D orientation (face_up / face_down / portrait_up / portrait_down / landscape_left / landscape_right / unknown)",
-      "displayName": "Orientation",
-      "name": "orientation",
-      "type": "STRING",
-      "unit": ""
-    },
-    {
-      "aggregateTypes": [],
-      "description": "LIS2DUXS12 Qvar raw count (signed int16). Swings sharply when the IKS4A1 edge pads are touched.",
-      "displayName": "Qvar",
-      "name": "qvar",
-      "type": "INTEGER",
-      "unit": ""
+    "_meta": {
+        "version": "2.0"
     }
-  ],
-  "commands": [
-    {
-      "name": "LED_ON",
-      "command": "{\n    \"command\": \"IKS4A1_LED_ON\"\n}",
-      "requiredParam": false,
-      "requiredAck": false,
-      "isOTACommand": false
-    },
-    {
-      "name": "LED_OFF",
-      "command": "{\n    \"command\": \"IKS4A1_LED_OFF\"\n}",
-      "requiredParam": false,
-      "requiredAck": false,
-      "isOTACommand": false
-    },
-    {
-      "name": "SET_INTERVAL",
-      "command": "{\n    \"command\": \"IKS4A1_SET_INTERVAL\",\n    \"interval_seconds\": <%PARAM%>\n}",
-      "requiredParam": true,
-      "requiredAck": false,
-      "isOTACommand": false
-    }
-  ],
-  "messageVersion": "2.1",
-  "msgCode": "XG4ESTI",
-  "capability": "24",
-  "enableCSR": "false",
-  "c2dOnDemand": 0,
-  "properties": {
-    "description": "WBA55 + X-NUCLEO-IKS4A1 sensor uplink (BLE-only)",
-    "dataFrequency": "120",
-    "fileSupport": false,
-    "certRenewalDay": 0,
-    "enableCSR": false
-  },
-  "_meta": {
-    "version": "2.0"
-  }
 }
