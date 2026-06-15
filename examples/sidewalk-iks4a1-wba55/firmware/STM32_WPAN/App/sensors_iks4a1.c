@@ -247,8 +247,10 @@ int sensors_iks4a1_read(sensors_iks4a1_reading_t *out)
     return 0;
 }
 
-#else /* SID_APP_IKS4A1_ENABLED disabled — provide stubs to keep linker happy
-       * if the symbols are referenced through an unused #if branch.        */
+#elif !defined(SID_APP_IKS5A1_ENABLED) || (SID_APP_IKS5A1_ENABLED != 1)
+/* Neither IKS4A1 nor IKS5A1 enabled — provide stubs so any stale reference
+ * still links. (When SID_APP_IKS5A1_ENABLED == 1, sensors_iks5a1.c provides
+ * the real implementations with the same symbol names — skip the stubs.) */
 
 int sensors_iks4a1_init(void)                            { return -1; }
 int sensors_iks4a1_read(sensors_iks4a1_reading_t *out)
@@ -312,6 +314,10 @@ static uint32_t s_tlv_i16x3le(uint8_t *buf, uint32_t o, uint8_t tag, const int16
     return o;
 }
 
+#if !defined(SID_APP_IKS5A1_ENABLED) || (SID_APP_IKS5A1_ENABLED != 1)
+/* When SID_APP_IKS5A1_ENABLED == 1, sensors_iks5a1.c owns these symbols.
+ * The TLV helpers above are static so they don't conflict; only the two
+ * exported pack functions need the mutual-exclusion guard. */
 uint32_t sensors_iks4a1_pack(uint8_t *buf,
                               uint32_t buf_len,
                               uint8_t  seq,
@@ -383,6 +389,7 @@ uint32_t sensors_iks4a1_pack_capability(uint8_t *buf, uint32_t buf_len)
 
     return o;
 }
+#endif /* !SID_APP_IKS5A1_ENABLED — pack functions ceded to sensors_iks5a1.c */
 
 #if defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)
 static int16_t s_clamp_i16(int32_t v)
