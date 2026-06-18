@@ -8,8 +8,8 @@ __pycache__/
 .DS_Store
 *.swp
 
-# Build artifacts — firmware hexes are reproducible from the SDK, no need to commit
-binaries/*.hex
+# Build artifacts — firmware .hex files ARE committed (see binaries/), but
+# intermediate object/elf/bin artifacts are not.
 binaries/*.bin
 binaries/*.elf
 
