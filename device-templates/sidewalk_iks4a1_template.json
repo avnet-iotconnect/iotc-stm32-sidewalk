@@ -1,6 +1,6 @@
 {
-    "code": "STsidiks5",
-    "name": "Sidewalk WBA55 + IKS4A1 v2",
+    "code": "STswMEMS",
+    "name": "Sidewalk ST WBA55 + MEMS",
     "authType": 2,
     "attributes": [
         {
@@ -174,6 +174,38 @@
                     "displayName": "",
                     "type": "INTEGER",
                     "description": "LIS2DUXS12 Qvar raw count (TLV tag 0x29, signed int16). Capacitive variation on the IKS4A1 edge pads; swings hundreds-to-thousands when a finger touches a pad.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "mlc1_raw",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "LSM6DSV16X MLC1_SRC register value (TLV tag 0x2A). Raw label index from the asset_tracking decision tree. Expected values: 0, 4, 8, 12. Anything else means the MLC is mid-classification (decoder labels it transition_N).",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "mlc1_label",
+                    "displayName": "",
+                    "type": "STRING",
+                    "description": "Human-readable mapping of mlc1_raw via the model's label map (chosen using mlc1_model_id). For the asset_tracking model: 0=stationary_upright, 4=stationary_not_upright, 8=in_motion, 12=shaken. Any unrecognized raw value surfaces as transition_N. Empty (raw_N) if the decoder doesn't know the model.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "mlc1_model_id",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "Identifies which MLC decision tree (UCF) produced mlc1_raw (TLV tag 0x2B). 0=none (no UCF loaded), 1=asset_tracking, 2=activity_recognition_for_mobile, 3=activity_recognition_for_wrist, 4=gym_activity_recognition, 5=head_gestures, 6=yoga_pose_recognition. Decoder uses this to pick the right raw->label map.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "mlc1_model_name",
+                    "displayName": "",
+                    "type": "STRING",
+                    "description": "Human-readable model name for mlc1_model_id. Lets dashboards filter/group records by which decision tree was running. unknown_model_N if a newer firmware reports a model the decoder hasn't been taught yet.",
                     "unit": "",
                     "attributeColor": ""
                 }

@@ -1,16 +1,26 @@
-# STM32 Sidewalk IKS4A1 Demo (WBA55 + X-NUCLEO-IKS4A1 + /IOTCONNECT)
+# STM32 Sidewalk MEMS Sensor Demo (WBA55 + X-NUCLEO-IKS4A1 / IKS5A1 + /IOTCONNECT)
 
-This guide documents a **BLE‑only Sidewalk demo** that reads the on‑board **X‑NUCLEO‑IKS4A1** MEMS expansion shield from a **NUCLEO‑WBA55CG** and ships the readings to **/IOTCONNECT** over Amazon Sidewalk Link Type 1 (BLE).
+This guide documents a **BLE‑only Sidewalk demo** that reads an on‑board **X‑NUCLEO‑IKS4A1** *or* **X‑NUCLEO‑IKS5A1** MEMS expansion shield from a **NUCLEO‑WBA55CG** and ships the readings to **/IOTCONNECT** over Amazon Sidewalk Link Type 1 (BLE).
 
-It builds on top of the existing [`ble-wba55`](../ble-wba55/README.md) example: rather than forking a new SDK app, this example **enables a build flag** in the existing `sid_ble` app that swaps the 1‑byte counter uplink for a packed sensor payload.
+It builds on top of the existing [`ble-wba55`](../ble-wba55/README.md) example: rather than forking a new SDK app, this example **enables build flags** in the existing `sid_ble` app that swap the 1‑byte counter uplink for a packed sensor payload. The same firmware source tree builds for either board — flipping one `.cproject` symbol (`SID_APP_IKS4A1_ENABLED=1` vs `SID_APP_IKS5A1_ENABLED=1`) selects which sensor stack is compiled in. The same `/IOTCONNECT` decoder + template handle both, since the TLV wire format is shared.
 
-What you get end‑to‑end:
+What you get end‑to‑end, per board:
 
+**X‑NUCLEO‑IKS4A1**
 - LSM6DSV16X — 6‑axis IMU (accel + gyro) **+ native 6D orientation** (face_up / face_down / portrait / landscape)
 - LPS22DF — barometric pressure
 - SHT40AD1B — humidity + temperature
 - STTS22H — temperature
 - **LIS2DUXS12 — Qvar (capacitive sensing)** — touch the silver pads on the IKS4A1 edge to swing the `qvar` field
+
+**X‑NUCLEO‑IKS5A1**
+- ISM6HG256X — 6‑axis IMU (accel + gyro)
+- ILPS22QS — barometric pressure + on‑die temperature (surfaced as `temp_stts22h_c` — same TLV tag for dashboard compatibility)
+- **IIS2DULPX — Qvar (capacitive sensing)** — touch the silver pads on the IKS5A1 edge to swing the `qvar` field
+- *No SHT40* — `temp_sht40_c` / `humidity_sht40_pct` are empty on IKS5A1 builds
+- *6D orientation not yet exposed* — `orientation` reports `unknown`
+
+Both share:
 - /IOTCONNECT decoder + device template aligned with the demo payload
 
 ---
@@ -45,12 +55,12 @@ For production manufacturing integration, work with the **/IOTCONNECT team**:
 | Item | Notes |
 |---|---|
 | NUCLEO‑WBA55CG | Sidewalk host MCU. SWD via on‑board ST‑LINK. |
-| X‑NUCLEO‑IKS4A1 | MEMS expansion shield. Stacks on the Arduino headers of the NUCLEO‑WBA55CG. |
+| **One of**: X‑NUCLEO‑IKS4A1 *or* X‑NUCLEO‑IKS5A1 | MEMS expansion shield. Stacks on the Arduino headers of the NUCLEO‑WBA55CG. Pick the firmware variant that matches your board. |
 | USB micro‑B cable | ST‑LINK programming + UART log. |
 
-The expansion shield communicates via the Arduino I²C connector (PB6 = SCL, PB7 = SDA → STM32WBA55 I2C1). No jumpers or additional wiring are required for the four sensors used in this demo.
+The expansion shield communicates via the Arduino I²C connector (PB6 = SCL, PB7 = SDA → STM32WBA55 I2C1). No jumpers or additional wiring are required for the sensors used in this demo.
 
-> X‑NUCLEO‑IKS4A1 also exposes LIS2MDL (3-axis magnetometer); it's present on the bus but not sampled here.
+> X‑NUCLEO‑IKS4A1 also exposes LIS2MDL (3-axis magnetometer); X‑NUCLEO‑IKS5A1 also exposes IIS2MDC. Both are present on the bus but not sampled here.
 
 ### Software
 
@@ -177,12 +187,21 @@ Use `-build` (not `-cleanBuild`) for incremental rebuilds. The hex lands in the 
 
 > If you forget to remove the CubeMX natures (`MCUCubeProjectNature`, `MCUCubeIdeServicesRevAev2ProjectNature`) from `.project`, the headless invocation trips an `IocGeneratorAdapter` NPE — use the GUI build until that's fixed.
 
+### Selecting the board (IKS4A1 vs IKS5A1)
+
+Both variants are built from the same source tree by flipping one pair of `.cproject` symbols.
+
+- **IKS4A1 build** (default): `SID_APP_IKS4A1_ENABLED=1`, `SID_APP_IKS5A1_ENABLED=0`
+- **IKS5A1 build**: `SID_APP_IKS4A1_ENABLED=0`, `SID_APP_IKS5A1_ENABLED=1`
+
+The flags are mutually exclusive at link time (the IKS4A1 and IKS5A1 BSP component objects use the same global names). The companion `scripts/build-firmware.sh` in this repo flips the flag automatically and produces both hexes in one invocation. See [Section 4 → Headless / CLI build](#headless--cli-build).
+
 ### What's already wired up for you (for transparency)
 
-- `Drivers/BSP/IKS4A1` and `Drivers/BSP/Components` are linked into the project tree (as virtual folders pointing at `APP_ROOT_DIR/Drivers/BSP/...`).
+- `Drivers/BSP/IKS4A1`, `Drivers/BSP/IKS5A1`, and `Drivers/BSP/Components` are linked into the project tree (as virtual folders pointing at `APP_ROOT_DIR/Drivers/BSP/...`).
 - The Nucleo-WBA55 bus glue file `Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.c` is linked as an individual source.
-- Compiler include paths added for `IKS4A1`, `Components/Common`, `Components/{lsm6dsv16x,lps22df,sht40ad1b,stts22h}`, and `STM32WBAxx_Nucleo` (for the bus glue header).
-- Define `SID_APP_IKS4A1_ENABLED=1` added to both Nucleo configs.
+- Compiler include paths added for `IKS4A1`, `IKS5A1`, `Components/Common`, `Components/{lsm6dsv16x,lps22df,sht40ad1b,stts22h,lis2duxs12,ism6hg256x,iis2dulpx,ilps22qs}`, and `STM32WBAxx_Nucleo` (for the bus glue header).
+- Defines `SID_APP_IKS4A1_ENABLED` and `SID_APP_IKS5A1_ENABLED` added to all four Nucleo configs (one set to 1, the other to 0 — flip to switch boards).
 - `HAL_I2C_MODULE_ENABLED` un-commented in `Config/stm32wbaxx_hal_conf.h`.
 - `iks4a1_conf.h` is in place with only the four sensors we use enabled and I2C macros pointing at `BSP_I2C1_*`.
 
@@ -527,18 +546,21 @@ Setup:
 ### `cmox_init.h` missing
 CMOX library not installed in SDK. Copy `include/` and `lib/` from X‑CUBE‑CRYPTOLIB. See `examples/ble-wba55/README.md`.
 
-### `iks4a1_motion_sensors.h: No such file or directory`
-Include path or source folder for the X‑CUBE‑MEMS1 BSP is missing. Re‑check Step 2 and Step 4.
+### `iks4a1_motion_sensors.h: No such file or directory` (or `iks5a1_motion_sensors.h: …`)
+Include path or source folder for the corresponding X‑CUBE‑MEMS1 BSP is missing. Re‑check Step 2 and Step 4.
 
 ### `MFG storage: validation failed`
 Wrong manufacturing image or wrong address. Re‑generate with `provision.py st aws --chip WBA55xG` and re‑flash.
 
-### `IKS4A1: LSM6DSV16X init failed (-2)`
-I²C transactions are failing. Confirm:
-- The expansion shield is fully seated on the Arduino headers.
-- `HAL_I2C_MODULE_ENABLED` is defined.
+### `IKS4A1: LSM6DSV16X init failed (-1)` / `IKS5A1: ISM6HG256X init failed (-1)`
+The IMU on the expansion shield isn't responding on I²C. Confirm:
+- The expansion shield is fully seated on the Arduino headers (most common cause — reseat firmly in both directions).
+- You're running the firmware variant that matches the physical board (IKS4A1 firmware on IKS4A1, IKS5A1 firmware on IKS5A1).
+- `HAL_I2C_MODULE_ENABLED` is defined in `Config/stm32wbaxx_hal_conf.h`.
 - I2C1 (PB6/PB7) is initialized at 100 kHz before `sensors_iks4a1_init()` runs.
-- IKS4A1 jumpers are at factory defaults.
+- IKS4A1/IKS5A1 jumpers are at factory defaults.
+
+The firmware logs the init failure but **does not** hard-fault on subsequent reads — direct-register paths (6D orientation, Qvar) are guarded by runtime `s_lsm6dsv16x_ok` / `s_lis2duxs12_ok` / `s_iis2dulpx_ok` flags so a `NULL` BSP component handle never gets dereferenced.
 
 ### Uplink shows zeros
 At least one sensor read returned an error. The module logs a `WARNING` per failing sensor but still sends the rest — check the UART log for the offending sensor and re‑check its driver / power.

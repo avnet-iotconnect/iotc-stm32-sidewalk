@@ -94,8 +94,8 @@ Typical STM32 Sidewalk hardware pairings (WBA55 with common radio options):
 - **BLE‑only Sidewalk on Nucleo‑WBA55**  
   [examples/ble-wba55/README.md](examples/ble-wba55/README.md)
 
-- **Sensor Demo: WBA55 + X‑NUCLEO‑IKS4A1**  
-  [examples/sidewalk-iks4a1-wba55/README.md](examples/sidewalk-iks4a1-wba55/README.md)
+- **MEMS Sensor Demo: WBA55 + X‑NUCLEO‑IKS4A1 / IKS5A1**  
+  [examples/sidewalk-mems-wba55/README.md](examples/sidewalk-mems-wba55/README.md)
 
 - **Geolocation: Teseo GNSS (WBA55)**  
   [examples/geolocation-teseo/README.md](examples/geolocation-teseo/README.md)

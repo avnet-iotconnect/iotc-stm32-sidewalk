@@ -7,3 +7,12 @@ __pycache__/
 # OS / editor
 .DS_Store
 *.swp
+
+# Build artifacts — firmware hexes are reproducible from the SDK, no need to commit
+binaries/*.hex
+binaries/*.bin
+binaries/*.elf
+
+# Sidewalk manufacturing artifacts — cert.json contains device PRIVATE KEYS,
+# mfg.bin/mfg.hex are derived from them. NEVER commit any of this.
+binaries/sidewalk-mfg/
