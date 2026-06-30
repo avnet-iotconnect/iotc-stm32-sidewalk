@@ -67,17 +67,17 @@ An /IOTCONNECT account with an **AWS backend** is required (Amazon Sidewalk runs
 
 The **device template** defines the telemetry attributes and downlink commands for the MEMS demo, and the **decoder** turns the raw Sidewalk TLV uplink into named values.
 
-1. Download the pre-made device template from this repo: [`device-templates/sidewalk_iks4a1_template.json`](device-templates/sidewalk_iks4a1_template.json) (template code `STswMEMS`, *“Sidewalk ST WBA55 + MEMS”*). The same template covers both the IKS4A1 and IKS5A1 boards.
+1. Download the pre-made device template from this repo: [`device-templates/sidewalk_st_WBA55+MEMS_template.JSON`](device-templates/sidewalk_st_WBA55+MEMS_template.JSON) (template code `STswMEMS`, *“Sidewalk ST WBA55 + MEMS”*). The same template covers both the IKS4A1 and IKS5A1 boards.
 2. Login to the platform at [console.iotconnect.io](https://console.iotconnect.io).
 3. From the navigation panel on the left, select the **Devices** icon and the **Device** sub-menu.<br>![Devices menu](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/menu-devices-device.png?raw=true)
 4. At the bottom of the page, select the **Templates** icon from the toolbar.<br>![Templates toolbar icon](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/menu-templates.png?raw=true)
 5. At the top-right of the page, select the **Create Template** button.<br>![Create Template button](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/button-create-template.png?raw=true)
 6. At the top-right of the page, select the **Import** button.<br>![Import button](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/button-import.png?raw=true)
-7. Click **Browse**, navigate to and select the downloaded `sidewalk_iks4a1_template.json`.
+7. Click **Browse**, navigate to and select the downloaded `sidewalk_st_WBA55+MEMS_template.JSON`.
 8. Click **Save**.
 
 > [!NOTE]
-> **Attach the decoder.** Sidewalk uplinks arrive as a base64 TLV payload, so /IOTCONNECT needs the matching Python decoder [`decoders/sidewalk-iks4a1-tlv.py`](decoders/sidewalk-iks4a1-tlv.py) to surface the individual sensor values. Submit it for decoder approval and attach it to this template (allow ~24 h for approval). While it is in review you can validate the full path today using the already-approved `STsidewalk2` decoder — see [section 12 of the example README](examples/sidewalk-mems-wba55/README.md#12-temporary-device--validate-today-using-the-alreadyapproved-decoder).
+> **Attach the decoder.** Sidewalk uplinks arrive as a base64 TLV payload, so /IOTCONNECT needs the matching Python decoder [`decoders/sidewalk-mems-tlv.py`](decoders/sidewalk-mems-tlv.py) to surface the individual sensor values. Submit it for decoder approval and attach it to this template (allow ~24 h for approval). While it is in review you can validate the full path today using the already-approved `STsidewalk2` decoder — see [section 12 of the example README](examples/sidewalk-mems-wba55/README.md#12-temporary-device--validate-today-using-the-alreadyapproved-decoder).
 
 ---
 

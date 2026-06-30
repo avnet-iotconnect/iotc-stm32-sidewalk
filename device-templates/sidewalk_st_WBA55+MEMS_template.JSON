@@ -1,0 +1,263 @@
+{
+    "code": "STswMEMS",
+    "name": "Sidewalk ST WBA55 + MEMS",
+    "authType": 2,
+    "attributes": [
+        {
+            "name": "payload",
+            "displayName": "",
+            "type": "OBJECT",
+            "description": "Decoded sid_demo TLV uplink. Fields below populate from on-board sensors on each action notification.",
+            "attributeColor": "",
+            "childs": [
+                {
+                    "name": "id",
+                    "displayName": "",
+                    "type": "STRING",
+                    "description": "sid_demo msg_desc decoded as opc-cmd_class-cmd_id. 2-0-0 is a capability frame, 2-0-1 is an action frame.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "Sequence",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "Uplink sequence counter from the firmware (TLV tag 0x21). Wraps at 256.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "Sinewave",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "Reserved sid_demo template field, always 0 for this firmware. Kept for dashboard compatibility.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "version",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "IKS4A1 firmware payload schema version (TLV tag 0x20).",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "payload_size",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "Total uplink size in bytes. ~14 bytes for capability frames, ~61 bytes for action frames with all sensors present.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "sensor_data",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "Whole-degree STTS22H temperature in C from sid_demo tag 0x06. Same value as temp_stts22h_c rounded to int.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "Temperature",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "Whole-degree STTS22H temperature in C as a decimal. Same value as sensor_data. Surfaced for the standard /IOTCONNECT Temperature widget.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "gps_time",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "GPS time at uplink (TLV tag 0x07), seconds since the Sidewalk GPS epoch. 0 if the device has not yet time-synced.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "link_type",
+                    "displayName": "",
+                    "type": "STRING",
+                    "description": "Sidewalk link the uplink traversed (TLV tag 0x0C). Always BLE for the sid_ble app.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "acc_x_g",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X X-axis acceleration in g (TLV tag 0x22).",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "acc_y_g",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X Y-axis acceleration in g (TLV tag 0x22).",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "acc_z_g",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X Z-axis acceleration in g (TLV tag 0x22). ~+1 g when the board is face-up flat on a desk.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "gyr_x_dps",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X X-axis angular rate in dps (TLV tag 0x23). Near zero when still.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "gyr_y_dps",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X Y-axis angular rate in dps (TLV tag 0x23).",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "gyr_z_dps",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "LSM6DSV16X Z-axis angular rate in dps (TLV tag 0x23).",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "temp_stts22h_c",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "High-resolution STTS22H temperature in C (TLV tag 0x24, 0.01 C resolution). The IKS4A1 dedicated temperature die.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "temp_sht40_c",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "SHT40AD1B temperature in C (TLV tag 0x25, 0.01 C resolution). Co-located with the humidity sensor.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "humidity_sht40_pct",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "SHT40AD1B relative humidity in percent (TLV tag 0x26, 0.01 percent resolution).",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "pressure_hpa",
+                    "displayName": "",
+                    "type": "DECIMAL",
+                    "description": "LPS22DF barometric pressure in hPa (TLV tag 0x27, 0.01 hPa resolution). Typical sea-level value 1013 hPa.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "orientation",
+                    "displayName": "",
+                    "type": "STRING",
+                    "description": "LSM6DSV16X native 6D engine output (TLV tag 0x28). One of: face_up, face_down, portrait_up, portrait_down, landscape_left, landscape_right, unknown.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "qvar",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "LIS2DUXS12 Qvar raw count (TLV tag 0x29, signed int16). Capacitive variation on the IKS4A1 edge pads; swings hundreds-to-thousands when a finger touches a pad.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "mlc1_raw",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "LSM6DSV16X MLC1_SRC register value (TLV tag 0x2A). Raw label index from the asset_tracking decision tree. Expected values: 0, 4, 8, 12. Anything else means the MLC is mid-classification (decoder labels it transition_N).",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "mlc1_label",
+                    "displayName": "",
+                    "type": "STRING",
+                    "description": "Human-readable mapping of mlc1_raw via the active model's label map (asset_tracking default: 0=stationary_upright, 4=stationary_not_upright, 8=in_motion, 12=shaken). Any other raw value surfaces as transition_N.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "mlc1_model_id",
+                    "displayName": "",
+                    "type": "INTEGER",
+                    "description": "Active LSM6DSV16X MLC model id reported by the firmware (TLV tag 0x2B). Selects which label map mlc1_label uses. 0=none, 1=asset_tracking, 2=activity_recognition_for_mobile, 3=activity_recognition_for_wrist, 4=gym_activity_recognition, 5=head_gestures, 6=yoga_pose_recognition.",
+                    "unit": "",
+                    "attributeColor": ""
+                },
+                {
+                    "name": "mlc1_model_name",
+                    "displayName": "",
+                    "type": "STRING",
+                    "description": "Human-readable MLC model name derived from mlc1_model_id (e.g. asset_tracking). Unknown ids surface as unknown_model_N.",
+                    "unit": "",
+                    "attributeColor": ""
+                }
+            ],
+            "aggregateTypes": []
+        },
+        {
+            "name": "decoder_name",
+            "displayName": "",
+            "type": "STRING",
+            "description": "Name of the /IOTCONNECT decoder that produced the record. Always sidewalk-mems-tlv for this template.",
+            "unit": "",
+            "attributeColor": "",
+            "aggregateTypes": []
+        }
+    ],
+    "commands": [
+        {
+            "name": "LED_ON",
+            "command": "{\n    \"command\": \"IKS4A1_LED_ON\"\n}",
+            "requiredParam": false,
+            "requiredAck": false,
+            "isOTACommand": false
+        },
+        {
+            "name": "SET_INTERVAL",
+            "command": "{     \"command\": \"IKS4A1_SET_INTERVAL\",     \"interval_seconds\": 60 }",
+            "requiredParam": true,
+            "requiredAck": false,
+            "isOTACommand": false
+        },
+        {
+            "name": "LED_OFF",
+            "command": "{\n    \"command\": \"IKS4A1_LED_OFF\"\n}",
+            "requiredParam": false,
+            "requiredAck": false,
+            "isOTACommand": false
+        }
+    ],
+    "messageVersion": "2.1",
+    "msgCode": "XG4E3M4",
+    "capability": "24",
+    "c2dOnDemand": 0,
+    "properties": {
+        "description": "WBA55 + X-NUCLEO-IKS4A1 sensor uplink (BLE-only)",
+        "dataFrequency": "120",
+        "fileSupport": false,
+        "certRenewalDay": 0,
+        "enableCSR": false
+    },
+    "_meta": {
+        "version": "2.0"
+    }
+}

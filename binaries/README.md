@@ -119,8 +119,8 @@ Subsequent boots will say `Sidewalk registration status: Registered` and skip
 the ECPFG flow.
 
 After the first uplink reaches the gateway, the corresponding record should
-appear in /IOTCONNECT under the device's name (template `STsideIKA4`, decoder
-`sidewalk-iks4a1-tlv`). Send cadence is ~1 uplink per 2 minutes — the gap
+appear in /IOTCONNECT under the device's name (template `STswMEMS`, decoder
+`sidewalk-mems-tlv`). Send cadence is ~1 uplink per 2 minutes — the gap
 matches Sidewalk's BLE re-acquisition window, not the firmware's demo timer.
 
 ## Rebuilding firmware

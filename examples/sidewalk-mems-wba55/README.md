@@ -294,7 +294,7 @@ Expected after reset:
 
 The uplink is a **`sid_demo`-style TLV stream** (little‑endian values), so the same payload can be parsed by both:
 
-- the **new** [`sidewalk-iks4a1-tlv.py`](../../decoders/sidewalk-iks4a1-tlv.py) decoder (surfaces every IKS4A1 sensor) — submit this for /IOTCONNECT decoder approval, and
+- the **new** [`sidewalk-mems-tlv.py`](../../decoders/sidewalk-mems-tlv.py) decoder (surfaces every IKS4A1 sensor) — submit this for /IOTCONNECT decoder approval, and
 - the **existing approved `STsidewalk2`** decoder (surfaces just the STTS22H temperature via tag `0x06`) — useful for a temporary /IOTCONNECT device while the new decoder is in review.
 
 ### Two frame types
@@ -325,7 +325,7 @@ value  (length bytes, little-endian for multi-byte ints)
 
 ### Tags emitted in the action frame (`0x41`)
 
-| Tag    | Name                       | Size | Encoding                | Read by `STsidewalk2`? | Read by `sidewalk-iks4a1-tlv`? |
+| Tag    | Name                       | Size | Encoding                | Read by `STsidewalk2`? | Read by `sidewalk-mems-tlv`? |
 |--------|----------------------------|------|--------------------------|:------:|:------:|
 | `0x06` | TEMPERATURE_SENSOR_DATA    | 2 B  | int16 LE °C (whole)     | ✅ → `Temperature`/`sensor_data` | ignored (precision lives in 0x24) |
 | `0x07` | CURRENT_GPS_TIME_IN_SECONDS| 4 B  | uint32 LE seconds       | — | ✅ → `gps_time` |
@@ -469,7 +469,7 @@ Expected on the UART log:
 
 ## 10) /IOTCONNECT decoder
 
-Submit [`decoders/sidewalk-iks4a1-tlv.py`](../../decoders/sidewalk-iks4a1-tlv.py) for /IOTCONNECT decoder approval (allow ~24 h). It:
+Submit [`decoders/sidewalk-mems-tlv.py`](../../decoders/sidewalk-mems-tlv.py) for /IOTCONNECT decoder approval (allow ~24 h). It:
 
 - Walks the TLV stream and silently skips unknown tags (matching `sid_demo` semantics).
 - Returns scaled SI values (g, dps, °C, %RH, hPa) keyed to the attribute names declared in the device template.
@@ -483,7 +483,7 @@ def dict_from_payload(base64_input: str, fport: int = None):
 Quick local check (builds a synthetic TLV payload, encodes to base64, decodes, prints):
 
 ```
-python3 decoders/sidewalk-iks4a1-tlv.py
+python3 decoders/sidewalk-mems-tlv.py
 ```
 
 Expected output: a JSON dump of the synthetic sample payload (~23 °C, ~42 %RH, ~1013 hPa).
@@ -492,7 +492,7 @@ Expected output: a JSON dump of the synthetic sample payload (~23 °C, ~42 %RH, 
 
 ## 11) /IOTCONNECT device template
 
-Use [`device-templates/sidewalk_iks4a1_template.json`](../../device-templates/sidewalk_iks4a1_template.json) when creating the device template. It declares:
+Use [`device-templates/sidewalk_st_WBA55+MEMS_template.JSON`](../../device-templates/sidewalk_st_WBA55+MEMS_template.JSON) when creating the device template. It declares:
 
 - The uplink attributes (decoder output fields with units and aggregation types).
 - The three downlink commands (`LED_ON`, `LED_OFF`, `SET_INTERVAL`) as JSON descriptors, matching the standard /IOTCONNECT Sidewalk pattern (cf. ST's `WLS0723`).
@@ -503,7 +503,7 @@ The cloud-side downlink translator that converts those JSON descriptors to the w
 
 ## 12) Temporary device — validate today using the already‑approved decoder
 
-While `sidewalk-iks4a1-tlv.py` is in /IOTCONNECT decoder review (~24 h), you can prove the full Sidewalk path end‑to‑end **today** by spinning up a second /IOTCONNECT device against the existing approved `STsidewalk2` decoder. **No firmware changes** — the same image works because tag `0x06` carries an STTS22H whole‑degree temperature in the same TLV stream.
+While `sidewalk-mems-tlv.py` is in /IOTCONNECT decoder review (~24 h), you can prove the full Sidewalk path end‑to‑end **today** by spinning up a second /IOTCONNECT device against the existing approved `STsidewalk2` decoder. **No firmware changes** — the same image works because tag `0x06` carries an STTS22H whole‑degree temperature in the same TLV stream.
 
 Setup:
 
@@ -519,7 +519,7 @@ Setup:
 
    Other template attributes (`gps_time`, `link_type`, `ota_*`, `button_*`, `led_*`, etc.) stay empty — the firmware doesn't emit those tags. That's expected and harmless.
 
-5. **When the new decoder is approved**, attach `sidewalk-iks4a1-tlv.py` to a primary device on the [`sidewalk_iks4a1_template.json`](../../device-templates/sidewalk_iks4a1_template.json) template and decommission the temporary device. The same firmware image carries over without re‑flashing.
+5. **When the new decoder is approved**, attach `sidewalk-mems-tlv.py` to a primary device on the [`sidewalk_st_WBA55+MEMS_template.JSON`](../../device-templates/sidewalk_st_WBA55+MEMS_template.JSON) template and decommission the temporary device. The same firmware image carries over without re‑flashing.
 
 > Why this works: our TLV stream emits tag `0x06` (whole °C) **and** tag `0x24` (°C × 100). `STsidewalk2` knows tag `0x06` and silently skips the IKS4A1‑specific tags 0x20–0x27 (sid_demo's `_read_tlv` advances over unknown tags rather than erroring). Once the new decoder is in place, it ignores tag `0x06` and reads tag `0x24` for higher precision plus all the other sensor tags.
 
@@ -535,7 +535,7 @@ Setup:
 6. Generate `mfg_wba55.hex` from the /IOTCONNECT JSON.
 7. Erase → flash firmware → flash MFG.
 8. Confirm `IKS4A1: sensors initialized` and `IKS4A1 uplink seq=...` in the UART log.
-9. Apply `sidewalk-iks4a1-tlv.py` decoder + `sidewalk_iks4a1_template.json` template in /IOTCONNECT.
+9. Apply `sidewalk-mems-tlv.py` decoder + `sidewalk_st_WBA55+MEMS_template.JSON` template in /IOTCONNECT.
 10. Wire `decoders/iks4a1_downlink_translator.py` into your /IOTCONNECT downlink hook (or as a Lambda) so dashboard commands hit the firmware as opcode bytes. (Or use the `bytesCommand` REST path with `tools/register_iks4a1_commands.py --apply`.)
 11. (Optional) Fire `aws iotwireless send-data-to-wireless-device --payload-data AQ==` to confirm `CMD led_on` lands.
 
