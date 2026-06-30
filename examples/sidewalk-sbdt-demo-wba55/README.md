@@ -1,13 +1,20 @@
 # sid_sbdt_demo — Build & Flash Notes
 
-Built: 2026-06-30  
 Board: NUCLEO-WBA55CG (BLE-only, no Sub-GHz radio required)  
-Device JSON: `StSidewalk5.json` (SMSN: 930F390B...)  
 SDK: STM32-Sidewalk-SDK
+
+> **Pre-built binaries are not distributed in this repository.** The
+> three hex files that make up the demo (the AIM secure bootloader, the
+> signed SBDT demo application, and the OTA-delivery image) incorporate
+> compiled code from X-CUBE-CRYPTOLIB (CMOX) and the Amazon Sidewalk SDK,
+> whose upstream licenses constrain binary redistribution. See
+> [../../NOTICE.md](../../NOTICE.md) for the SBOM. Workshop participants
+> receive pre-flashed boards from the facilitator; everyone else rebuilds
+> the artifacts locally per the instructions below.
 
 ---
 
-## Files in this folder
+## Files referenced by this guide (produced locally — not committed)
 
 | File | Description | Flash? |
 |---|---|---|
@@ -18,11 +25,15 @@ SDK: STM32-Sidewalk-SDK
 | `sid_sbdt_demo_wba55_ota_image.hex` | Signed OTA payload — sent to device over Sidewalk SBDT | Do not flash directly |
 | `application_signing_key.pem` | Ed25519 private key used to sign the firmware | Keep safe — not flashed |
 
+All of the above land in this directory after you complete the build
+steps in **Rebuilding from source** below and the provisioning step at
+the end of the same section.
+
 ---
 
 ## Flash order (STM32CubeProgrammer CLI)
 
-Connect ST-LINK to the NUCLEO-WBA55CG, then run these commands in order:
+After completing the local build, connect ST-LINK to the NUCLEO-WBA55CG, then run these commands in order:
 
 ```bash
 # 0. Full chip erase (do this first, every time)

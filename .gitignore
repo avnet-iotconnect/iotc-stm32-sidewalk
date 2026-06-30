@@ -8,10 +8,15 @@ __pycache__/
 .DS_Store
 *.swp
 
-# Build artifacts — firmware .hex files ARE committed (see binaries/), but
-# intermediate object/elf/bin artifacts are not.
+# Pre-built firmware images are NOT committed. They incorporate compiled
+# code from third-party components (notably X-CUBE-CRYPTOLIB / CMOX and
+# Amazon Sidewalk Content) whose upstream licenses constrain public
+# binary redistribution. Workshop facilitators pre-flash boards locally;
+# all other users rebuild via scripts/build-firmware.sh.
+binaries/*.hex
 binaries/*.bin
 binaries/*.elf
+examples/sidewalk-sbdt-demo-wba55/*.hex
 
 # Sidewalk manufacturing artifacts — cert.json contains device PRIVATE KEYS,
 # mfg.bin/mfg.hex are derived from them. NEVER commit any of this.

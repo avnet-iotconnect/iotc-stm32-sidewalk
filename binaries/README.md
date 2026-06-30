@@ -1,28 +1,46 @@
 # Sidewalk WBA55 Firmware + Provisioning
 
-Pre-built firmware images and per-device Sidewalk manufacturing data for the
-**Nucleo-WBA55CG + X-NUCLEO-IKSxA1** demo. Pair the correct firmware with the
-matching sensor expansion board and flash both the firmware and a device's
-`mfg.bin` to bring a unit online.
+**Build-output destination** for the Nucleo-WBA55CG + X-NUCLEO-IKSxA1 demo.
+None of the firmware images or per-device data described here are committed
+to the public repository — see the security / licensing notes below. This
+directory is where local builds and provisioning runs deposit their output,
+ready to flash to your hardware.
 
-## Contents
+## Contents (after a local build + provisioning run)
 
 ```
 binaries/
 ├── sid_ble_wba55_iks4a1.hex    # firmware for boards with X-NUCLEO-IKS4A1
 ├── sid_ble_wba55_iks5a1.hex    # firmware for boards with X-NUCLEO-IKS5A1
-└── sidewalk-mfg/               # NOT COMMITTED — contains private keys
+└── sidewalk-mfg/
     └── <device-name>/
         ├── cert.json           # AWS-provided cert (PRIVATE KEY — do not share)
         ├── mfg.bin             # WBA55-format manufacturing image
         └── mfg.hex             # same content, hex form
 ```
 
-The two firmware hexes are reproducible from the SDK, so they are
-intentionally `.gitignore`d. Run `../scripts/build-firmware.sh` to rebuild.
+**None of these files are committed.** They are produced locally and
+gitignored. To populate this directory:
+
+* Firmware hexes: run `../scripts/build-firmware.sh` (requires the
+  STM32-Sidewalk-SDK + STM32CubeIDE + X-CUBE-CRYPTOLIB to be set up; see
+  the example READMEs under `../examples/`).
+* Per-device manufacturing data: run
+  `../scripts/provision-device.sh <device-name> <path-to-cert.json>`.
+
+## Why pre-built binaries are not distributed in this repository
+
+Pre-built firmware images would incorporate compiled code from third-party
+components — notably the X-CUBE-CRYPTOLIB (CMOX) cryptographic library and
+the Amazon Sidewalk SDK — whose upstream licenses constrain binary
+redistribution. See `../NOTICE.md` for the full SBOM and the per-component
+upstream license citations. Integrators rebuild firmware locally (and
+accept the X-CUBE-CRYPTOLIB click-through at download time as part of
+that setup) so the redistribution constraints stay on the integrator
+side of the trust boundary.
 
 The `sidewalk-mfg/` directory is **never committed** — `cert.json` contains
-device private keys.
+device-bound Sidewalk private keys.
 
 ## Sensor board → firmware mapping
 

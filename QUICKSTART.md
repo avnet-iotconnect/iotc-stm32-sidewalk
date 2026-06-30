@@ -160,18 +160,35 @@ binaries/sidewalk-mfg/wba55-mems-01/
 
 ---
 
-## 9. Download and Flash the Pre-Compiled Firmware
+## 9. Build and Flash the Firmware
 
-Two pre-compiled firmware images ship in this repo — pick the one for your sensor board:
+> **Workshop note.** In Avnet-facilitated workshops, the facilitator pre-flashes participant boards before the session — skip ahead to **Step 10**, plug in your board, and confirm the boot banner on the UART.
+
+For independent setup, you build the firmware yourself; pre-built images are not distributed in this repository (see `NOTICE.md` for the licensing rationale). You then flash **two** images: the firmware and the per-device manufacturing data from Step 7.
+
+### Build the firmware locally
+
+```bash
+./scripts/build-firmware.sh           # both IKS4A1 and IKS5A1 variants
+./scripts/build-firmware.sh iks4a1    # IKS4A1 only
+./scripts/build-firmware.sh iks5a1    # IKS5A1 only
+```
+
+Prerequisites — STM32CubeIDE, the STM32-Sidewalk-SDK adjacent to this repo, X-CUBE-MEMS1 BSP drivers, and X-CUBE-CRYPTOLIB (CMOX) downloaded from st.com with click-through accepted. See [examples/sidewalk-mems-wba55/README.md](examples/sidewalk-mems-wba55/README.md) for the full setup. Output lands at:
+
+```
+binaries/sid_ble_wba55_iks4a1.hex
+binaries/sid_ble_wba55_iks5a1.hex
+```
+
+Pick the one that matches your sensor board:
 
 | Physical board | Firmware hex |
 |---|---|
-| NUCLEO-WBA55CG + **X-NUCLEO-IKS4A1** | [`binaries/sid_ble_wba55_iks4a1.hex`](binaries/sid_ble_wba55_iks4a1.hex) |
-| NUCLEO-WBA55CG + **X-NUCLEO-IKS5A1** | [`binaries/sid_ble_wba55_iks5a1.hex`](binaries/sid_ble_wba55_iks5a1.hex) |
+| NUCLEO-WBA55CG + **X-NUCLEO-IKS4A1** | `binaries/sid_ble_wba55_iks4a1.hex` |
+| NUCLEO-WBA55CG + **X-NUCLEO-IKS5A1** | `binaries/sid_ble_wba55_iks5a1.hex` |
 
-You flash **two** images: the firmware and the per-device manufacturing data from Step 7.
-
-### One-shot helper (recommended)
+### One-shot flash helper (recommended)
 
 The wrapper erases the chip, then writes the firmware, then writes the MFG image — each step under connect-under-reset (`mode=UR`) with an automatic one-shot retry:
 
