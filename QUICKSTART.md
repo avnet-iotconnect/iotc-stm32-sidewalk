@@ -2,8 +2,8 @@
 
 [Purchase the NUCLEO-WBA55CG](https://estore.st.com/en/nucleo-wba55cg-cpn.html) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://estore.st.com/en/x-nucleo-iks4a1-cpn.html)
 
-![NUCLEO-WBA55CG Sidewalk hardware (boxed) reaching /IOTCONNECT over Amazon Sidewalk](media/wba55-sidewalk-hardware.png)
-_The boxed **NUCLEO-WBA55CG** (BLE / Link Type 1) is the host board this demo runs on — stack the X-NUCLEO-IKS4A1 / IKS5A1 MEMS sensor shield onto its Arduino headers (Step 8). It reaches /IOTCONNECT over Amazon Sidewalk via a nearby gateway (e.g. Amazon Echo) and the AWS backend. The other pairings shown add sub-GHz radios and are not used here._
+![NUCLEO-WBA55CG with the X-NUCLEO-IKS MEMS sensor shield stacked on its Arduino headers](media/wba55-iks-stack.png)
+_The X-NUCLEO-IKS4A1 / IKS5A1 MEMS sensor shield stacked on the NUCLEO-WBA55CG Arduino headers (Step 8). The WBA55 reaches /IOTCONNECT over Amazon Sidewalk (BLE / Link Type 1) via a nearby gateway (e.g. Amazon Echo) and the AWS backend._
 
 ![Amazon Sidewalk end-to-end workflow](https://docs.iotconnect.io/wp-content/uploads/2023/12/image7.png)
 
