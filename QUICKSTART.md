@@ -217,6 +217,26 @@ _(Screen: Telemetry)_
 
 Sanity-check values for a device sitting on a desk: accel ≈ (0, 0, 1000) mg, gyro ≈ (0, 0, 0) dps, temperature ≈ 22–25 °C, humidity ≈ 30–60 %RH, pressure ≈ 1000–1015 hPa. Touch the silver Qvar pads on the edge of the expansion board to watch the `qvar` field swing.
 
+### Data sent to the cloud (per board)
+
+Both boards share the same TLV wire format and the single `STswMEMS` template; the IKS5A1 simply leaves a few fields empty. A ✅ means the attribute is populated on every action uplink.
+
+| Cloud attribute | Sensor (IKS4A1 / IKS5A1) | IKS4A1 | IKS5A1 |
+|---|---|:--:|:--:|
+| `acc_x_g`, `acc_y_g`, `acc_z_g` | LSM6DSV16X / ISM6HG256X (g) | ✅ | ✅ |
+| `gyr_x_dps`, `gyr_y_dps`, `gyr_z_dps` | LSM6DSV16X / ISM6HG256X (dps) | ✅ | ✅ |
+| `temp_stts22h_c` | STTS22H / ILPS22QS (°C) | ✅ | ✅ |
+| `pressure_hpa` | LPS22DF / ILPS22QS (hPa) | ✅ | ✅ |
+| `qvar` | LIS2DUXS12 / IIS2DULPX (raw count) | ✅ | ✅ |
+| `temp_sht40_c` | SHT40AD1B (°C) | ✅ | — |
+| `humidity_sht40_pct` | SHT40AD1B (%RH) | ✅ | — |
+| `orientation` | LSM6DSV16X 6D engine | ✅ | — (`unknown`) |
+| `mlc1_label` (+ `mlc1_raw`, `mlc1_model_id`, `mlc1_model_name`) | LSM6DSV16X MLC | ✅ | — |
+| `sensor_data` / `Temperature` | whole-°C temperature (for the standard widget) | ✅ | ✅ |
+| `Sequence`, `gps_time`, `link_type`, `version` | firmware / Sidewalk metadata | ✅ | ✅ |
+
+> The IKS5A1 omits SHT40 temperature/humidity, 6D orientation (reported as `unknown`), and the MLC activity classifier — its IMU 6D and MLC paths are not yet wired in firmware.
+
 ---
 
 ## 11. Send a Command (Downlink)
