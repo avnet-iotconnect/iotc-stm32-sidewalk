@@ -1,6 +1,6 @@
 # QuickStart: STM32 Amazon Sidewalk MEMS Sensor Demo with /IOTCONNECT
 
-[Purchase the NUCLEO-WBA55CG](https://estore.st.com/en/nucleo-wba55cg-cpn.html) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://estore.st.com/en/x-nucleo-iks4a1-cpn.html) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS5A1](https://estore.st.com/en/x-nucleo-iks5a1-cpn.html)
+[Purchase the NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
 
 ![NUCLEO-WBA55CG with the X-NUCLEO-IKS MEMS sensor shield stacked on its Arduino headers](media/wba55-iks-stack.png)
 _The X-NUCLEO-IKS4A1 / IKS5A1 MEMS sensor shield stacked on the NUCLEO-WBA55CG Arduino headers (Step 8). The WBA55 reaches /IOTCONNECT over Amazon Sidewalk (BLE / Link Type 1) via a nearby gateway (e.g. Amazon Echo) and the AWS backend._
@@ -29,8 +29,8 @@ Because the data travels over Amazon Sidewalk, your device reaches the cloud thr
 
 **Hardware**
 
-* [NUCLEO-WBA55CG](https://estore.st.com/en/nucleo-wba55cg-cpn.html) — Sidewalk host MCU (programmed over the on-board ST-LINK)
-* **One of:** [X-NUCLEO-IKS4A1](https://estore.st.com/en/x-nucleo-iks4a1-cpn.html) *or* [X-NUCLEO-IKS5A1](https://estore.st.com/en/x-nucleo-iks5a1-cpn.html) MEMS sensor expansion board
+* [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) — Sidewalk host MCU (programmed over the on-board ST-LINK)
+* **One of:** [X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) *or* [X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356) MEMS sensor expansion board
 * USB micro-B cable (ST-LINK programming + UART log)
 * A compatible **Amazon Sidewalk gateway** in range (e.g. Amazon Echo 4th Gen) with Sidewalk enabled
 
@@ -265,7 +265,7 @@ _(Screen: Command)_
 * [Pre-built binaries & provisioning details](binaries/README.md)
 * [Repository overview](README.md)
 * /IOTCONNECT Sidewalk device docs: [Sidewalk Device](https://docs.iotconnect.io/iotconnect/user-manuals/devices/device/sidewalk) · [Wireless Device Types](https://docs.iotconnect.io/iotconnect/concepts/device-types/wireless-device/)
-* Hardware: [NUCLEO-WBA55CG](https://estore.st.com/en/nucleo-wba55cg-cpn.html) · [X-NUCLEO-IKS4A1](https://estore.st.com/en/x-nucleo-iks4a1-cpn.html) · [X-NUCLEO-IKS5A1](https://estore.st.com/en/x-nucleo-iks5a1-cpn.html)
+* Hardware: [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) · [X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) · [X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
 * Amazon Sidewalk: [supported gateways](https://docs.sidewalk.amazon/getting-started/) · [device lifecycle](https://docs.sidewalk.amazon/manufacturing/sidewalk-device-lifecycle.html)
 
 ---
