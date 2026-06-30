@@ -16,3 +16,14 @@ binaries/*.elf
 # Sidewalk manufacturing artifacts — cert.json contains device PRIVATE KEYS,
 # mfg.bin/mfg.hex are derived from them. NEVER commit any of this.
 binaries/sidewalk-mfg/
+
+# SBDT demo per-device artifacts. The .pem is the Ed25519 *private* key that
+# signs every OTA image; sharing it would let an attacker produce signed
+# updates AIM accepts. mfg.bin/mfg.hex carry device-specific credentials.
+examples/sidewalk-sbdt-demo-wba55/application_signing_key.pem
+examples/sidewalk-sbdt-demo-wba55/mfg.bin
+examples/sidewalk-sbdt-demo-wba55/mfg.hex
+
+# Earlier dev-machine copy of the same SBDT artifacts (includes the .pem).
+# Kept on disk for reference but must never be tracked.
+binaries/sid_sbdt_demo/
