@@ -85,7 +85,7 @@ The **device template** defines the telemetry attributes and downlink commands f
 
 In this step you create a **Wireless Device** of transmission type **Sidewalk**, associated with the template you just imported. /IOTCONNECT registers it with AWS IoT Wireless and generates the per-device Sidewalk credentials.
 
-1. From the navigation panel on the left, hover over **Devices** and select **Wireless Device**.
+1. From the navigation panel on the left, select the **Devices** icon and choose **Wireless Device** from the sub-menu.<br>![Devices menu with Wireless Device selected](media/menu-wireless-device.png)
 2. At the top-right, click **Create Device**.
 3. Fill in the fields:
    * **Transmission Type:** select **Sidewalk**
