@@ -1,6 +1,6 @@
 # QuickStart: STM32 Amazon Sidewalk MEMS Sensor Demo with /IOTCONNECT
 
-[Purchase the NUCLEO-WBA55CG](https://estore.st.com/en/nucleo-wba55cg-cpn.html) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://estore.st.com/en/x-nucleo-iks4a1-cpn.html)
+[Purchase the NUCLEO-WBA55CG](https://estore.st.com/en/nucleo-wba55cg-cpn.html) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://estore.st.com/en/x-nucleo-iks4a1-cpn.html) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS5A1](https://estore.st.com/en/x-nucleo-iks5a1-cpn.html)
 
 ![NUCLEO-WBA55CG with the X-NUCLEO-IKS MEMS sensor shield stacked on its Arduino headers](media/wba55-iks-stack.png)
 _The X-NUCLEO-IKS4A1 / IKS5A1 MEMS sensor shield stacked on the NUCLEO-WBA55CG Arduino headers (Step 8). The WBA55 reaches /IOTCONNECT over Amazon Sidewalk (BLE / Link Type 1) via a nearby gateway (e.g. Amazon Echo) and the AWS backend._
