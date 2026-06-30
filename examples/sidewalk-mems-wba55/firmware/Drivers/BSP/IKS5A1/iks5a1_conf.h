@@ -1,14 +1,29 @@
 /**
   ******************************************************************************
   * @file    iks5a1_conf.h
-  * @brief   IKS5A1 configuration for Nucleo-WBA55CG + Sidewalk demo.
-  *          Mirrors iks4a1_conf.h. Sensors enabled:
-  *            - ISM6HG256X  (motion: 6-axis IMU, high-g)
-  *            - IIS2DULPX   (motion: accel + Qvar capacitive front-end)
-  *            - ILPS22QS    (env:    pressure + on-die temperature)
-  *          Disabled to keep flash small:
-  *            - ISM330IS    (ISPU IMU - add when ISPU is wired up)
-  *            - IIS2MDC     (magnetometer - no template field yet)
+  * @author  MEMS Software Solutions Team
+  * @brief   This file contains definitions for the MEMS components bus interfaces
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2023 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  *
+  * Modifications by Avnet /IOTCONNECT for the iotc-stm32-sidewalk demo
+  * (file originally derived from iks5a1_conf_template.h in X-CUBE-MEMS1):
+  *   - Mirrors iks4a1_conf.h structure for the Nucleo-WBA55CG.
+  *   - Sensors enabled:  ISM6HG256X, IIS2DULPX, ILPS22QS.
+  *   - Sensors disabled: ISM330IS (ISPU IMU — add when ISPU is wired up);
+  *                       IIS2MDC (magnetometer — no template field yet).
+  *
+  * Upstream license terms (BSD-3-Clause) are preserved; refer to the SDK LICENSE
+  * file for the full text.
   ******************************************************************************
   */
 #ifndef IKS5A1_CONF_H

@@ -2,6 +2,20 @@ MIT License
 
 Copyright (c) 2026 Avnet /IOTCONNECT
 
+The MIT terms below apply to the original Avnet /IOTCONNECT content in this
+repository (decoders, device templates, scripts, documentation, and original
+firmware source files written for this demo).
+
+This repository also contains source files derived from third-party
+components (notably ST X-CUBE-MEMS1 BSP templates and the STMems_Machine_
+Learning_Core UCF configuration), and pre-built firmware images that
+incorporate compiled code from many third-party components. Those files
+and binaries remain governed by their own upstream licenses and the MIT
+terms below DO NOT relicense them. See NOTICE.md in this directory for
+the Software Bill of Materials and the upstream copyright / license
+attributions.
+
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights

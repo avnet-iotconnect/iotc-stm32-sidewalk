@@ -1,14 +1,31 @@
 /**
   ******************************************************************************
   * @file    stm32wbaxx_nucleo_bus.h
-  * @brief   BSP bus glue for the IKS4A1 sensor expansion shield on Nucleo-WBA55CG.
+  * @author  MCD Application Team
+  * @brief   Header file for the BSP BUS IO driver
+  ******************************************************************************
+  * @attention
   *
-  *   Pinout (UM3301 + Nucleo-WBA55CG schematic):
-  *     D14 ARDUINO = PB1 = I2C1_SDA (AF4)
-  *     D15 ARDUINO = PB2 = I2C1_SCL (AF4)
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
   *
-  *   Clock: I2C1 is sourced from HSI16 (16 MHz) so TIMINGR stays stable
-  *   regardless of system clock tweaks. Standard mode (100 kHz).
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  *
+  * Modifications by Avnet /IOTCONNECT for the iotc-stm32-sidewalk demo:
+  *   - BSP bus glue tailored for the IKS4A1 / IKS5A1 sensor expansion shields
+  *     on Nucleo-WBA55CG.
+  *   - Pinout (UM3301 + Nucleo-WBA55CG schematic):
+  *       D14 ARDUINO = PB1 = I2C1_SDA (AF4)
+  *       D15 ARDUINO = PB2 = I2C1_SCL (AF4)
+  *   - Clock: I2C1 is sourced from HSI16 (16 MHz) so TIMINGR stays stable
+  *     regardless of system clock tweaks. Standard mode (100 kHz).
+  *
+  * Upstream license terms (BSD-3-Clause) are preserved; refer to the SDK LICENSE
+  * file for the full text.
   ******************************************************************************
   */
 

@@ -1,11 +1,28 @@
 /**
   ******************************************************************************
   * @file    iks4a1_conf.h
-  * @brief   IKS4A1 configuration for Nucleo-WBA55CG + Sidewalk demo.
-  *          Generated from iks4a1_conf_template.h with:
-  *            - WBA HAL header
-  *            - WBA Nucleo BSP I2C bus glue (PB1=SDA / PB2=SCL via I2C1)
-  *            - Only the four sensors we ship PID drivers for enabled
+  * @author  MEMS Software Solutions Team
+  * @brief   This file contains definitions for the MEMS components bus interfaces
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  *
+  * Modifications by Avnet /IOTCONNECT for the iotc-stm32-sidewalk demo
+  * (file originally derived from iks4a1_conf_template.h in X-CUBE-MEMS1):
+  *   - Includes stm32wbaxx_hal.h and the WBA Nucleo BSP I2C bus glue header
+  *     (PB1=SDA / PB2=SCL via I2C1) instead of the generic template.
+  *   - Enables only the four sensors we ship PID drivers for.
+  *
+  * Upstream license terms (BSD-3-Clause) are preserved; refer to the SDK LICENSE
+  * file for the full text.
   ******************************************************************************
   */
 #ifndef IKS4A1_CONF_H

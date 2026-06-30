@@ -1,9 +1,29 @@
 /**
   ******************************************************************************
   * @file    stm32wbaxx_nucleo_bus.c
-  * @brief   BSP I2C1 bus implementation for Nucleo-WBA55CG (Arduino D14/D15).
-  *          Used by the IKS4A1 sensor expansion shield through the X-CUBE-MEMS1
-  *          BSP and PID component drivers.
+  * @author  MCD Application Team
+  * @brief   Source file for the BSP BUS IO driver
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  *
+  * Modifications by Avnet /IOTCONNECT for the iotc-stm32-sidewalk demo:
+  *   - I2C1 bus implementation tailored for Nucleo-WBA55CG (Arduino D14/D15
+  *     pins, PB1=SDA / PB2=SCL), used by the IKS4A1 / IKS5A1 sensor expansion
+  *     shields through the X-CUBE-MEMS1 BSP and PID component drivers.
+  *   - Refcounted Init/DeInit so multiple sensor modules sharing the bus do
+  *     not double-init / prematurely tear down the peripheral.
+  *
+  * Upstream license terms (BSD-3-Clause) are preserved; refer to the SDK LICENSE
+  * file for the full text.
   ******************************************************************************
   */
 
