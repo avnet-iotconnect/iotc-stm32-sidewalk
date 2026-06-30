@@ -3,6 +3,7 @@
 [Purchase the NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
 
 ![NUCLEO-WBA55CG with the X-NUCLEO-IKS MEMS sensor shield stacked on its Arduino headers](media/wba55-iks-stack.png)
+
 _The X-NUCLEO-IKS4A1 / IKS5A1 MEMS sensor shield stacked on the NUCLEO-WBA55CG Arduino headers (Step 8). The WBA55 reaches /IOTCONNECT over Amazon Sidewalk (BLE / Link Type 1) via a nearby gateway (e.g. Amazon Echo) and the AWS backend._
 
 ![Amazon Sidewalk end-to-end workflow](https://docs.iotconnect.io/wp-content/uploads/2023/12/image7.png)
@@ -97,11 +98,13 @@ In this step you create a **Wireless Device** of transmission type **Sidewalk**,
 4. Click **Save & View**. Saving whitelists the device with AWS IoT Wireless for authorization.
 
 ![Create Device screen](https://docs.iotconnect.io/wp-content/uploads/2023/12/image3.png)
+
 _(Screen: Create Device)_
 
 After saving, the device appears in the Sidewalk device list, ready to be provisioned and flashed.
 
 ![Sidewalk Device List screen](https://docs.iotconnect.io/wp-content/uploads/2023/12/image4.png)
+
 _(Screen: Sidewalk Device List)_
 
 ---
@@ -213,6 +216,7 @@ Open the board's USB serial port at **115200 8N1**. On first boot you should see
 Back in /IOTCONNECT, find your device in the **Wireless Device** list and open its **Live Data** tab to confirm telemetry is flowing.
 
 ![Telemetry / Live Data screen](https://docs.iotconnect.io/wp-content/uploads/2023/12/image5.png)
+
 _(Screen: Telemetry)_
 
 Sanity-check values for a device sitting on a desk: accel ≈ (0, 0, 1000) mg, gyro ≈ (0, 0, 0) dps, temperature ≈ 22–25 °C, humidity ≈ 30–60 %RH, pressure ≈ 1000–1015 hPa. Touch the silver Qvar pads on the edge of the expansion board to watch the `qvar` field swing.
@@ -252,6 +256,7 @@ The template ships with three downlink commands that travel from the cloud back 
 Open the device's **Command** tab, choose a command (supply the interval value for `SET_INTERVAL`), and send it. The device logs the received opcode on its serial console (`CMD led_on`, `CMD set_interval -> 300 s`).
 
 ![Command screen](https://docs.iotconnect.io/wp-content/uploads/2023/12/image6.png)
+
 _(Screen: Command)_
 
 > [!NOTE]
