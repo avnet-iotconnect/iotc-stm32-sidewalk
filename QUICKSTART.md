@@ -248,9 +248,9 @@ Open the board's USB serial port at **115200 8N1**. On first boot you should see
 
 Back in /IOTCONNECT, find your device in the **Wireless Device** list and open its **Live Data** tab to confirm telemetry is flowing.
 
-![Telemetry / Live Data screen](https://docs.iotconnect.io/wp-content/uploads/2023/12/image5.png)
+![Wireless Device list — the device shows CONNECTED with a recent Last Communication](media/device-list.png)
 
-_(Screen: Telemetry)_
+_(Screen: Wireless Device list — a recent **Last Communication** and a **CONNECTED** provisioning status confirm uplinks are arriving; open the device's **Live Data** tab to see the decoded values.)_
 
 Sanity-check values for a device sitting on a desk: accel ≈ (0, 0, 1000) mg, gyro ≈ (0, 0, 0) dps, temperature ≈ 22–25 °C, humidity ≈ 30–60 %RH, pressure ≈ 1000–1015 hPa. Touch the silver Qvar pads on the edge of the expansion board to watch the `qvar` field swing.
 
@@ -268,11 +268,11 @@ Both boards share the same TLV wire format and the single `STswMEMS` template; t
 | `temp_sht40_c` | SHT40AD1B (°C) | ✅ | — |
 | `humidity_sht40_pct` | SHT40AD1B (%RH) | ✅ | — |
 | `orientation` | LSM6DSV16X 6D engine | ✅ | — (`unknown`) |
-| `mlc1_label` (+ `mlc1_raw`, `mlc1_model_id`, `mlc1_model_name`) | LSM6DSV16X MLC | ✅ | — |
+| `mlc1_label` (+ `mlc1_raw`, `mlc1_model_id`, `mlc1_model_name`) | LSM6DSV16X / ISM6HG256X MLC (asset_tracking) | ✅ | ✅ |
 | `sensor_data` / `Temperature` | whole-°C temperature (for the standard widget) | ✅ | ✅ |
 | `Sequence`, `gps_time`, `link_type`, `version` | firmware / Sidewalk metadata | ✅ | ✅ |
 
-> The IKS5A1 omits SHT40 temperature/humidity, 6D orientation (reported as `unknown`), and the MLC activity classifier — its IMU 6D and MLC paths are not yet wired in firmware.
+> The IKS5A1 omits SHT40 temperature/humidity and 6D orientation (reported as `unknown` — its 6D path is not yet wired in firmware). It **does** run the ISM6HG256X **MLC asset-tracking** classifier, emitting the same `mlc1_label` classes and model id as the IKS4A1, so the shared decoder handles both boards unchanged.
 
 ---
 

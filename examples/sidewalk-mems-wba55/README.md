@@ -19,6 +19,7 @@ What you get end‑to‑end, per board:
 - ISM6HG256X — 6‑axis IMU (accel + gyro)
 - ILPS22QS — barometric pressure + on‑die temperature (surfaced as `temp_stts22h_c` — same TLV tag for dashboard compatibility)
 - **IIS2DULPX — Qvar (capacitive sensing)** — touch the silver pads on the IKS5A1 edge to swing the `qvar` field
+- **ISM6HG256X MLC — asset‑tracking classifier** — emits `mlc1_label` (stationary_upright / stationary_not_upright / in_motion / shaken) from the ISM6HG256X MLC, using the same UCF classes and model id as the IKS4A1, so the shared decoder handles it unchanged
 - *No SHT40* — `temp_sht40_c` / `humidity_sht40_pct` are empty on IKS5A1 builds
 - *6D orientation not yet exposed* — `orientation` reports `unknown`
 

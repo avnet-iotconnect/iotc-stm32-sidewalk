@@ -8,9 +8,10 @@ is which subset of tags is populated:
   X-NUCLEO-IKS4A1 emits :  acc, gyro, STTS22H temp, SHT40 temp+RH, LPS22DF pressure,
                            LSM6DSV16X 6D orientation, LIS2DUXS12 Qvar
   X-NUCLEO-IKS5A1 emits :  acc, gyro, ILPS22QS temp (under stts22h tag),
-                           ILPS22QS pressure (under lps22df tag), IIS2DULPX Qvar
-                           (no SHT40, orientation = "unknown" until ISM6HG256X
-                            6D engine is wired in firmware)
+                           ILPS22QS pressure (under lps22df tag), IIS2DULPX Qvar,
+                           ISM6HG256X MLC asset_tracking (mlc1, same model id as
+                           IKS4A1)  (no SHT40; orientation = "unknown" until the
+                            ISM6HG256X 6D engine is wired in firmware)
 
 Output fields for "missing" sensors stay empty rather than being omitted, so a
 single /IOTCONNECT template covers both boards.
