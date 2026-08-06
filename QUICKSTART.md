@@ -248,9 +248,9 @@ Open the board's USB serial port at **115200 8N1**. On first boot you should see
 
 Back in /IOTCONNECT, find your device in the **Wireless Device** list and open its **Live Data** tab to confirm telemetry is flowing.
 
-![Wireless Device list — the device shows CONNECTED with a recent Last Communication](media/device-list.png)
+![Device Live Data tab showing decoded MEMS telemetry records streaming in](media/sidewalk-live-data.png)
 
-_(Screen: Wireless Device list — a recent **Last Communication** and a **CONNECTED** provisioning status confirm uplinks are arriving; open the device's **Live Data** tab to see the decoded values.)_
+_(Screen: the device's **Live Data → Telemetry** tab — each record is the decoded `sidewalk-mems-tlv` payload: accel/gyro, temperature, pressure, `qvar`, `orientation`, and `mlc1_label`.)_
 
 Sanity-check values for a device sitting on a desk: accel ≈ (0, 0, 1000) mg, gyro ≈ (0, 0, 0) dps, temperature ≈ 22–25 °C, humidity ≈ 30–60 %RH, pressure ≈ 1000–1015 hPa. Touch the silver Qvar pads on the edge of the expansion board to watch the `qvar` field swing.
 
