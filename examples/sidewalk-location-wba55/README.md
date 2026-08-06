@@ -1,4 +1,4 @@
-# STM32 Sidewalk BLE Location Demo (WBA55 + /IOTCONNECT)
+# STM32 Sidewalk BLE Location Demo (WBA55 / WBA65 + /IOTCONNECT)
 
 A **minimal, sensor-free** example whose only job is to prove **AWS IoT Core
 Device Location** works end-to-end for a BLE-only Amazon Sidewalk device, surfaced
@@ -8,8 +8,14 @@ so a single device reports **sensor data *and* location**.
 
 It builds on the stock [`ble-wba55`](../ble-wba55/README.md) / `sid_ble` app and
 adds one thing: a **Level-1 BLE gateway-proximity location resolve** via the
-Amazon Sidewalk Location Library. No GNSS or Wi-Fi hardware — the WBA55 board on
+Amazon Sidewalk Location Library. No GNSS or Wi-Fi hardware — the Nucleo board on
 its own is enough.
+
+Runs on **both the NUCLEO-WBA55CG and the NUCLEO-WBA65RI**. The overlay source
+files (`location_wba55.c` / `location_wba55.h`) keep their names for both boards:
+the code is board-agnostic (pure Sidewalk Location Library calls), so it builds
+unchanged on WBA65. Wherever this guide gives a WBA55-specific path, config, or
+command, the WBA65 equivalent is shown alongside it.
 
 ---
 
@@ -56,7 +62,7 @@ disclaimer as the other examples in this repo.)
 
 | Item | Notes |
 |---|---|
-| NUCLEO-WBA55CG | Sidewalk host MCU. SWD via on-board ST-LINK. |
+| NUCLEO-WBA55CG **or** NUCLEO-WBA65RI | Sidewalk host MCU (STM32WBA55CG, 1 MB flash / STM32WBA65RI, 2 MB flash). SWD via on-board ST-LINK. Either board runs this example. |
 | USB micro-B cable | ST-LINK programming + UART log. |
 | A Community-Finding Sidewalk gateway in range | **Required for any coordinates to resolve.** Echo (4th-gen+) / supported Ring devices with Amazon Sidewalk + Community Finding enabled. |
 
@@ -64,9 +70,11 @@ No expansion shield. No sub-GHz radio. No GNSS.
 
 ## 2) Software / SDK
 
-Same toolchain as the other WBA55 examples (STM32CubeIDE, STM32CubeProgrammer
-CLI, Python 3.10+, X-CUBE-CRYPTOLIB/CMOX). SDK at
-`<WORKSPACE_ROOT>/STM32-Sidewalk-SDK`.
+Same toolchain as the other WBA55 / WBA65 examples (STM32CubeIDE,
+STM32CubeProgrammer CLI, Python 3.10+, X-CUBE-CRYPTOLIB/CMOX). SDK at
+`<WORKSPACE_ROOT>/STM32-Sidewalk-SDK`. The SDK already ships the STM32WBA65
+CubeIDE project for `sid_ble` (with `Debug_Nucleo-WBA65` / `Release_Nucleo-WBA65`
+build configs) — no new SDK project needs to be created for WBA65.
 
 This example needs the **location-enabled (full) Sidewalk library variant** and
 the `SID_SDK_CONFIG_ENABLE_LOCATION=1` flag — both covered in
@@ -76,7 +84,9 @@ the `SID_SDK_CONFIG_ENABLE_LOCATION=1` flag — both covered in
 
 The bespoke source ([`firmware/STM32_WPAN/App/location_wba55.c` / `.h`](firmware/STM32_WPAN/App/))
 wraps the Sidewalk Location Library for BLE Level-1 and is driven from the stock
-`sid_ble` demo task. Copy it into the SDK and apply the `app_sidewalk.c` hooks
+`sid_ble` demo task. The files keep the `location_wba55` name on both boards —
+the code is board-agnostic (pure Sidewalk Location Library calls) and builds
+unchanged on WBA65. Copy it into the SDK and apply the `app_sidewalk.c` hooks
 exactly as listed in [`firmware/README.md`](firmware/README.md):
 
 - link `sidewalk_sdk_full_stm32wba_ble.a` (not the basic archive),
@@ -86,15 +96,29 @@ exactly as listed in [`firmware/README.md`](firmware/README.md):
 ## 4) Generate manufacturing data + flash
 
 Identical to the other examples — create the device in /IOTCONNECT, generate the
-WBA55 manufacturing image from its certificate JSON, then erase → flash firmware
-→ flash MFG:
+manufacturing image from its certificate JSON, then erase → flash firmware
+→ flash MFG. Pass the `--chip` that matches your board:
 
+**WBA55:**
 ```
 python3 <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/tools/provision/provision.py \
   st aws --chip WBA55xG \
   --certificate_json <DEVICE_JSON>.json \
   --output_bin mfg_wba55.bin --output_hex mfg_wba55.hex
 ```
+
+**WBA65:**
+```
+python3 <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/tools/provision/provision.py \
+  st aws --chip WBA65xI \
+  --certificate_json <DEVICE_JSON>.json \
+  --output_bin mfg_wba65.bin --output_hex mfg_wba65.hex
+```
+
+The MFG image flashes to a **different address per board** — `0x080FE000` on
+WBA55, `0x081FE000` on WBA65. The repo helper `scripts/provision-device.sh`
+takes an optional 3rd arg `[chip]` (default `WBA55xG`; pass `WBA65xI` for WBA65)
+and auto-selects the correct mfg flash address.
 
 See [sidewalk-mems-wba55 README §5–6](../sidewalk-mems-wba55/README.md) for the
 provisioning + `connect-under-reset` flashing details (unchanged here).

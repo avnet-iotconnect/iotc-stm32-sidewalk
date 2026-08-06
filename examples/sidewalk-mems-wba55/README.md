@@ -1,6 +1,8 @@
-# STM32 Sidewalk MEMS Sensor Demo (WBA55 + X-NUCLEO-IKS4A1 / IKS5A1 + /IOTCONNECT)
+# STM32 Sidewalk MEMS Sensor Demo (WBA55 / WBA65 + X-NUCLEO-IKS4A1 / IKS5A1 + /IOTCONNECT)
 
-This guide documents a **BLE‑only Sidewalk demo** that reads an on‑board **X‑NUCLEO‑IKS4A1** *or* **X‑NUCLEO‑IKS5A1** MEMS expansion shield from a **NUCLEO‑WBA55CG** and ships the readings to **/IOTCONNECT** over Amazon Sidewalk Link Type 1 (BLE).
+This guide documents a **BLE‑only Sidewalk demo** that reads an on‑board **X‑NUCLEO‑IKS4A1** *or* **X‑NUCLEO‑IKS5A1** MEMS expansion shield from a **NUCLEO‑WBA55CG** *or* **NUCLEO‑WBA65RI** and ships the readings to **/IOTCONNECT** over Amazon Sidewalk Link Type 1 (BLE).
+
+Both Nucleo boards are supported from the same overlay source tree — the only differences are the CubeIDE project/build‑config names, one board compile macro, and the provisioning chip/mfg address (all summarized per section below). The `/IOTCONNECT` decoder, device template, and TLV wire format are **board‑independent** — the same decoder + template serve both boards.
 
 It builds on top of the existing [`ble-wba55`](../ble-wba55/README.md) example: rather than forking a new SDK app, this example **enables build flags** in the existing `sid_ble` app that swap the 1‑byte counter uplink for a packed sensor payload. The same firmware source tree builds for either board — flipping one `.cproject` symbol (`SID_APP_IKS4A1_ENABLED=1` vs `SID_APP_IKS5A1_ENABLED=1`) selects which sensor stack is compiled in. The same `/IOTCONNECT` decoder + template handle both, since the TLV wire format is shared.
 
@@ -54,11 +56,13 @@ For production manufacturing integration, work with the **/IOTCONNECT team**:
 
 | Item | Notes |
 |---|---|
-| NUCLEO‑WBA55CG | Sidewalk host MCU. SWD via on‑board ST‑LINK. |
-| **One of**: X‑NUCLEO‑IKS4A1 *or* X‑NUCLEO‑IKS5A1 | MEMS expansion shield. Stacks on the Arduino headers of the NUCLEO‑WBA55CG. Pick the firmware variant that matches your board. |
+| **One of**: NUCLEO‑WBA55CG *or* NUCLEO‑WBA65RI | Sidewalk host MCU. SWD via on‑board ST‑LINK. WBA55CG = STM32WBA55CG (1 MB flash); WBA65RI = STM32WBA65RI (2 MB flash). |
+| **One of**: X‑NUCLEO‑IKS4A1 *or* X‑NUCLEO‑IKS5A1 | MEMS expansion shield. Stacks on the Arduino headers of the Nucleo board. Pick the firmware variant that matches your board. |
 | USB micro‑B cable | ST‑LINK programming + UART log. |
 
-The expansion shield communicates via the Arduino I²C connector (PB6 = SCL, PB7 = SDA → STM32WBA55 I2C1). No jumpers or additional wiring are required for the sensors used in this demo.
+The expansion shield communicates via the Arduino I²C connector. On the **NUCLEO‑WBA55CG** this maps to **PB1 = SDA, PB2 = SCL (AF4 → STM32WBA55 I2C1)**. No jumpers or additional wiring are required for the sensors used in this demo.
+
+> ⚠️ **NUCLEO‑WBA65RI I²C pin caveat.** On WBA65 the Arduino‑I²C pin mapping in the overlay bus glue **defaults to the WBA55 pinout (PB1/PB2, AF4, I2C1)** and is marked `>>> VERIFY` in the code. The WBA6x package is larger than WBA5x, so the GPIO behind the Arduino D14/D15 (I²C) header can differ. **Confirm the SDA/SCL pins against the NUCLEO‑WBA65RI schematic before trusting sensor data**, and adjust `Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.h` (the `#if defined(NUCLEO_WBA65_BOARD)` branch) if they differ.
 
 > X‑NUCLEO‑IKS4A1 also exposes LIS2MDL (3-axis magnetometer); X‑NUCLEO‑IKS5A1 also exposes IIS2MDC. Both are present on the bus but not sampled here.
 
@@ -125,7 +129,7 @@ Edit `STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/Config/stm32wbaxx_hal_conf.h`:
 #define HAL_I2C_MODULE_ENABLED
 ```
 
-If `iks4a1_bus.c` does not initialize I2C1 itself, add a small `MX_I2C1_Init()` call from `app_entry.c` (or from `sensors_iks4a1_init()`) configuring PB6/PB7 for I2C1 alternate function and a 100 kHz timing.
+If `iks4a1_bus.c` does not initialize I2C1 itself, add a small `MX_I2C1_Init()` call from `app_entry.c` (or from `sensors_iks4a1_init()`) configuring the I2C1 SDA/SCL pins (PB1/PB2 AF4 on WBA55; verify the WBA65 mapping per Section 1) for their alternate function and a 100 kHz timing.
 
 ---
 
@@ -152,28 +156,45 @@ Patched file:
 
 ## 4) Build the IKS4A1 Sidewalk demo (STM32CubeIDE)
 
-> **The project is pre-wired.** The IKS4A1 BSP linked-resource entries, include paths, and the `SID_APP_IKS4A1_ENABLED=1` symbol are already committed to `.project` / `.cproject` for both Nucleo configs (Debug and Release). All you do is import the project and click Build.
+This section applies to **both boards**. Substitute the per‑board names below; everything else is identical.
+
+| Aspect | NUCLEO‑WBA55CG | NUCLEO‑WBA65RI |
+|---|---|---|
+| CubeIDE project dir (under `sid_ble/STM32CubeIDE/`) | `STM32WBA55` | `STM32WBA65` |
+| CubeIDE project + hex name | `sid_ble_wba55` | `sid_ble_wba65` |
+| Build config (active) | `Debug_Nucleo-WBA55` (or `Release_Nucleo-WBA55`) | `Debug_Nucleo-WBA65` (or `Release_Nucleo-WBA65`) |
+| Board compile macro (set by the SDK project) | `NUCLEO_WBA55_BOARD` | `NUCLEO_WBA65_BOARD` |
+
+> **Pre-wiring differs per board.** The IKS4A1/IKS5A1 BSP linked-resource entries, include paths, and the `SID_APP_IKS4A1_ENABLED=1` symbol are already committed to `.project` / `.cproject` **for the STM32WBA55 project only** (both its Nucleo configs, Debug and Release). For that board you just import and click Build. The stock SDK **STM32WBA65** `sid_ble` project ships **without** the MEMS wiring — you must apply the same linked resources, include paths, and `SID_APP_IKS4A1_ENABLED` / `HAL_I2C_MODULE_ENABLED` wiring to its `Debug_Nucleo-WBA65` / `Release_Nucleo-WBA65` configs (see "What's already wired up for you" below for the exact list, and `firmware/README.md` → *Build-system changes*).
 
 ### One‑time GUI bring‑up
 
 1. **Launch** STM32CubeIDE 1.18 or newer.
-2. **Import project**: `File → Open Projects from File System... → Directory:` and pick:
+2. **Import project**: `File → Open Projects from File System... → Directory:` and pick (WBA55 shown; use `STM32WBA65` for WBA65):
    ```
    <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55
    ```
-   Confirm `sid_ble_wba55` shows up and click *Finish*.
-3. **Set the active build configuration** to `Debug_Nucleo-WBA55`: in the Project Explorer, right-click `sid_ble_wba55 → Build Configurations → Set Active → Debug_Nucleo-WBA55`.
+   Confirm the project (`sid_ble_wba55`, or `sid_ble_wba65` for WBA65) shows up and click *Finish*.
+3. **Set the active build configuration** to `Debug_Nucleo-WBA55` (WBA65: `Debug_Nucleo-WBA65`): in the Project Explorer, right-click `sid_ble_wba55 → Build Configurations → Set Active → Debug_Nucleo-WBA55` (substitute the WBA65 names as needed).
 4. **Build**: `Project → Build Project` (or click the hammer icon, or `Ctrl+B`).
 
 ### Build output
+
+WBA55:
 
 ```
 <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/Debug_Nucleo-WBA55/sid_ble_wba55.hex
 ```
 
+WBA65:
+
+```
+<WORKSPACE_ROOT>/STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/Debug_Nucleo-WBA65/sid_ble_wba65.hex
+```
+
 ### Headless / CLI build
 
-A headless build works once the project's CubeMX natures have been removed from `.project` (already done in this repo). With CubeIDE 1.18+ installed at `/opt/st/stm32cubeide_1.18.0/` (adjust to your install path):
+A headless build works once the project's CubeMX natures have been removed from `.project` (already done in this repo). With CubeIDE 1.18+ installed at `/opt/st/stm32cubeide_1.18.0/` (adjust to your install path). WBA55:
 
 ```
 /opt/st/stm32cubeide_1.18.0/headless-build.sh \
@@ -183,7 +204,17 @@ A headless build works once the project's CubeMX natures have been removed from 
   -no-indexer
 ```
 
-Use `-build` (not `-cleanBuild`) for incremental rebuilds. The hex lands in the same `Debug_Nucleo-WBA55/sid_ble_wba55.hex` path as the GUI build.
+WBA65 — swap the import dir and the `-cleanBuild` target:
+
+```
+/opt/st/stm32cubeide_1.18.0/headless-build.sh \
+  -data /tmp/cubeide-ws \
+  -import <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65 \
+  -cleanBuild "sid_ble_wba65/Debug_Nucleo-WBA65" \
+  -no-indexer
+```
+
+Use `-build` (not `-cleanBuild`) for incremental rebuilds. The hex lands in the same `Debug_Nucleo-WBA55/sid_ble_wba55.hex` (WBA65: `Debug_Nucleo-WBA65/sid_ble_wba65.hex`) path as the GUI build.
 
 > If you forget to remove the CubeMX natures (`MCUCubeProjectNature`, `MCUCubeIdeServicesRevAev2ProjectNature`) from `.project`, the headless invocation trips an `IocGeneratorAdapter` NPE — use the GUI build until that's fixed.
 
@@ -194,14 +225,16 @@ Both variants are built from the same source tree by flipping one pair of `.cpro
 - **IKS4A1 build** (default): `SID_APP_IKS4A1_ENABLED=1`, `SID_APP_IKS5A1_ENABLED=0`
 - **IKS5A1 build**: `SID_APP_IKS4A1_ENABLED=0`, `SID_APP_IKS5A1_ENABLED=1`
 
-The flags are mutually exclusive at link time (the IKS4A1 and IKS5A1 BSP component objects use the same global names). The companion `scripts/build-firmware.sh` in this repo flips the flag automatically and produces both hexes in one invocation. See [Section 4 → Headless / CLI build](#headless--cli-build).
+The flags are mutually exclusive at link time (the IKS4A1 and IKS5A1 BSP component objects use the same global names). The companion `scripts/build-firmware.sh` in this repo flips the flag automatically and produces both hexes in one invocation. It takes a `BOARD=wba55|wba65` env var (default `wba55`) to pick the board: WBA55 emits `sid_ble_wba55_iks4a1.hex` / `sid_ble_wba55_iks5a1.hex`, and `BOARD=wba65` emits `sid_ble_wba65_iks4a1.hex` / `sid_ble_wba65_iks5a1.hex`. See [Section 4 → Headless / CLI build](#headless--cli-build).
 
 ### What's already wired up for you (for transparency)
 
+> The wiring below is committed to the **STM32WBA55** `sid_ble` project. For **STM32WBA65** the stock SDK project does **not** ship this wiring — apply the same entries to its `Debug_Nucleo-WBA65` / `Release_Nucleo-WBA65` configs before building.
+
 - `Drivers/BSP/IKS4A1`, `Drivers/BSP/IKS5A1`, and `Drivers/BSP/Components` are linked into the project tree (as virtual folders pointing at `APP_ROOT_DIR/Drivers/BSP/...`).
-- The Nucleo-WBA55 bus glue file `Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.c` is linked as an individual source.
+- The Nucleo bus glue file `Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.c` is linked as an individual source. The matching `.h` picks the pin mapping by board macro (`NUCLEO_WBA55_BOARD` vs `NUCLEO_WBA65_BOARD`) — see the WBA65 I²C caveat in Section 1.
 - Compiler include paths added for `IKS4A1`, `IKS5A1`, `Components/Common`, `Components/{lsm6dsv16x,lps22df,sht40ad1b,stts22h,lis2duxs12,ism6hg256x,iis2dulpx,ilps22qs}`, and `STM32WBAxx_Nucleo` (for the bus glue header).
-- Defines `SID_APP_IKS4A1_ENABLED` and `SID_APP_IKS5A1_ENABLED` added to all four Nucleo configs (one set to 1, the other to 0 — flip to switch boards).
+- Defines `SID_APP_IKS4A1_ENABLED` and `SID_APP_IKS5A1_ENABLED` added to both Nucleo configs (one set to 1, the other to 0 — flip to switch sensor shields).
 - `HAL_I2C_MODULE_ENABLED` un-commented in `Config/stm32wbaxx_hal_conf.h`.
 - `iks4a1_conf.h` is in place with only the four sensors we use enabled and I2C macros pointing at `BSP_I2C1_*`.
 
@@ -215,7 +248,14 @@ When you create a Sidewalk device in /IOTCONNECT, you receive a JSON certificate
 <DEVICE_JSON>.json
 ```
 
-Generate the WBA55‑compatible manufacturing image:
+Pick the `--chip` value (and, for `.bin`, the mfg flash address) to match your board:
+
+| Board | `--chip` | mfg flash address |
+|---|---|---|
+| NUCLEO‑WBA55CG | `WBA55xG` | `0x080FE000` |
+| NUCLEO‑WBA65RI | `WBA65xI` | `0x081FE000` |
+
+Generate the manufacturing image (WBA55 shown; for WBA65 use `--chip WBA65xI` and name the outputs `mfg_wba65.*`):
 
 ```
 python3 <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/tools/provision/provision.py \
@@ -226,7 +266,7 @@ python3 <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/tools/provision/provision.py \
   --output_hex mfg_wba55.hex
 ```
 
-Expected output:
+Expected output (WBA55):
 
 ```
 Using chip config : (WBA55xG:STM32WBA55xG address: 0x80fe000)
@@ -234,15 +274,19 @@ Generated .../mfg_wba55.bin
 Generated .../mfg_wba55.hex
 ```
 
-> Do **not** flash the raw `mfg.bin` from /IOTCONNECT. Always run `provision.py st aws --chip WBA55xG` first.
+For WBA65 the address in the log is `0x81fe000` instead.
+
+> Do **not** flash the raw `mfg.bin` from /IOTCONNECT. Always run `provision.py st aws --chip WBA55xG` (WBA65: `--chip WBA65xI`) first. The companion `scripts/provision-device.sh` takes an optional 3rd arg `[chip]` (default `WBA55xG`; pass `WBA65xI`) and auto‑picks the matching mfg address.
 
 ---
 
 ## 6) Flash firmware + manufacturing data
 
-> WBA55 needs **connect-under-reset** (`mode=UR`) and often a one-shot retry, because the prior firmware can be in Stop/Standby and miss the first SWD handshake. The wrapper script below handles both.
+> WBA55/WBA65 need **connect-under-reset** (`mode=UR`) and often a one-shot retry, because the prior firmware can be in Stop/Standby and miss the first SWD handshake. The wrapper script below handles both.
 
 ### One-shot helper (recommended)
+
+`tools/flash_wba55.sh` is board‑agnostic — pass whichever firmware + mfg hex you built (WBA55 shown; for WBA65 substitute the `STM32WBA65/Debug_Nucleo-WBA65/sid_ble_wba65.hex` path and the WBA65 mfg hex):
 
 ```
 tools/flash_wba55.sh \
@@ -260,10 +304,13 @@ STM32_Programmer_CLI -c port=SWD mode=UR -w <firmware.hex>
 STM32_Programmer_CLI -c port=SWD mode=UR -w <mfg.hex>
 ```
 
-If using `.bin` for the manufacturing image, program at **0x080FE000**:
+If using `.bin` for the manufacturing image, program at the board's mfg address — **0x080FE000** on WBA55, **0x081FE000** on WBA65:
 
 ```
+# WBA55
 STM32_Programmer_CLI -c port=SWD mode=UR -w mfg_wba55.bin 0x080FE000
+# WBA65
+STM32_Programmer_CLI -c port=SWD mode=UR -w mfg_wba65.bin 0x081FE000
 ```
 
 ---
@@ -527,12 +574,12 @@ Setup:
 
 ## 13) End‑to‑end checklist
 
-1. Stack X‑NUCLEO‑IKS4A1 on the NUCLEO‑WBA55CG.
+1. Stack X‑NUCLEO‑IKS4A1 on the NUCLEO‑WBA55CG *or* NUCLEO‑WBA65RI. (On WBA65, first confirm the Arduino‑I²C pins against the schematic — see Section 1.)
 2. Copy X‑CUBE‑MEMS1 IKS4A1 BSP + PID drivers (LSM6DSV16X, LPS22DF, SHT40AD1B, STTS22H) into the SDK.
 3. Enable `HAL_I2C_MODULE_ENABLED` in the SDK HAL config.
-4. Define `SID_APP_IKS4A1_ENABLED=1` and add include + source paths in CubeIDE.
-5. Build `sid_ble` Debug_Nucleo-WBA55.
-6. Generate `mfg_wba55.hex` from the /IOTCONNECT JSON.
+4. Define `SID_APP_IKS4A1_ENABLED=1` and add include + source paths in CubeIDE. (WBA55 is pre-wired; on WBA65 apply the same wiring to its Nucleo-WBA65 configs — see Section 4.)
+5. Build `sid_ble` Debug_Nucleo-WBA55 (WBA65: Debug_Nucleo-WBA65).
+6. Generate `mfg_wba55.hex` (WBA65: `mfg_wba65.hex` with `--chip WBA65xI`) from the /IOTCONNECT JSON.
 7. Erase → flash firmware → flash MFG.
 8. Confirm `IKS4A1: sensors initialized` and `IKS4A1 uplink seq=...` in the UART log.
 9. Apply `sidewalk-mems-tlv.py` decoder + `sidewalk_st_WBA55+MEMS_template.JSON` template in /IOTCONNECT.
@@ -550,14 +597,14 @@ CMOX library not installed in SDK. Copy `include/` and `lib/` from X‑CUBE‑CR
 Include path or source folder for the corresponding X‑CUBE‑MEMS1 BSP is missing. Re‑check Step 2 and Step 4.
 
 ### `MFG storage: validation failed`
-Wrong manufacturing image or wrong address. Re‑generate with `provision.py st aws --chip WBA55xG` and re‑flash.
+Wrong manufacturing image or wrong address. Re‑generate with `provision.py st aws --chip WBA55xG` (WBA65: `--chip WBA65xI`) and re‑flash. Confirm the `.bin` was programmed at the board's mfg address (WBA55 `0x080FE000`, WBA65 `0x081FE000`).
 
 ### `IKS4A1: LSM6DSV16X init failed (-1)` / `IKS5A1: ISM6HG256X init failed (-1)`
 The IMU on the expansion shield isn't responding on I²C. Confirm:
 - The expansion shield is fully seated on the Arduino headers (most common cause — reseat firmly in both directions).
 - You're running the firmware variant that matches the physical board (IKS4A1 firmware on IKS4A1, IKS5A1 firmware on IKS5A1).
 - `HAL_I2C_MODULE_ENABLED` is defined in `Config/stm32wbaxx_hal_conf.h`.
-- I2C1 (PB6/PB7) is initialized at 100 kHz before `sensors_iks4a1_init()` runs.
+- I2C1 (PB1/PB2 AF4 on WBA55; verify the WBA65 mapping per Section 1) is initialized at 100 kHz before `sensors_iks4a1_init()` runs.
 - IKS4A1/IKS5A1 jumpers are at factory defaults.
 
 The firmware logs the init failure but **does not** hard-fault on subsequent reads — direct-register paths (6D orientation, Qvar) are guarded by runtime `s_lsm6dsv16x_ok` / `s_lis2duxs12_ok` / `s_iis2dulpx_ok` flags so a `NULL` BSP component handle never gets dereferenced.

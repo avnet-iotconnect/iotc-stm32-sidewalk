@@ -1,0 +1,134 @@
+diff --git a/apps/st/common/build_system/stm32_sidewalk_sdk_version.def b/apps/st/common/build_system/stm32_sidewalk_sdk_version.def
+index 555750e..8470c34 100644
+--- a/apps/st/common/build_system/stm32_sidewalk_sdk_version.def
++++ b/apps/st/common/build_system/stm32_sidewalk_sdk_version.def
+@@ -5,4 +5,4 @@
+ # in the root directory of this software component.
+ # If no LICENSE file comes with this software, it is provided AS-IS.
+ 
+-STM32WBA_APPS_PACKAGE_VER := 1.1.0
++STM32WBA_APPS_PACKAGE_VER := 1.1.5
+diff --git a/apps/common/sid_app_sbdt_demo/include/sid_app_sbdt_demo.h b/apps/common/sid_app_sbdt_demo/include/sid_app_sbdt_demo.h
+index c38af75..96c2a18 100644
+--- a/apps/common/sid_app_sbdt_demo/include/sid_app_sbdt_demo.h
++++ b/apps/common/sid_app_sbdt_demo/include/sid_app_sbdt_demo.h
+@@ -127,6 +127,7 @@ struct app_demo_hw_ifc {
+ typedef struct app_context {
+     bool cap_done;
+     bool pending_ota_status;
++    bool ota_just_installed;   /* AIM booted us "pending confirmation" -> an OTA image was just installed */
+     bool finalize_on_release;
+     uint8_t counter;
+     TaskHandle_t main_task;
+--- a/apps/common/sid_app_sbdt_demo/sid_app_sbdt_demo.c
++++ b/apps/common/sid_app_sbdt_demo/sid_app_sbdt_demo.c
+@@ -27,6 +27,8 @@
+ #include <queue.h>
+ #include <task.h>
+ #include <sid_api.h>
++#include <sid_application_install_manager_ifc.h>
++#include SID_APP_VERSION_HEADER
+ 
+ #include <stdbool.h>
+ #include <stdlib.h>
+@@ -44,6 +46,10 @@
+ #define FILE_TRANSFER_CRC_KEY 1
+ #define FILE_OTA_PENDING_KEY 2
+ #define FILE_OTA_CHECK_VERSION 3
++
++/* App version reported in the capability uplink (SID_APP_PROJECT_*), distinct from the
++   SDK firmware version carried in tag 0x0F. Kept in sync with the v3 decoder. */
++#define SID_DEMO_TAG_APP_VERSION 0x14
+ 
+ enum OTA_STATUS {
+     OTA_STATUS_INVALID = 0,
+@@ -728,13 +734,27 @@
+         .link_type = active_link,
+     };
+ 
+-    uint8_t temp_buffer[sizeof(discovery)] = {0};
++    uint8_t temp_buffer[sizeof(discovery) + 16] = {0};
+     struct sid_parse_state state = {};
+     sid_parse_state_init(&state, temp_buffer, sizeof(temp_buffer));
+     sid_demo_app_capability_discovery_notification_serialize(&state, &discovery);
+     if (state.ret_code != SID_ERROR_NONE) {
+         SID_PAL_LOG_ERROR("OTA SUPPORT NOTIFY SERIALIZE FAILED :%d", state.ret_code);
+         return;
++    }
++
++    /* Append the application version (SID_APP_PROJECT_*), distinct from the SDK version
++       written above (tag 0x0F), so the cloud/decoder can track which app build is running. */
++    {
++        struct tl_in_tlv tl = { .tag = SID_DEMO_TAG_APP_VERSION };
++        uint8_t appver[6] = {0};
++        struct sid_parse_state av = {};
++        sid_parse_state_init(&av, appver, sizeof(appver));
++        sid_write_entry_uint16(&av, SID_APP_PROJECT_MAJOR_VERSION);
++        sid_write_entry_uint16(&av, SID_APP_PROJECT_MINOR_VERSION);
++        sid_write_entry_uint16(&av, SID_APP_PROJECT_PATCH_VERSION);
++        tl.len = av.offset;
++        sid_write_entry_tlv_nbytes(&state, &tl, appver, av.offset);
+     }
+ 
+     struct sid_demo_msg_desc msg_desc = {
+@@ -803,38 +823,17 @@
+     STR(SID_SDK_MAJOR_VERSION) \
+     "." STR(SID_SDK_MINOR_VERSION) "." STR(SID_SDK_PATCH_VERSION) "-" STR(SID_SDK_BUILD_VERSION)
+ 
+-    uint32_t ota = 0;
+-    sid_pal_storage_kv_record_get(FILE_TRANSFER_OTA_GROUP, FILE_OTA_PENDING_KEY, &ota, sizeof(ota));
+-    if (!ota) {
++    /* Report FUOTA completion using the AIM verification state captured at boot instead
++       of the FILE_OTA_PENDING_KEY flag (the KV/LittleFS store is unusable on this board).
++       If AIM booted us "pending confirmation", an OTA image was just installed and we are
++       now running it -> report SUCCESS. A failed/corrupt image is aborted by AIM, which
++       then boots the previous app in the CONFIRMED state, so this cannot false-positive. */
++    if (!g_app_context->ota_just_installed) {
+         goto start_capability;
+     }
+-
+-    uint8_t build_version[sizeof(struct sid_demo_sdk_version)] = {};
+-    sid_pal_storage_kv_record_get(FILE_TRANSFER_OTA_GROUP, FILE_OTA_CHECK_VERSION, build_version,
+-                                  sizeof(build_version));
+-    struct sid_parse_state state;
+-    sid_parse_state_init(&state, build_version, sizeof(build_version));
+-
+-    struct sid_demo_sdk_version sdk_version;
+-    sid_demo_sdk_version_deserialize(&state, &sdk_version);
+-    SID_PAL_ASSERT(state.ret_code == SID_ERROR_NONE);
+-
+-    const bool success = sdk_version.major == SID_SDK_MAJOR_VERSION && sdk_version.minor == SID_SDK_MINOR_VERSION
+-                         && sdk_version.patch == SID_SDK_PATCH_VERSION && sdk_version.build == SID_SDK_BUILD_VERSION;
+-    if (success) {
+-        SID_PAL_LOG_INFO("READ_VERSION: %d.%d.%d-%d == " SID_SDK_VERSION_STR, sdk_version.major, sdk_version.minor,
+-                         sdk_version.patch, sdk_version.build);
+-    } else {
+-        SID_PAL_LOG_ERROR("READ_VERSION: %d.%d.%d-%d != " SID_SDK_VERSION_STR, sdk_version.major, sdk_version.minor,
+-                          sdk_version.patch, sdk_version.build);
+-    }
+-
+-    const bool successful_ota = (ota == OTA_STATUS_PLATFORM_VALIDATION_SUCCESS && success);
+-
+-    process_event_send_ota_status(0, successful_ota ? SID_DEMO_OTA_COMPLETION_STATUS_SUCCESS
+-                                                    : SID_DEMO_OTA_COMPLETION_STATUS_FAILED);
+-
+-    sid_pal_storage_kv_group_delete(FILE_TRANSFER_OTA_GROUP);
++    g_app_context->ota_just_installed = false; /* report only once */
++
++    process_event_send_ota_status(0, SID_DEMO_OTA_COMPLETION_STATUS_SUCCESS);
+ 
+ start_capability:
+     if (!g_app_context->cap_done && !xTimerIsTimerActive(g_app_context->cap_timer_handle)) {
+@@ -906,6 +905,12 @@
+ 
+     g_app_context->hw_ifc.platform_flash_init();
+ 
++    /* Capture whether AIM booted us "pending confirmation", i.e. an OTA image was just
++       installed. Used to report FUOTA SUCCESS reliably (the KV FILE_OTA_PENDING_KEY flag
++       is unusable because the LittleFS/KV store is broken on this board). */
++    g_app_context->ota_just_installed =
++        (sid_aim_ifc_get_app_verification_state() == AIMAVS_CONFIRMATION_PENDING);
++
+     g_app_context->event_queue = xQueueCreate(MSG_QUEUE_LEN, sizeof(struct app_demo_event));
+     if (g_app_context->event_queue == NULL) {
+         SID_PAL_ASSERT(false);

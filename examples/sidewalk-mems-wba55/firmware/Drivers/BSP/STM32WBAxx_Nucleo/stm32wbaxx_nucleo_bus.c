@@ -16,9 +16,11 @@
   ******************************************************************************
   *
   * Modifications by Avnet /IOTCONNECT for the iotc-stm32-sidewalk demo:
-  *   - I2C1 bus implementation tailored for Nucleo-WBA55CG (Arduino D14/D15
-  *     pins, PB1=SDA / PB2=SCL), used by the IKS4A1 / IKS5A1 sensor expansion
-  *     shields through the X-CUBE-MEMS1 BSP and PID component drivers.
+  *   - I2C1 bus implementation for the IKS4A1 / IKS5A1 sensor expansion shields
+  *     on Nucleo-WBA55CG and Nucleo-WBA65RI (Arduino D14/D15 pins), through the
+  *     X-CUBE-MEMS1 BSP and PID component drivers. The concrete SDA/SCL pin
+  *     mapping is selected by board macro in stm32wbaxx_nucleo_bus.h — see the
+  *     WBA65 ">>> VERIFY" note there before trusting WBA65 sensor data.
   *   - Refcounted Init/DeInit so multiple sensor modules sharing the bus do
   *     not double-init / prematurely tear down the peripheral.
   *

@@ -1,0 +1,28 @@
+diff --git a/apps/st/stm32wba/sid_sbdt_demo/STM32_WPAN/App/app_sidewalk.c b/apps/st/stm32wba/sid_sbdt_demo/STM32_WPAN/App/app_sidewalk.c
+index 13aa6a8..d20950a 100644
+--- a/apps/st/stm32wba/sid_sbdt_demo/STM32_WPAN/App/app_sidewalk.c
++++ b/apps/st/stm32wba/sid_sbdt_demo/STM32_WPAN/App/app_sidewalk.c
+@@ -395,6 +395,23 @@ static sid_error_t init_and_start_link(app_context_t * const context, struct sid
+     /* Register sidewalk handle to the application context */
+     context->sidewalk_handle = sid_handle;
+ 
++    /* Register the SBDT (Sidewalk Bulk Data Transfer) receive handlers so incoming
++     * FUOTA/OTA file transfers are accepted by the stack instead of rejected with
++     * SID_ERROR_NOSUPPORT. Without this the OTA transfer-request callbacks are never
++     * reached (and get garbage-collected from the image). */
++    {
++        struct sid_bulk_data_transfer_config sbdt_config = {
++            .callbacks = demo_sbdt_app_get_sid_event_callbacks(),
++        };
++        ret = sid_bulk_data_transfer_init(&sbdt_config, sid_handle);
++        if (ret != SID_ERROR_NONE)
++        {
++            SID_PAL_LOG_ERROR("Failed to init Sidewalk bulk data transfer (SBDT), err:%d", (int)ret);
++            goto error;
++        }
++        SID_PAL_LOG_INFO(">>> OTA | SBDT receive handlers registered -- ready to receive OTA");
++    }
++
+     /* Start the Sidewalk stack with the selected link type */
+     ret = sid_start(sid_handle, config->link_mask);
+     if (ret != SID_ERROR_NONE)

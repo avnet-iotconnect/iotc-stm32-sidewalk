@@ -18,7 +18,8 @@
   * Modifications by Avnet /IOTCONNECT for the iotc-stm32-sidewalk demo
   * (file originally derived from iks4a1_conf_template.h in X-CUBE-MEMS1):
   *   - Includes stm32wbaxx_hal.h and the WBA Nucleo BSP I2C bus glue header
-  *     (PB1=SDA / PB2=SCL via I2C1) instead of the generic template.
+  *     (I2C1; concrete SDA/SCL pins selected per board in that header — WBA55
+  *     PB1/PB2, WBA65 see its VERIFY note) instead of the generic template.
   *   - Enables only the four sensors we ship PID drivers for.
   *
   * Upstream license terms (BSD-3-Clause) are preserved; refer to the SDK LICENSE

@@ -3,8 +3,13 @@
 Bespoke firmware for the **BLE-only Sidewalk location** proof. Like the MEMS
 example, these files are **copied into a checkout of the STM32-Sidewalk-SDK**
 (they are not part of the upstream SDK) and `app_sidewalk.c` is patched with the
-guarded hooks below. Everything else (Sidewalk stack, FreeRTOS, WBA55 HAL, CMOX)
+guarded hooks below. Everything else (Sidewalk stack, FreeRTOS, WBA HAL, CMOX)
 comes from the SDK.
+
+Supports **both the NUCLEO-WBA55CG and NUCLEO-WBA65RI**. The overlay files keep
+the `location_wba55` name on both boards — the code is board-agnostic (pure
+Sidewalk Location Library calls) and builds unchanged on WBA65. Where a path or
+build config below is WBA55-specific, the WBA65 equivalent is shown alongside it.
 
 Base app: **`apps/st/stm32wba/sid_ble`** (the stock 1-byte counter BLE app). We
 add a Level-1 BLE gateway-location resolve to its existing demo task.
@@ -15,10 +20,23 @@ add a Level-1 BLE gateway-location resolve to its existing demo task.
 |---|---|---|
 | `STM32_WPAN/App/location_wba55.c` / `.h` | `STM32_WPAN/App/` | Sidewalk Location Library wrapper (BLE L1) |
 
-## Build-system changes (CubeIDE project, `STM32CubeIDE/STM32WBA55/`)
+## Build-system changes (CubeIDE project)
+
+The SDK ships a CubeIDE project per board under `sid_ble/`:
+
+| Board | CubeIDE project dir | Build config | Project / hex name | Board macro (set by the SDK project) |
+|---|---|---|---|---|
+| WBA55 | `STM32CubeIDE/STM32WBA55/` | `Debug_Nucleo-WBA55` (or `Release_Nucleo-WBA55`) | `sid_ble_wba55` | `NUCLEO_WBA55_BOARD` |
+| WBA65 | `STM32CubeIDE/STM32WBA65/` | `Debug_Nucleo-WBA65` (or `Release_Nucleo-WBA65`) | `sid_ble_wba65` | `NUCLEO_WBA65_BOARD` |
+
+The STM32WBA65 project (with its `Debug_Nucleo-WBA65` / `Release_Nucleo-WBA65`
+configs) already ships in the SDK — no new project needs to be created. Each
+project defines the corresponding board macro (`NUCLEO_WBA55_BOARD` /
+`NUCLEO_WBA65_BOARD`) for you.
 
 The location library ships **only in the "full" prebuilt variant** — the basic
-archive `sid_ble` links by default omits it. Two changes:
+archive `sid_ble` links by default omits it. The changes below apply to
+whichever board's project you build:
 
 1. **Link the location-enabled archive.** In the linker settings / `.cproject`,
    replace the Sidewalk archive with:

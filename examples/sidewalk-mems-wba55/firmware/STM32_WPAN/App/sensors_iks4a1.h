@@ -75,6 +75,29 @@ extern "C" {
 #define TAG_IKS4A1_PRESSURE_X100           (0x27u)
 #define TAG_IKS4A1_ORIENTATION             (0x28u)  /* u8 enum, see sensors_iks4a1_orient_t */
 #define TAG_IKS4A1_QVAR_RAW                (0x29u)  /* i16le, raw LIS2DUXS12 Qvar count */
+#define TAG_IKS4A1_MLC1                    (0x2Au)  /* u8, LSM6DSV16X MLC1_SRC raw label
+                                                       (asset_tracking UCF: 0=stationary_upright,
+                                                       4=stationary_not_upright, 8=in_motion, 12=shaken) */
+#define TAG_IKS4A1_MLC1_MODEL              (0x2Bu)  /* u8, identifies which UCF/decision tree is
+                                                       loaded; the decoder uses this to pick the
+                                                       right raw-value -> label map. See the
+                                                       SENSORS_IKS4A1_MLC1_MODEL_* enum. */
+
+/* MLC1 model identifier — emitted on the wire so the decoder can pick the
+ * right label dictionary for the raw MLC1_SRC value. When you change the
+ * .ucf you load in sensors_iks4a1_init(), bump the value here AND register
+ * the matching label map in the decoder. Old decoders that don't know a new
+ * model ID fall back to surfacing the raw integer untranslated, which is
+ * graceful (no crash, just no label string). */
+#define SENSORS_IKS4A1_MLC1_MODEL_NONE             (0u) /* MLC not loaded / not wired */
+#define SENSORS_IKS4A1_MLC1_MODEL_ASSET_TRACKING   (1u) /* lsm6dsv16x_asset_tracking.ucf (IKS4A1) or
+                                                           ism6hg256x_asset_tracking (IKS5A1) —
+                                                           same algorithm, same 0/4/8/12 classes */
+#define SENSORS_IKS4A1_MLC1_MODEL_ACTIVITY_MOBILE  (2u) /* lsm6dsv16x_activity_recognition_for_mobile.ucf  (reserved) */
+#define SENSORS_IKS4A1_MLC1_MODEL_ACTIVITY_WRIST   (3u) /* activity_recognition_for_wrist                 (reserved) */
+#define SENSORS_IKS4A1_MLC1_MODEL_GYM_ACTIVITY     (4u) /* gym_activity_recognition                       (reserved) */
+#define SENSORS_IKS4A1_MLC1_MODEL_HEAD_GESTURES    (5u) /* head_gestures                                  (reserved) */
+#define SENSORS_IKS4A1_MLC1_MODEL_YOGA_POSE        (6u) /* yoga_pose_recognition                          (reserved) */
 
 /* msg_desc bytes per sid_demo encoding:
  *   bit 7    : status_hdr_ind
@@ -113,6 +136,8 @@ typedef struct {
     uint32_t lps22df_pa_x100;    /* hPa * 100 (cPa)    */
     uint8_t  orientation;        /* sensors_iks4a1_orient_t */
     int16_t  qvar_raw;           /* LIS2DUXS12 Qvar raw count (signed) */
+    uint8_t  mlc1_raw;           /* LSM6DSV16X MLC1_SRC label (0/4/8/12 for asset_tracking) */
+    uint8_t  mlc1_model_id;      /* SENSORS_IKS4A1_MLC1_MODEL_* — which UCF produced mlc1_raw */
 } sensors_iks4a1_reading_t;
 
 /* Returns 0 on success, negative on error. Safe to call from a FreeRTOS task. */

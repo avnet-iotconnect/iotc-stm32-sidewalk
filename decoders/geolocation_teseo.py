@@ -94,6 +94,6 @@ def dict_from_payload(base64_input: str, fport: int = None):
 
 if __name__ == "__main__":
     # Example: decode a base64 string (replace with real payload)
-    example = ""
+    example = "MTc="
     if example:
         print(json.dumps(dict_from_payload(example), indent=2))

@@ -2,15 +2,18 @@
 
 [Purchase the NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
 
+> [!NOTE]
+> **Two host boards are supported.** This guide is written around the **NUCLEO-WBA55CG**, but the **NUCLEO-WBA65RI** (STM32WBA65RI, 2 MB flash) works too and follows the exact same steps. Wherever a WBA55-specific value appears — the prebuilt firmware hex names, the `provision-device.sh` chip argument, the `BOARD=` build flag, and the raw `mfg.bin` flash address — the WBA65 equivalent is noted alongside it. Pick one board and follow the matching values throughout.
+
 ![NUCLEO-WBA55CG with the X-NUCLEO-IKS MEMS sensor shield stacked on its Arduino headers](media/wba55-iks-stack.png)
 
-_The X-NUCLEO-IKS4A1 / IKS5A1 MEMS sensor shield stacked on the NUCLEO-WBA55CG Arduino headers (Step 8). The WBA55 reaches /IOTCONNECT over Amazon Sidewalk (BLE / Link Type 1) via a nearby gateway (e.g. Amazon Echo) and the AWS backend._
+_The X-NUCLEO-IKS4A1 / IKS5A1 MEMS sensor shield stacked on the NUCLEO-WBA55CG Arduino headers (Step 8; a NUCLEO-WBA65RI hosts the same shield identically). The board reaches /IOTCONNECT over Amazon Sidewalk (BLE / Link Type 1) via a nearby gateway (e.g. Amazon Echo) and the AWS backend._
 
 ![Amazon Sidewalk end-to-end workflow](https://docs.iotconnect.io/wp-content/uploads/2023/12/image7.png)
 
 ## 1. Introduction
 
-This guide walks through bringing a **NUCLEO-WBA55CG** with an **X-NUCLEO-IKS4A1** (or **X-NUCLEO-IKS5A1**) MEMS sensor expansion board online with the Avnet **/IOTCONNECT** platform over **Amazon Sidewalk** (BLE / Link Type 1). When complete, the board streams live accelerometer, gyroscope, temperature, humidity, pressure, orientation, and Qvar (capacitive touch) readings to an /IOTCONNECT dashboard, and you can send commands back to the device.
+This guide walks through bringing a **NUCLEO-WBA55CG** (or **NUCLEO-WBA65RI**) with an **X-NUCLEO-IKS4A1** (or **X-NUCLEO-IKS5A1**) MEMS sensor expansion board online with the Avnet **/IOTCONNECT** platform over **Amazon Sidewalk** (BLE / Link Type 1). When complete, the board streams live accelerometer, gyroscope, temperature, humidity, pressure, orientation, and Qvar (capacitive touch) readings to an /IOTCONNECT dashboard, and you can send commands back to the device.
 
 The fastest path uses a **pre-compiled firmware image** — no toolchain or build step is required. If you would rather build the firmware from source, follow the detailed [example README](examples/sidewalk-mems-wba55/README.md) instead; this QuickStart references it where useful.
 
@@ -30,7 +33,7 @@ Because the data travels over Amazon Sidewalk, your device reaches the cloud thr
 
 **Hardware**
 
-* [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) — Sidewalk host MCU (programmed over the on-board ST-LINK)
+* [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) — Sidewalk host MCU (STM32WBA55CG, 1 MB flash; programmed over the on-board ST-LINK). **Or** a **NUCLEO-WBA65RI** (STM32WBA65RI, 2 MB flash) — same steps, using the WBA65 values noted throughout this guide.
 * **One of:** [X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) *or* [X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356) MEMS sensor expansion board
 * USB micro-B cable (ST-LINK programming + UART log)
 * A compatible **Amazon Sidewalk gateway** in range (e.g. Amazon Echo 4th Gen) with Sidewalk enabled
@@ -91,7 +94,7 @@ In this step you create a **Wireless Device** of transmission type **Sidewalk**,
 3. Fill in the fields:
    * **Transmission Type:** select **Sidewalk**
    * **Unique ID (DUID):** a unique identifier for this unit, e.g. `wba55-mems-01`
-   * **Device Type / Hardware:** select the option matching your STM32WBA55 hardware
+   * **Device Type / Hardware:** select the option matching your STM32WBA55 (or STM32WBA65) hardware
    * **Display Name:** a friendly name, e.g. `WBA55 MEMS Demo`
    * **Entity:** select the entity to own the device (new accounts have a single option)
    * **Template:** select the imported template `STswMEMS`
@@ -123,37 +126,43 @@ Amazon Sidewalk provisions each device with a unique **certificate JSON** (the S
 
 ## 7. Generate the Manufacturing Image
 
-The certificate JSON must be converted into a **WBA55-format manufacturing image** (`mfg.bin` / `mfg.hex`) before it can be flashed. A helper script in this repo wraps the SDK's `provision.py` and writes the output to a per-device, permission-locked folder.
+The certificate JSON must be converted into a **board-format manufacturing image** (`mfg.bin` / `mfg.hex`) before it can be flashed. A helper script in this repo wraps the SDK's `provision.py` and writes the output to a per-device, permission-locked folder.
 
 ```bash
-./scripts/provision-device.sh <device-name> <path-to-cert.json>
+./scripts/provision-device.sh <device-name> <path-to-cert.json> [chip]
 ```
+
+The optional `[chip]` argument selects the MCU: it defaults to **`WBA55xG`** (NUCLEO-WBA55CG); pass **`WBA65xI`** for the NUCLEO-WBA65RI. The script auto-selects the matching mfg flash address for the raw `mfg.bin`.
 
 Example:
 
 ```bash
-./scripts/provision-device.sh wba55-mems-01 ~/Downloads/wba55-mems-01.json
+./scripts/provision-device.sh wba55-mems-01 ~/Downloads/wba55-mems-01.json           # WBA55 (default)
+./scripts/provision-device.sh wba65-mems-01 ~/Downloads/wba65-mems-01.json WBA65xI    # WBA65
 ```
 
-This produces:
+This produces (WBA55 shown; on WBA65 the `mfg.bin` flashes @ `0x081FE000`):
 
 ```
 binaries/sidewalk-mfg/wba55-mems-01/
 ├── cert.json
-├── mfg.bin      <-- flash this @ 0x080FE000
+├── mfg.bin      <-- flash this @ 0x080FE000  (WBA65: 0x081FE000)
 └── mfg.hex
 ```
 
 > [!NOTE]
-> The script requires the [STM32-Sidewalk-SDK](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK) checked out (it uses the SDK's bundled `tools/provision/provision.py`). It defaults to `~/dev/sidewalk/STM32-Sidewalk-SDK`; override with `SDK_ROOT=/path/to/STM32-Sidewalk-SDK`. Do **not** flash the raw certificate or any `mfg.bin` from elsewhere — always run `provision-device.sh` (i.e. `provision.py st aws --chip WBA55xG`) first.
+> The script requires the [STM32-Sidewalk-SDK](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK) checked out (it uses the SDK's bundled `tools/provision/provision.py`). It defaults to `~/dev/sidewalk/STM32-Sidewalk-SDK`; override with `SDK_ROOT=/path/to/STM32-Sidewalk-SDK`. Do **not** flash the raw certificate or any `mfg.bin` from elsewhere — always run `provision-device.sh` (i.e. `provision.py st aws --chip WBA55xG`, or `--chip WBA65xI` for the WBA65) first.
 
 ---
 
 ## 8. Setup Hardware
 
-1. **Stack** the MEMS expansion board onto the NUCLEO-WBA55CG: align the **X-NUCLEO-IKS4A1** (or **IKS5A1**) onto the Arduino headers and press firmly until fully seated. No jumpers or extra wiring are needed — the sensors talk over the Arduino I²C connector.
-2. **Connect** the USB micro-B cable from your PC to the NUCLEO-WBA55CG's ST-LINK port.
+1. **Stack** the MEMS expansion board onto the NUCLEO-WBA55CG (or NUCLEO-WBA65RI): align the **X-NUCLEO-IKS4A1** (or **IKS5A1**) onto the Arduino headers and press firmly until fully seated. No jumpers or extra wiring are needed — the sensors talk over the Arduino I²C connector.
+2. **Connect** the USB micro-B cable from your PC to the board's ST-LINK port.
 3. Confirm the board powers up (the ST-LINK LED illuminates).
+
+> [!NOTE]
+> **WBA65 users:** the firmware's sensor-shield Arduino-I²C pin mapping currently defaults to the known-good WBA55 pinout and has **not yet been confirmed against the NUCLEO-WBA65RI schematic**. Confirm the Arduino-I²C pins against the board schematic before trusting sensor data on the WBA65.
 
 > [!NOTE]
 > Use the firmware variant that matches your physical board (IKS4A1 firmware on the IKS4A1 board, IKS5A1 firmware on the IKS5A1 board). A mismatch shows up as an IMU `init failed` message in the serial log.
@@ -169,28 +178,34 @@ For independent setup, you build the firmware yourself; pre-built images are not
 ### Build the firmware locally
 
 ```bash
-./scripts/build-firmware.sh           # both IKS4A1 and IKS5A1 variants
+./scripts/build-firmware.sh           # both IKS4A1 and IKS5A1 variants (WBA55)
 ./scripts/build-firmware.sh iks4a1    # IKS4A1 only
 ./scripts/build-firmware.sh iks5a1    # IKS5A1 only
+
+BOARD=wba65 ./scripts/build-firmware.sh   # build the WBA65 hex(es) instead (BOARD defaults to wba55)
 ```
+
+The `BOARD` env var selects the host board (default `wba55`); `BOARD=wba65` builds the WBA65 variants from the STM32WBA65 CubeIDE project (`STM32CubeIDE/STM32WBA65`, `Debug_Nucleo-WBA65` config) that the SDK already ships.
 
 Prerequisites — STM32CubeIDE, the STM32-Sidewalk-SDK adjacent to this repo, X-CUBE-MEMS1 BSP drivers, and X-CUBE-CRYPTOLIB (CMOX) downloaded from st.com with click-through accepted. See [examples/sidewalk-mems-wba55/README.md](examples/sidewalk-mems-wba55/README.md) for the full setup. Output lands at:
 
 ```
-binaries/sid_ble_wba55_iks4a1.hex
-binaries/sid_ble_wba55_iks5a1.hex
+binaries/sid_ble_wba55_iks4a1.hex     # (WBA65: sid_ble_wba65_iks4a1.hex)
+binaries/sid_ble_wba55_iks5a1.hex     # (WBA65: sid_ble_wba65_iks5a1.hex)
 ```
 
-Pick the one that matches your sensor board:
+Pick the one that matches your host board + sensor board:
 
 | Physical board | Firmware hex |
 |---|---|
 | NUCLEO-WBA55CG + **X-NUCLEO-IKS4A1** | `binaries/sid_ble_wba55_iks4a1.hex` |
 | NUCLEO-WBA55CG + **X-NUCLEO-IKS5A1** | `binaries/sid_ble_wba55_iks5a1.hex` |
+| NUCLEO-WBA65RI + **X-NUCLEO-IKS4A1** | `binaries/sid_ble_wba65_iks4a1.hex` |
+| NUCLEO-WBA65RI + **X-NUCLEO-IKS5A1** | `binaries/sid_ble_wba65_iks5a1.hex` |
 
 ### One-shot flash helper (recommended)
 
-The wrapper erases the chip, then writes the firmware, then writes the MFG image — each step under connect-under-reset (`mode=UR`) with an automatic one-shot retry:
+The wrapper erases the chip, then writes the firmware, then writes the MFG image — each step under connect-under-reset (`mode=UR`) with an automatic one-shot retry. It is board-agnostic: pass whichever board's firmware hex and `mfg.hex` you built or downloaded (WBA55 shown; for WBA65 swap in `sid_ble_wba65_iks4a1.hex` and the WBA65 device's `mfg.hex`):
 
 ```bash
 tools/flash_wba55.sh \
@@ -201,16 +216,17 @@ tools/flash_wba55.sh \
 ### Manual equivalent
 
 ```bash
-# IKS4A1 board shown — swap the firmware hex for the IKS5A1 build if needed
+# WBA55 + IKS4A1 shown — swap the firmware hex for the IKS5A1/WBA65 build if needed
 STM32_Programmer_CLI -c port=SWD mode=UR -e all
 STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sid_ble_wba55_iks4a1.hex -v
+# mfg.bin flash address: 0x080FE000 on WBA55, 0x081FE000 on WBA65 (a .hex carries its own address)
 STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sidewalk-mfg/wba55-mems-01/mfg.bin 0x080FE000 -v
 ```
 
 After flashing, **press the black RESET button** (or power-cycle) to start the firmware.
 
 > [!NOTE]
-> If `STM32_Programmer_CLI` returns `DEV_CONNECT_ERR` repeatedly, **hold the black RESET button** on the Nucleo while the command starts. Between Sidewalk BLE advertising windows the WBA55 enters a low-power mode that gates the SWD pads; holding RESET keeps the CPU awake long enough for the programmer to attach.
+> If `STM32_Programmer_CLI` returns `DEV_CONNECT_ERR` repeatedly, **hold the black RESET button** on the Nucleo while the command starts. Between Sidewalk BLE advertising windows the WBA55 / WBA65 enters a low-power mode that gates the SWD pads; holding RESET keeps the CPU awake long enough for the programmer to attach.
 
 ---
 
@@ -305,7 +321,7 @@ _(Screen: Command)_
 * [Pre-built binaries & provisioning details](binaries/README.md)
 * [Repository overview](README.md)
 * /IOTCONNECT Sidewalk device docs: [Sidewalk Device](https://docs.iotconnect.io/iotconnect/user-manuals/devices/device/sidewalk) · [Wireless Device Types](https://docs.iotconnect.io/iotconnect/concepts/device-types/wireless-device/)
-* Hardware: [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) · [X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) · [X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
+* Hardware: [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) · NUCLEO-WBA65RI · [X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) · [X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
 * Amazon Sidewalk: [supported gateways](https://docs.sidewalk.amazon/getting-started/) · [device lifecycle](https://docs.sidewalk.amazon/manufacturing/sidewalk-device-lifecycle.html)
 
 ---

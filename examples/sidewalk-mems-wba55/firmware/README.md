@@ -1,10 +1,14 @@
 # IKS4A1 firmware sources
 
-These are the **bespoke** firmware files for the WBA55 + X-NUCLEO-IKS4A1 Sidewalk
-example. They are not part of the upstream STM32 Sidewalk SDK — copy them into a
-checkout of the SDK and apply the integration hooks below to reproduce the build.
+These are the **bespoke** firmware files for the WBA55 / WBA65 + X-NUCLEO-IKS4A1
+Sidewalk example. They are not part of the upstream STM32 Sidewalk SDK — copy them
+into a checkout of the SDK and apply the integration hooks below to reproduce the
+build. The same overlay sources build for **both** the NUCLEO-WBA55CG and the
+NUCLEO-WBA65RI; the board is selected by the SDK project's board compile macro
+(`NUCLEO_WBA55_BOARD` vs `NUCLEO_WBA65_BOARD`), which drives the board-conditional
+blocks noted below.
 
-Everything else the build needs (the Sidewalk stack, FreeRTOS, the WBA55 HAL,
+Everything else the build needs (the Sidewalk stack, FreeRTOS, the WBA55/WBA65 HAL,
 CMOX) comes from the SDK, and the MEMS sensor drivers come from ST's
 **X-CUBE-MEMS1** package (see the parent example README, Section 2).
 
@@ -15,10 +19,14 @@ The folder layout here mirrors the SDK so you can copy paths verbatim. Root is
 
 | This folder | Copy to (under `sid_ble/`) | What it is |
 |---|---|---|
-| `STM32_WPAN/App/sensors_iks4a1.c` / `.h` | `STM32_WPAN/App/` | Sensor read + sid_demo TLV packing (action + capability frames) |
-| `STM32_WPAN/App/commands_iks4a1.c` / `.h` | `STM32_WPAN/App/` | Downlink opcode dispatch (LED on/off, set-interval) |
+| `STM32_WPAN/App/sensors_iks4a1.c` / `.h` | `STM32_WPAN/App/` | Sensor read + sid_demo TLV packing (action + capability frames). Loads the LSM6DSV16X asset-tracking MLC at init and emits its `MLC1_SRC` label (tags `0x2A`/`0x2B`). |
+| `STM32_WPAN/App/sensors_iks5a1.c` | `STM32_WPAN/App/` | IKS5A1 implementation of the same abstraction (`SID_APP_IKS5A1_ENABLED=1`). Loads the ISM6HG256X asset-tracking MLC at init — same classes/model id as the IKS4A1 build. |
+| `STM32_WPAN/App/commands_iks4a1.c` / `.h` | `STM32_WPAN/App/` | Downlink opcode dispatch (LED on/off, set-interval). The `LED_BLUE` board guards accept **both** boards: `#if defined(NUCLEO_WBA55_BOARD) || defined(NUCLEO_WBA65_BOARD)`. |
+| `mlc/lsm6dsv16x_asset_tracking.h` | `STM32_WPAN/App/` | Smart Asset Tracking MLC config for LSM6DSV16X (IKS4A1 build) — see [`mlc/README.md`](mlc/README.md) |
+| `mlc/ism6hg256x_asset_tracking.h` | `STM32_WPAN/App/` | Smart Asset Tracking MLC config for ISM6HG256X (IKS5A1 build) — same algorithm/classes, from ST's `st-mems-machine-learning-core` repo |
 | `Drivers/BSP/IKS4A1/iks4a1_conf.h` | `Drivers/BSP/IKS4A1/` | BSP config — enables LSM6DSV16X, LIS2DUXS12, LPS22DF, SHT40AD1B, STTS22H; I²C macros → `BSP_I2C1_*` |
-| `Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.c` / `.h` | `Drivers/BSP/STM32WBAxx_Nucleo/` | I2C1 bus glue (PB1=SDA/PB2=SCL AF4, 100 kHz) the BSP calls |
+| `Drivers/BSP/IKS5A1/iks5a1_conf.h` | `Drivers/BSP/IKS5A1/` | BSP config — enables ISM6HG256X, IIS2DULPX, ILPS22QS |
+| `Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.c` / `.h` | `Drivers/BSP/STM32WBAxx_Nucleo/` | I2C1 bus glue the BSP calls. The `.h` picks the SDA/SCL pin macros by board: `#if defined(NUCLEO_WBA65_BOARD)` (WBA65) `#else` WBA55 default. WBA55 = PB1=SDA/PB2=SCL AF4 I2C1, 100 kHz. **The WBA65 branch currently defaults to the same PB1/PB2/AF4/I2C1 values and is marked `>>> VERIFY` — those pins are NOT yet confirmed against the NUCLEO-WBA65RI schematic (larger package; the GPIO behind Arduino D14/D15 can differ). Confirm before trusting WBA65 sensor data.** |
 
 > Not included (ST-owned): the X-CUBE-MEMS1 PID component drivers
 > (`Drivers/BSP/Components/{lsm6dsv16x,lis2duxs12,lps22df,sht40ad1b,stts22h,Common}`).
@@ -27,8 +35,10 @@ The folder layout here mirrors the SDK so you can copy paths verbatim. Root is
 > `qvar` field; the LSM6DSV16X driver provides the native 6D orientation
 > engine used for the `orientation` field. Both are enabled via the existing
 > BSP wrappers (`IKS4A1_MOTION_SENSOR_Enable_6D_Orientation`,
-> `IKS4A1_MOTION_SENSOR_Read_Register` for direct Qvar register access) —
-> no UCF / MLC blob required.
+> `IKS4A1_MOTION_SENSOR_Read_Register` for direct Qvar register access).
+> The asset-tracking MLC (tags `0x2A`/`0x2B`) additionally loads the matching
+> UCF header from [`mlc/`](mlc/) — LSM6DSV16X on IKS4A1, ISM6HG256X on IKS5A1;
+> both emit the same class values so the decoder model is shared.
 
 ## Integration into `app_sidewalk.c`
 
@@ -144,7 +154,9 @@ interval afterwards:
 
 ## Build-system changes (CubeIDE project)
 
-In `STM32CubeIDE/STM32WBA55/`:
+These changes are **already committed to the STM32WBA55 project** (`STM32CubeIDE/STM32WBA55/`, both `Debug_Nucleo-WBA55` and `Release_Nucleo-WBA55` configs). To also build for the NUCLEO-WBA65RI, apply the **same** changes to the stock SDK **STM32WBA65** project (`STM32CubeIDE/STM32WBA65/`, its `Debug_Nucleo-WBA65` / `Release_Nucleo-WBA65` configs) — the stock WBA65 `sid_ble` project does **not** ship the MEMS wiring. The SDK already provides the WBA65 CubeIDE project itself (project/hex `sid_ble_wba65`, configs `Debug_Nucleo-WBA65` / `Release_Nucleo-WBA65`, board macro `NUCLEO_WBA65_BOARD`); no new SDK project needs to be created.
+
+In `STM32CubeIDE/STM32WBA55/` (and, for WBA65, `STM32CubeIDE/STM32WBA65/`):
 
 - **`.cproject`** — define `SID_APP_IKS4A1_ENABLED=1`; add include paths for
   `Drivers/BSP/IKS4A1`, `Drivers/BSP/Components/Common`,
@@ -155,4 +167,5 @@ In `STM32CubeIDE/STM32WBA55/`:
 - **`Config/stm32wbaxx_hal_conf.h`** — uncomment `#define HAL_I2C_MODULE_ENABLED`.
 
 See the parent [example README](../README.md), Sections 2–4, for the full
-step-by-step.
+step-by-step (including the per-board project/build-config/hex names and the
+WBA65 I²C pin-verification caveat).

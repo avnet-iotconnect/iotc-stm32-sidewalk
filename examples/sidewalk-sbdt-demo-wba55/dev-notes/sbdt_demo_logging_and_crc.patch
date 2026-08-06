@@ -1,0 +1,134 @@
+diff --git a/apps/common/sid_app_sbdt_demo/sid_app_sbdt_demo.c b/apps/common/sid_app_sbdt_demo/sid_app_sbdt_demo.c
+index a173471..a4db62b 100644
+--- a/apps/common/sid_app_sbdt_demo/sid_app_sbdt_demo.c
++++ b/apps/common/sid_app_sbdt_demo/sid_app_sbdt_demo.c
+@@ -319,6 +319,8 @@ static void on_sbdt_transfer_request(const struct sid_bulk_data_transfer_request
+     }
+     SID_PAL_LOG_INFO("%s ID %x req_buffer_size %u", __func__, transfer_request->file_id,
+                      transfer_request->minimum_scratch_buffer_size);
++    SID_PAL_LOG_INFO(">>> OTA | TRANSFER REQUEST RECEIVED from cloud: file_id=0x%x, file_size=%u bytes",
++                     (unsigned)transfer_request->file_id, (unsigned)transfer_request->file_size);
+ 
+     uint32_t free_space = g_app_context->hw_ifc.platform_flash_get_free_space();
+     if (transfer_request->file_size > free_space) {
+@@ -356,12 +358,14 @@ static void on_sbdt_transfer_request(const struct sid_bulk_data_transfer_request
+     transfer_response->status = SID_BULK_DATA_TRANSFER_ACTION_ACCEPT;
+     transfer_response->scratch_buffer = g_app_context->sbdt[iter].scratch_buffer;
+     transfer_response->scratch_buffer_size = sizeof(g_app_context->sbdt[iter].scratch_buffer);
++    SID_PAL_LOG_INFO(">>> OTA | Transfer request ACCEPTED -- firmware download starting");
+ 
+     SID_PAL_LOG_INFO("PAUSE CAP_DISCOVERY!");
+     set_cap_done();
+ 
+     return;
+ err:
++    SID_PAL_LOG_INFO(">>> OTA | Transfer request REJECTED by device");
+     transfer_response->status = SID_BULK_DATA_TRANSFER_ACTION_REJECT;
+     transfer_response->scratch_buffer = NULL;
+     transfer_response->scratch_buffer_size = 0;
+@@ -372,11 +376,13 @@ static void on_sbdt_data_received(const struct sid_bulk_data_transfer_desc *cons
+                                   void *context)
+ {
+     if (desc->file_offset == 0) {
+-        sid_pal_storage_kv_group_delete(FILE_TRANSFER_OTA_GROUP);
++        SID_PAL_LOG_INFO(">>> OTA | First data block received -- FIRMWARE DOWNLOAD STARTED");
+     }
+ 
+     SID_PAL_LOG_INFO("%s file_id %x file_offset %x, link type %x", __func__, desc->file_id, desc->file_offset,
+                      desc->link_type);
++    SID_PAL_LOG_INFO(">>> OTA | Data block received: offset=%u bytes, block size=%u bytes",
++                     (unsigned)desc->file_offset, (unsigned)buffer->size);
+     uint8_t iter = get_instace_by_file_id(desc->file_id);
+     if (iter == SBDT_CONCURRENT_SESSIONS) {
+         goto err;
+@@ -394,15 +400,12 @@ static void on_sbdt_data_received(const struct sid_bulk_data_transfer_desc *cons
+     }
+     SID_PAL_LOG_FLUSH();
+ 
+-    uint32_t crc = 0;
+-    sid_error_t result =
+-        sid_pal_storage_kv_record_get(FILE_TRANSFER_OTA_GROUP, FILE_TRANSFER_CRC_KEY, &crc, sizeof(uint32_t));
+-    if (result == SID_ERROR_NOT_FOUND) {
+-        SID_PAL_LOG_INFO("CRC NOT FOUND IN FLASH!");
+-    } else if (result != SID_ERROR_NONE) {
+-        SID_PAL_LOG_INFO("CRC COULD NOT BE LOADED");
++    /* CRC is accumulated in RAM across blocks. The KV/LittleFS store is unusable on this
++     * board and is not needed for a single-session OTA, so it is not read/written here
++     * (this avoids the per-block LittleFS "No more free space" errors). Reset at start. */
++    if (desc->file_offset == 0) {
++        g_app_context->sbdt[iter].crc = 0;
+     }
+-    g_app_context->sbdt[iter].crc = crc;
+ 
+     SID_PAL_LOG_INFO("Prev CRC: 0x%x", g_app_context->sbdt[iter].crc);
+     g_app_context->sbdt[iter].crc = crc32_compute(buffer->data, buffer->size, &g_app_context->sbdt[iter].crc);
+@@ -410,6 +413,8 @@ static void on_sbdt_data_received(const struct sid_bulk_data_transfer_desc *cons
+     if (g_app_context->sbdt[iter].file_size == (desc->file_offset + buffer->size)) {
+         SID_PAL_LOG_INFO("Entire File Received: [%x:%u:0%x]", desc->file_id, g_app_context->sbdt[iter].file_size,
+                          g_app_context->sbdt[iter].crc);
++        SID_PAL_LOG_INFO(">>> OTA | ENTIRE FIRMWARE IMAGE RECEIVED (%u bytes) -- download complete",
++                         (unsigned)g_app_context->sbdt[iter].file_size);
+     } else {
+         SID_PAL_LOG_INFO("File Updated Crc: 0x%x", g_app_context->sbdt[iter].crc);
+     }
+@@ -418,11 +423,6 @@ static void on_sbdt_data_received(const struct sid_bulk_data_transfer_desc *cons
+     SID_PAL_LOG_INFO("PAUSE CAP_DISCOVERY!");
+     set_cap_done();
+ 
+-    result = sid_pal_storage_kv_record_set(FILE_TRANSFER_OTA_GROUP, FILE_TRANSFER_CRC_KEY,
+-                                           &g_app_context->sbdt[iter].crc, sizeof(g_app_context->sbdt[iter].crc));
+-    if (result != SID_ERROR_NONE) {
+-        SID_PAL_LOG_ERROR("COULD NOT STORE CRC: %x", g_app_context->sbdt[iter].crc);
+-    }
+     struct sbdt_buffer_release *evt_data = (struct sbdt_buffer_release *)malloc(sizeof(*evt_data));
+     if (evt_data == NULL) {
+         SID_PAL_LOG_ERROR("Failed to allocate event buffer !");
+@@ -452,6 +452,7 @@ err:
+ static void on_sbdt_finalize_request(uint32_t file_id, void *context)
+ {
+     SID_PAL_LOG_INFO("%s", __func__);
++    SID_PAL_LOG_INFO(">>> OTA | Download COMPLETE -- finalizing and validating firmware image");
+ 
+     uint8_t iter = get_instace_by_file_id(file_id);
+     if (iter == SBDT_CONCURRENT_SESSIONS) {
+@@ -465,6 +466,7 @@ static void on_sbdt_finalize_request(uint32_t file_id, void *context)
+ 
+     bool flash_check =
+         g_app_context->hw_ifc.platform_flash_check(g_app_context->sbdt[iter].file_size, g_app_context->sbdt[iter].crc);
++    SID_PAL_LOG_INFO(">>> OTA | Firmware image validation %s", flash_check ? "PASSED" : "FAILED");
+ 
+     sid_error_t result = sid_bulk_data_transfer_finalize(g_app_context->sidewalk_handle, 0,
+                                                          flash_check ? SID_BULK_DATA_TRANSFER_FINAL_STATUS_SUCCESS
+@@ -519,11 +521,13 @@ static void on_sbdt_release_scratch_buffer(uint32_t file_id, void *context)
+ static void on_sbdt_error(uint32_t file_id, void *context)
+ {
+     SID_PAL_LOG_INFO("%s", __func__);
++    SID_PAL_LOG_INFO(">>> OTA | Transfer ERROR reported by stack (file_id=0x%x)", (unsigned)file_id);
+ }
+ 
+ static void on_sbdt_cancel_request(uint32_t file_id, void *context)
+ {
+     SID_PAL_LOG_INFO("%s", __func__);
++    SID_PAL_LOG_INFO(">>> OTA | Transfer CANCELLED by cloud (file_id=0x%x)", (unsigned)file_id);
+ }
+ 
+ struct sid_bulk_data_transfer_event_callbacks *demo_sbdt_app_get_sid_event_callbacks()
+@@ -693,6 +697,9 @@ static void process_event_send_ota_progress(const struct app_demo_event *event)
+     };
+     sid_error_t ret = send_sbdt_demo_msg(&msg_desc, &demo_msg);
+     SID_PAL_LOG_INFO("Sending stats: %d, progress: %d", ret, notify.ota_stats.percent);
++    SID_PAL_LOG_INFO(">>> OTA UPLINK | FUOTA progress reported to cloud: %d%% (%u/%u bytes), send result=%d",
++                     (int)notify.ota_stats.percent, (unsigned)notify.ota_stats.completed_file_size,
++                     (unsigned)notify.ota_stats.total_file_size, (int)ret);
+ }
+ 
+ static void process_event_send_ota_capability(const struct app_demo_event *event)
+@@ -781,6 +788,8 @@ static void process_event_send_ota_status(uint32_t file_id, uint32_t status)
+     };
+     sid_error_t ret = send_sbdt_demo_msg(&msg_desc, &demo_msg);
+     SID_PAL_LOG_INFO("Sending ota Status: %d, status: %d", ret, status);
++    SID_PAL_LOG_INFO(">>> OTA UPLINK | FUOTA completion status reported to cloud: status=%d, send result=%d",
++                     (int)status, (int)ret);
+ }
+ 
+ static void process_event_ota_status(const struct app_demo_event *event)

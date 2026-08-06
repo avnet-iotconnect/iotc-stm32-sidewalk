@@ -28,6 +28,9 @@ binaries/sidewalk-mfg/
 examples/sidewalk-sbdt-demo-wba55/application_signing_key.pem
 examples/sidewalk-sbdt-demo-wba55/mfg.bin
 examples/sidewalk-sbdt-demo-wba55/mfg.hex
+# Pre-built OTA firmware image — same binary-redistribution constraint as the
+# .hex images above; rebuild via the SBDT demo build steps rather than commit.
+examples/sidewalk-sbdt-demo-wba55/*_ota_image.bin
 
 # Earlier dev-machine copy of the same SBDT artifacts (includes the .pem).
 # Kept on disk for reference but must never be tracked.

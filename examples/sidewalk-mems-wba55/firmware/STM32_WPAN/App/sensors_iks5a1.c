@@ -19,6 +19,9 @@
   *                                                          require direct
   *                                                          register access)
   *   IIS2DULPX Qvar         -> tag 0x29  (qvar)           — clean
+  *   ISM6HG256X MLC1        -> tags 0x2A/0x2B (mlc1)      — asset_tracking UCF
+  *                                                          (same classes/model
+  *                                                          id as IKS4A1)
   *   ILPS22QS  pressure     -> tag 0x27  (pressure_hpa)   — clean
   *   ILPS22QS  temperature  -> tag 0x06 + tag 0x24        — populated under
   *                                                          temp_stts22h_c
@@ -32,6 +35,7 @@
 
 #include "sensors_iks4a1.h"    /* shared struct + TLV tag definitions */
 
+#include <stdbool.h>
 #include <string.h>
 #include <sid_pal_log_ifc.h>
 
@@ -46,6 +50,20 @@
 #include "iks5a1_env_sensors.h"
 #include "stm32wbaxx_nucleo_bus.h"
 
+/* ISM6HG256X MLC asset-tracking decision tree. ucf_line_t[] of (reg, val)
+ * pairs converted from ST's official st-mems-machine-learning-core example
+ * (same Smart Asset Tracking algorithm and MLC1_SRC classes as the
+ * LSM6DSV16X variant on IKS4A1 — the cloud decoder model is shared). */
+#include "ism6hg256x_asset_tracking.h"
+
+/* ISM6HG256X registers we touch directly to read MLC inference output.
+ * Same layout as the LSM6DSV16X: FUNC_CFG_ACCESS bit7 selects the EMB_FUNC
+ * bank where MLC1_SRC lives. */
+#define ISM6HG256X_REG_FUNC_CFG_ACCESS     (0x01u)
+#define ISM6HG256X_FUNC_CFG_EMB_FUNC_BANK  (0x80u)  /* bit 7 = EMB_FUNC_REG_ACCESS */
+#define ISM6HG256X_FUNC_CFG_MAIN_BANK      (0x00u)
+#define ISM6HG256X_EMB_REG_MLC1_SRC        (0x70u)  /* in EMB_FUNC bank */
+
 /* IIS2DULPX Qvar registers (same layout as LIS2DUXS12 — both AH/Qvar parts). */
 #define IIS2DULPX_REG_OUT_T_AH_QVAR_L   (0x2Eu)
 #define IIS2DULPX_REG_OUT_T_AH_QVAR_H   (0x2Fu)
@@ -55,9 +73,17 @@
 static int16_t  s_clamp_i16(int32_t v);
 static uint16_t s_clamp_u16(int32_t v);
 
+/* See sensors_iks4a1.c for the rationale — IKS5A1 BSP wrappers have the same
+ * NULL-deref gotcha on Read_Register / Write_Register when init failed. */
+static bool s_iis2dulpx_ok = false;
+static bool s_mlc1_ok      = false;
+
 int sensors_iks4a1_init(void)
 {
     int32_t rc;
+
+    s_iis2dulpx_ok = false;
+    s_mlc1_ok      = false;
 
     if (BSP_I2C1_Init() != BSP_ERROR_NONE) {
         SID_PAL_LOG_ERROR("IKS5A1: I2C1 bus init failed");
@@ -88,6 +114,7 @@ int sensors_iks4a1_init(void)
     if (rc != BSP_ERROR_NONE) {
         SID_PAL_LOG_WARNING("IKS5A1: IIS2DULPX init failed (%ld) - qvar disabled", (long)rc);
     } else {
+        s_iis2dulpx_ok = true;
         (void)IKS5A1_MOTION_SENSOR_Enable(IKS5A1_IIS2DULPX_0, MOTION_ACCELERO);
         if (IKS5A1_MOTION_SENSOR_Write_Register(IKS5A1_IIS2DULPX_0,
                                                 IIS2DULPX_REG_AH_QVAR_CFG,
@@ -103,6 +130,40 @@ int sensors_iks4a1_init(void)
      * requires either an IKS5A1 BSP patch or direct register access via
      * Write/Read_Register. For now the orientation TLV (tag 0x28) reports
      * UNKNOWN. */
+
+    /* ISM6HG256X MLC — asset-tracking decision tree (same algorithm/classes as
+     * the LSM6DSV16X one on IKS4A1). Flat (register, value) write sequence:
+     * SW procedure, EMB_FUNC bank, ODR/full-scale (30 Hz LP, +-16 g), filter
+     * chain, features, decision tree, and finally back to the main bank.
+     * Note the UCF's tail leaves the gyro ODR off (CTRL2=0x00) — same accepted
+     * behavior as the IKS4A1 variant; gyro TLVs read zero while MLC is active.
+     * MLC needs ~0.5 s before its first stable inference; sensors_iks4a1_read()
+     * polls MLC1_SRC each cycle, so we just let it ride. */
+    {
+        const size_t n = sizeof(ism6hg256x_asset_tracking) / sizeof(ucf_line_t);
+        size_t bad = 0u;
+        for (size_t i = 0u; i < n; i++) {
+            if (IKS5A1_MOTION_SENSOR_Write_Register(IKS5A1_ISM6HG256X_0,
+                                                    ism6hg256x_asset_tracking[i].address,
+                                                    ism6hg256x_asset_tracking[i].data) != BSP_ERROR_NONE) {
+                bad++;
+            }
+        }
+        if (bad != 0u) {
+            SID_PAL_LOG_WARNING("IKS5A1: MLC UCF load: %u/%u writes failed",
+                                 (unsigned)bad, (unsigned)n);
+        } else {
+            s_mlc1_ok = true;
+            SID_PAL_LOG_INFO("IKS5A1: ISM6HG256X MLC (asset_tracking) loaded (%u writes)",
+                              (unsigned)n);
+        }
+        /* Always force the bank back to main mode, success or failure — same
+         * SWD-reflash safety rationale as the IKS4A1 loader (a sensor left in
+         * the EMB_FUNC bank fails WHO_AM_I on the next warm Init()). */
+        (void)IKS5A1_MOTION_SENSOR_Write_Register(IKS5A1_ISM6HG256X_0,
+                                                  ISM6HG256X_REG_FUNC_CFG_ACCESS,
+                                                  ISM6HG256X_FUNC_CFG_MAIN_BANK);
+    }
 
     SID_PAL_LOG_INFO("IKS5A1: sensors initialized (ISM6HG256X + IIS2DULPX + ILPS22QS)");
     return 0;
@@ -164,8 +225,10 @@ int sensors_iks4a1_read(sensors_iks4a1_reading_t *out)
     out->orientation = (uint8_t)SENSORS_IKS4A1_ORIENT_UNKNOWN;
 
 #if (USE_IKS5A1_MOTION_SENSOR_IIS2DULPX_0 == 1)
-    /* IIS2DULPX Qvar — same register layout as LIS2DUXS12 (0x2E/0x2F). */
-    {
+    /* IIS2DULPX Qvar — same register layout as LIS2DUXS12 (0x2E/0x2F). The
+     * Read_Register BSP wrapper does NOT null-check MotionCompObj, so calling
+     * it when IIS2DULPX init failed bus-faults. Gate on the runtime flag. */
+    if (s_iis2dulpx_ok) {
         uint8_t lo = 0, hi = 0;
         if (IKS5A1_MOTION_SENSOR_Read_Register(IKS5A1_IIS2DULPX_0,
                                                IIS2DULPX_REG_OUT_T_AH_QVAR_L, &lo) == BSP_ERROR_NONE
@@ -175,6 +238,28 @@ int sensors_iks4a1_read(sensors_iks4a1_reading_t *out)
         }
     }
 #endif
+
+    /* ISM6HG256X MLC1_SRC inference label. Lives in the EMB_FUNC bank, so we
+     * have to flip FUNC_CFG_ACCESS to bank-1 around the read and put it back.
+     * Asset-tracking UCF outputs: 0=stationary_upright, 4=stationary_not_upright,
+     * 8=in_motion, 12=shaken — identical to the IKS4A1/LSM6DSV16X model, so the
+     * shared model id (asset_tracking = 1) and decoder label map apply as-is. */
+    if (s_mlc1_ok) {
+        if (IKS5A1_MOTION_SENSOR_Write_Register(IKS5A1_ISM6HG256X_0,
+                                                ISM6HG256X_REG_FUNC_CFG_ACCESS,
+                                                ISM6HG256X_FUNC_CFG_EMB_FUNC_BANK) == BSP_ERROR_NONE) {
+            uint8_t mlc_src = 0u;
+            if (IKS5A1_MOTION_SENSOR_Read_Register(IKS5A1_ISM6HG256X_0,
+                                                   ISM6HG256X_EMB_REG_MLC1_SRC,
+                                                   &mlc_src) == BSP_ERROR_NONE) {
+                out->mlc1_raw      = mlc_src;
+                out->mlc1_model_id = SENSORS_IKS4A1_MLC1_MODEL_ASSET_TRACKING;
+            }
+            (void)IKS5A1_MOTION_SENSOR_Write_Register(IKS5A1_ISM6HG256X_0,
+                                                      ISM6HG256X_REG_FUNC_CFG_ACCESS,
+                                                      ISM6HG256X_FUNC_CFG_MAIN_BANK);
+        }
+    }
 
     return 0;
 }
@@ -255,9 +340,7 @@ uint32_t sensors_iks4a1_pack(uint8_t *buf,
 
     uint32_t o = 0;
 
-    /* WORKAROUND: emit CAP msg_desc 0x40 (not ACTION 0x41) — same workaround
-     * as IKS4A1 path, see sensors_iks4a1.c for the full explanation. Revert
-     * to SENSORS_IKS4A1_MSG_DESC_NOTIFY_ACTION once the fixed decoder lands. */
+    /* WORKAROUND: emit CAP msg_desc (0x40) — see sensors_iks4a1.c. */
     buf[o++] = SENSORS_IKS4A1_MSG_DESC_NOTIFY_CAP;
 
     /* sid_demo standard tags. */
@@ -277,6 +360,11 @@ uint32_t sensors_iks4a1_pack(uint8_t *buf,
     o = s_tlv_u32le (buf, o, TAG_IKS4A1_PRESSURE_X100,      r->lps22df_pa_x100);
     o = s_tlv_u8    (buf, o, TAG_IKS4A1_ORIENTATION,        r->orientation);
     o = s_tlv_i16le (buf, o, TAG_IKS4A1_QVAR_RAW,           r->qvar_raw);
+    /* ISM6HG256X MLC1_SRC label + model id (asset_tracking = 1) — same classes
+     * and decoder label map as the IKS4A1/LSM6DSV16X build. If the UCF load
+     * failed both fields are 0 and the decoder shows mlc1_model_name="none". */
+    o = s_tlv_u8    (buf, o, TAG_IKS4A1_MLC1,               r->mlc1_raw);
+    o = s_tlv_u8    (buf, o, TAG_IKS4A1_MLC1_MODEL,         r->mlc1_model_id);
 
     return o;
 }

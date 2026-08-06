@@ -46,6 +46,27 @@ static const char *status_str(enum sid_location_status st)
     }
 }
 
+/* Dump a byte buffer as hex over UART, 16 bytes/line so each line stays well
+ * under SID_PAL_LOG_MSG_LENGTH_MAX. Manual nibble formatting avoids relying on
+ * printf field-width support in the tiny-printf build. */
+static void log_payload_hex(const uint8_t *buf, size_t len)
+{
+    static const char hex[] = "0123456789ABCDEF";
+    char line[3 * 16 + 1];   /* "XX " per byte, 16 bytes, + NUL */
+    for (size_t off = 0; off < len; off += 16) {
+        size_t n = (len - off) < 16u ? (len - off) : 16u;
+        size_t p = 0;
+        for (size_t i = 0; i < n; i++) {
+            const uint8_t b = buf[off + i];
+            line[p++] = hex[(b >> 4) & 0x0Fu];
+            line[p++] = hex[b & 0x0Fu];
+            line[p++] = ' ';
+        }
+        line[p] = '\0';
+        SID_PAL_LOG_INFO("LOC: payload[%02u]: %s", (unsigned)off, line);
+    }
+}
+
 /* Asynchronous result of a location request. This is the device-side proof that
  * the resolve left the device; the resolved coordinates themselves are produced
  * cloud-side and delivered to the AWS location destination, not back to here. */
@@ -62,6 +83,20 @@ static void location_callback(const struct sid_location_result *const result, vo
     }
     SID_PAL_LOG_INFO("LOC: result status=%s mode=%d link=%d",
                      status_str(result->status), (int)result->mode, (int)result->link);
+
+    /* Raw uplink payload inspection. NOTE: this is the gateway-proximity data the
+     * device sends UP for cloud-side resolution — it is NOT a resolved lat/lon
+     * (no coordinate ever returns to the device on the BLE L1 path). Decoding it
+     * requires the Amazon location-protocol spec. Logged here only as a debug aid. */
+    if (result->size > 0u) {
+        size_t n = result->size;
+        if (n > SID_LOCATION_MAX_PAYLOAD_SIZE) {
+            n = SID_LOCATION_MAX_PAYLOAD_SIZE;
+        }
+        SID_PAL_LOG_INFO("LOC: uplink payload size=%u bytes (sent for cloud resolve, not a coordinate)",
+                         (unsigned)result->size);
+        log_payload_hex(result->payload, n);
+    }
 }
 
 sid_error_t location_wba55_init(struct sid_handle *handle)
@@ -76,8 +111,14 @@ sid_error_t location_wba55_init(struct sid_handle *handle)
     static struct sid_location_config cfg = {
         .sid_location_type_mask = SID_LOCATION_METHOD_BLE_GATEWAY, /* BLE only */
         .callbacks    = { .on_update = location_callback, .context = NULL },
-        .max_effort   = SID_LOCATION_EFFORT_L1,  /* never escalate to WiFi/GNSS */
-        .manage_effort = true,
+        .max_effort   = SID_LOCATION_EFFORT_L1,
+        /* manage_effort=false pins the request to a single, explicit effort mode.
+         * With managed effort the library auto-escalates past L1 when no
+         * consenting gateway is immediately available ("Trying next effort mode:
+         * 3"); mode L3 needs a WiFi/GNSS scan PAL absent from this BLE-only build,
+         * so sid_location_run() then returns SID_ERROR_NOSUPPORT (-6). BLE-only L1
+         * must never escalate, so we disable managed effort and request L1 below. */
+        .manage_effort = false,
         .stepdowns     = { 0 },  /* not applicable to BLE-only */
         .fragmentation = { 0 },  /* BLE needs no fragmentation */
     };
@@ -109,10 +150,13 @@ sid_error_t location_wba55_run(struct sid_handle *handle)
         s_last_run_gps_s = now_s;
     }
 
-    /* BLE Level-1: no scan buffer; cloud resolves from gateway proximity. */
+    /* BLE Level-1: no scan buffer; cloud resolves from gateway proximity.
+     * Request L1 explicitly. SID_LOCATION_EFFORT_DEFAULT is only valid with
+     * manage_effort=true (see header); since we disabled managed effort to stop
+     * escalation to unsupported WiFi/GNSS modes, we must name the mode. */
     struct sid_location_run_config run_cfg = {
         .type   = SID_LOCATION_SCAN_AND_SEND,
-        .mode   = SID_LOCATION_EFFORT_DEFAULT,  /* managed -> uses L1 */
+        .mode   = SID_LOCATION_EFFORT_L1,
         .buffer = NULL,
         .size   = 0u,
     };

@@ -17,7 +17,7 @@
   *
   * Modifications by Avnet /IOTCONNECT for the iotc-stm32-sidewalk demo
   * (file originally derived from iks5a1_conf_template.h in X-CUBE-MEMS1):
-  *   - Mirrors iks4a1_conf.h structure for the Nucleo-WBA55CG.
+  *   - Mirrors iks4a1_conf.h structure for the Nucleo-WBA55CG / Nucleo-WBA65RI.
   *   - Sensors enabled:  ISM6HG256X, IIS2DULPX, ILPS22QS.
   *   - Sensors disabled: ISM330IS (ISPU IMU — add when ISPU is wired up);
   *                       IIS2MDC (magnetometer — no template field yet).
@@ -45,7 +45,7 @@ extern "C" {
 #define USE_IKS5A1_MOTION_SENSOR_IIS2DULPX_0   1U
 #define USE_IKS5A1_MOTION_SENSOR_IIS2MDC_0     0U
 
-/* BSP I2C glue (same I2C1 the IKS4A1 uses on the WBA55 Arduino header). */
+/* BSP I2C glue (same I2C1 the IKS4A1 uses on the WBA55 / WBA65 Arduino header). */
 #define IKS5A1_I2C_INIT       BSP_I2C1_Init
 #define IKS5A1_I2C_DEINIT     BSP_I2C1_DeInit
 #define IKS5A1_I2C_READ_REG   BSP_I2C1_ReadReg

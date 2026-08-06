@@ -1,0 +1,80 @@
+diff --git a/apps/st/stm32wba/common/Core/Src/sid_application_install_manager_ifc.c b/apps/st/stm32wba/common/Core/Src/sid_application_install_manager_ifc.c
+index 24e9fdf..8f2984b 100644
+--- a/apps/st/stm32wba/common/Core/Src/sid_application_install_manager_ifc.c
++++ b/apps/st/stm32wba/common/Core/Src/sid_application_install_manager_ifc.c
+@@ -54,6 +54,12 @@ static const uint32_t validity_magic_word[SID_AIM_IFC_FLASH_WORD_SIZE / sizeof(u
+ static const uint32_t validity_failure_word[SID_AIM_IFC_FLASH_WORD_SIZE / sizeof(uint32_t)] = {0u};
+ static const uint32_t validity_pending_word[SID_AIM_IFC_FLASH_WORD_SIZE / sizeof(uint32_t)] = {0xFFFFFFFFu, 0xFFFFFFFFu, 0xFFFFFFFFu, 0xFFFFFFFFu, };
+ 
++/* Scratch buffer to 16-byte-align a short final OTA chunk before flashing. Sized for
++   the SBDT block granularity; access is serialised by flash_lock_semaphore so a single
++   shared buffer is safe. Kept as uint32_t for natural word alignment. */
++#define SID_AIM_IFC_OTA_ALIGNED_BUF_SIZE  (2048u)
++static uint32_t ota_aligned_tail_buf[SID_AIM_IFC_OTA_ALIGNED_BUF_SIZE / sizeof(uint32_t)];
++
+ static const osSemaphoreAttr_t flash_lock_sem_attributes = {
+     .name       = "AIM Flash Lock Semaphore",
+     .attr_bits  = TASK_DEFAULT_ATTR_BITS,
+@@ -442,12 +448,9 @@ int32_t sid_aim_ifc_store_ota_data_chunk(void * data, const uint32_t offset, con
+             break;
+         }
+ 
+-        if ((size % SID_AIM_IFC_FLASH_WORD_SIZE) != 0u)
+-        {
+-            SID_PAL_LOG_ERROR("OTA chunk write rejected, write length of %u is not aligned to flash word size (16 bytes)", size);
+-            err = SID_ERROR_INVALID_ARGS;
+-            break;
+-        }
++        /* The write LENGTH must also be a 16-byte multiple. The final OTA chunk is
++           usually shorter (image size is rarely a multiple of 16); it is padded up to
++           a word boundary below rather than rejected. */
+ 
+         os_status = osSemaphoreAcquire(flash_lock_semaphore, osWaitForever);
+         if (osErrorTimeout == os_status)
+@@ -467,8 +470,8 @@ int32_t sid_aim_ifc_store_ota_data_chunk(void * data, const uint32_t offset, con
+         }
+ 
+         /* Erase new pages that will be written by current data chunk */
+-        const uint32_t page_aligned_erase_start_offset = (offset + (FLASH_PAGE_SIZE - 1u)) & (FLASH_PAGE_SIZE - 1u);         /* Offset of the first new page that will be written */
+-        const uint32_t page_aligned_erase_end_offset   = (offset + size + (FLASH_PAGE_SIZE - 1u)) & (FLASH_PAGE_SIZE - 1u);  /* Offset past the last page that is touched by current operation */
++        const uint32_t page_aligned_erase_start_offset = (offset + (FLASH_PAGE_SIZE - 1u)) & ~(FLASH_PAGE_SIZE - 1u);         /* Offset of the first new page that will be written */
++        const uint32_t page_aligned_erase_end_offset   = (offset + size + (FLASH_PAGE_SIZE - 1u)) & ~(FLASH_PAGE_SIZE - 1u);  /* Offset past the last page that is touched by current operation */
+         const uint32_t pages_to_erase = (page_aligned_erase_end_offset - page_aligned_erase_start_offset) / FLASH_PAGE_SIZE; /* Total number of pages to be erased before writing */
+ 
+         if (pages_to_erase != 0u)
+@@ -511,11 +514,32 @@ int32_t sid_aim_ifc_store_ota_data_chunk(void * data, const uint32_t offset, con
+             }
+         }
+ 
+-        /* Now proceed with writing data */
++        /* Now proceed with writing data. STM32WBA5x programs flash in 16-byte words, so
++           the length handed to FM_Write must be a multiple of 16. If this chunk is not
++           (only the final short chunk of an image), copy it into a scratch buffer and pad
++           up to a word boundary with 0xFF (the erased-flash value). The padding lands past
++           the image's real end, so it does not change the image CRC (computed over the
++           exact image length). */
++        const void *write_src = data;
++        size_t      write_len = size;
++        if ((size % SID_AIM_IFC_FLASH_WORD_SIZE) != 0u)
++        {
++            write_len = (size + (SID_AIM_IFC_FLASH_WORD_SIZE - 1u)) & ~((size_t)SID_AIM_IFC_FLASH_WORD_SIZE - 1u);
++            if (write_len > sizeof(ota_aligned_tail_buf))
++            {
++                SID_PAL_LOG_ERROR("OTA chunk too large to align: %u bytes", size);
++                err = SID_ERROR_OUT_OF_RESOURCES;
++                break;
++            }
++            (void)memset(ota_aligned_tail_buf, 0xFF, write_len);
++            (void)memcpy(ota_aligned_tail_buf, data, size);
++            write_src = ota_aligned_tail_buf;
++        }
++
+         sid_pal_enter_critical_region();
+-        ota_write_params.src_addr   = (uint32_t *)data;
++        ota_write_params.src_addr   = (uint32_t *)(void *)write_src;
+         ota_write_params.dst_addr   = (uint32_t *)(void *)write_start_addr;
+-        ota_write_params.size_words = size / sizeof(uint32_t);
++        ota_write_params.size_words = write_len / sizeof(uint32_t);
+         fm_status = FM_Write(ota_write_params.src_addr, ota_write_params.dst_addr, ota_write_params.size_words, &aim_ifc_ota_block_write_fm_callback_node);
+         sid_pal_exit_critical_region();
+         if (fm_status != FM_OK)

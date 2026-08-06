@@ -1,3 +1,26 @@
+# Smart Asset Tracking MLC configs (both IMUs)
+
+This folder ships ST's Smart Asset Tracking MLC+FSM configuration for **both**
+MEMS shields used by this example — the same algorithm, output register
+(`MLC1_SRC` @ 0x70) and classes on each, so one /IOTCONNECT decoder model
+(`asset_tracking`, model id 1) covers both:
+
+| File | IMU | Shield | Source |
+|---|---|---|---|
+| `lsm6dsv16x_asset_tracking.ucf` / `.h` | LSM6DSV16X | X-NUCLEO-IKS4A1 | ST `STMems_Machine_Learning_Core` (legacy repo) |
+| `ism6hg256x_asset_tracking.h` | ISM6HG256X | X-NUCLEO-IKS5A1 | ST [`st-mems-machine-learning-core`](https://github.com/STMicroelectronics/st-mems-machine-learning-core/tree/main/examples/asset_tracking/ism6hg256x), converted 1:1 (all ops are plain register writes) to the same flat `ucf_line_t` format |
+
+Classes (read from `MLC1_SRC`): `0x00` Stationary-Upright · `0x04` Stationary-Not-upright · `0x08` In motion · `0x0C` Shaken.
+
+Both headers are loaded by the matching `sensors_iks*.c` module at init
+(`SID_APP_IKS4A1_ENABLED=1` → LSM6DSV16X config; `SID_APP_IKS5A1_ENABLED=1` →
+ISM6HG256X config) and copied to `STM32_WPAN/App/` in the SDK.
+
+The ST documentation below describes the algorithm (written for the LSM6DSV16X
+original; the ISM6HG256X variant is identical in behavior and classes).
+
+---
+
 ## 1 - Introduction
 
 This example combines Machine Learning Core (MLC) and Finite State Machine (FSM) capabilities to implement a Smart Asset Tracking algorithm able to detect and track the various states of a package (Stationary - Upright, Stationary - Not upright, In motion, Shaken) and detect some possible events (Impact, Free-fall).
