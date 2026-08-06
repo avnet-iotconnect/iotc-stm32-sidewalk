@@ -267,7 +267,7 @@ Both boards share the same TLV wire format and the single `STswMEMS` template; t
 | `qvar` | LIS2DUXS12 / IIS2DULPX (raw count) | ✅ | ✅ |
 | `temp_sht40_c` | SHT40AD1B (°C) | ✅ | — |
 | `humidity_sht40_pct` | SHT40AD1B (%RH) | ✅ | — |
-| `orientation` | LSM6DSV16X 6D engine | ✅ | — (`unknown`) |
+| `orientation` | LSM6DSV16X 6D engine | ✅ | — |
 | `mlc1_label` (+ `mlc1_raw`, `mlc1_model_id`, `mlc1_model_name`) | LSM6DSV16X / ISM6HG256X MLC (asset_tracking) | ✅ | ✅ |
 | `sensor_data` / `Temperature` | whole-°C temperature (for the standard widget) | ✅ | ✅ |
 | `Sequence`, `gps_time`, `link_type`, `version` | firmware / Sidewalk metadata | ✅ | ✅ |
