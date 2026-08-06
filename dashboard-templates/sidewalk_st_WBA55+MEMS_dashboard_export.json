@@ -1,0 +1,2778 @@
+{
+  "ddType": 2,
+  "items": [
+    {
+      "widgetGuid": "A8CB394D-15B1-42C9-94FC-AD7BDC599E2A",
+      "widgetProperties": {
+        "i": "Image",
+        "background": "#000000",
+        "fontColor": "#000000",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "10",
+        "title": "",
+        "titleAlign": "",
+        "contents": {
+          "option": {
+            "imageUpload": "false",
+            "imageUrl": "true",
+            "imageDevice": "false",
+            "imageTelemetry": "false",
+            "key": "option",
+            "position": "stretch"
+          },
+          "upload": {
+            "imageurl": "",
+            "key": "upload"
+          },
+          "url": {
+            "imageurl": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/sidewalk/sidewalk-title-banner_2.png",
+            "key": "url"
+          },
+          "device": {
+            "deviceGuid": "",
+            "deviceName": "",
+            "imageurl": "",
+            "key": "device"
+          },
+          "telemetry": {
+            "deviceGuid": "",
+            "deviceName": "",
+            "imageurl": "",
+            "key": "telemetry"
+          },
+          "classification": {
+            "showClassification": "false",
+            "key": "classification"
+          }
+        }
+      },
+      "properties": {
+        "x": "0",
+        "y": "0",
+        "w": "42",
+        "h": "13",
+        "i": "Image",
+        "minW": "5",
+        "minH": "5",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "F66A9747-6C71-40E5-8639-9F53233494D2",
+      "widgetProperties": {
+        "i": "Label",
+        "background": "#000000",
+        "fontColor": "#ffffff",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "32",
+        "title": "Motion, shock & tamper",
+        "titleAlign": "",
+        "contents": ""
+      },
+      "properties": {
+        "x": "42",
+        "y": "0",
+        "w": "46",
+        "h": "2",
+        "i": "Label",
+        "minW": "6",
+        "minH": "2",
+        "maxH": "2",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "8BF5A2DF-51FA-479B-B5D8-8413DC425CFF",
+      "widgetProperties": {
+        "i": "LiveLineChart",
+        "background": "#fff",
+        "fontColor": "#000000",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "25",
+        "title": "Accelerometer \u2014 3-axis (g)",
+        "titleAlign": "",
+        "contents": {
+          "liveChart": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "A7253834-E387-48AD-BF1A-97D5AAEC959D",
+                  "attributeName": "payload.Sequence",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "87",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "87"
+                },
+                {
+                  "attributeGuid": "C7C665A4-6AAB-4C7D-9889-9A672ED75294",
+                  "attributeName": "payload.Sinewave",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "1F4528DE-2649-49CD-9BBA-394D95E08BF3",
+                  "attributeName": "payload.version",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1"
+                },
+                {
+                  "attributeGuid": "87F619FD-FDFE-48C0-A784-0D388474A48F",
+                  "attributeName": "payload.payload_size",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "67",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "67"
+                },
+                {
+                  "attributeGuid": "3F22F811-14F8-4949-884A-1BF922A38DAE",
+                  "attributeName": "payload.sensor_data",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "24",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24"
+                },
+                {
+                  "attributeGuid": "CA9C2511-F00F-44C7-9F7D-92FFEBA19AF0",
+                  "attributeName": "payload.Temperature",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24"
+                },
+                {
+                  "attributeGuid": "C07F2780-27AB-4BFC-8148-2F9A1D0014F2",
+                  "attributeName": "payload.gps_time",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1468080051",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1468080051"
+                },
+                {
+                  "attributeGuid": "3BC5778E-D5E1-4486-ABFF-F43164939384",
+                  "attributeName": "payload.acc_x_g",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.047",
+                  "attributeColor": "#f5a623",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.047",
+                  "showColorPicker": "false"
+                },
+                {
+                  "attributeGuid": "5D9ACE00-185A-43BF-8998-73A0906878E7",
+                  "attributeName": "payload.acc_y_g",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.028",
+                  "attributeColor": "#7ed321",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.028",
+                  "showColorPicker": "false"
+                },
+                {
+                  "attributeGuid": "30336E9C-BE9D-44E4-9318-FDC7F010B075",
+                  "attributeName": "payload.acc_z_g",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.986",
+                  "attributeColor": "#4a90e2",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.986",
+                  "showColorPicker": "false"
+                },
+                {
+                  "attributeGuid": "3873EC50-1C88-4E07-99F9-24B517911C02",
+                  "attributeName": "payload.gyr_x_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-1.5",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-1.5"
+                },
+                {
+                  "attributeGuid": "FAE14F2F-296F-47DD-AE02-774B5DDD4CBB",
+                  "attributeName": "payload.gyr_y_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.3",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.3"
+                },
+                {
+                  "attributeGuid": "D571D2B9-292E-4C7E-8799-B43CFC9723F5",
+                  "attributeName": "payload.gyr_z_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.6",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.6"
+                },
+                {
+                  "attributeGuid": "A7AEC13C-F827-45DA-80A0-A0B6CC4574AD",
+                  "attributeName": "payload.temp_stts22h_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24.7",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24.7"
+                },
+                {
+                  "attributeGuid": "E952EE8B-3D5A-487A-9CE0-4E318AB5AEFD",
+                  "attributeName": "payload.temp_sht40_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24.81",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24.81"
+                },
+                {
+                  "attributeGuid": "652B4703-2222-4943-A53F-95A9C3B64EF0",
+                  "attributeName": "payload.humidity_sht40_pct",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "46.93",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "46.93"
+                },
+                {
+                  "attributeGuid": "64EC78E9-2D16-449D-B79A-77CA66D36160",
+                  "attributeName": "payload.pressure_hpa",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "973.7",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "973.7"
+                },
+                {
+                  "attributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+                  "attributeName": "payload.qvar",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "-96",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-96"
+                },
+                {
+                  "attributeGuid": "6D493E57-BD37-4567-87A9-B07611AF301E",
+                  "attributeName": "payload.mlc1_raw",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "4",
+                  "deviceUpdatedDate": "2026-07-14T16:00:35.130Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "4"
+                }
+              ]
+            },
+            "attrType": "1",
+            "key": "liveChart",
+            "recentEndPoints": "10"
+          }
+        }
+      },
+      "properties": {
+        "x": "42",
+        "y": "2",
+        "w": "15",
+        "h": "15",
+        "i": "LiveLineChart",
+        "minW": "15",
+        "minH": "15",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "8BF5A2DF-51FA-479B-B5D8-8413DC425CFF",
+      "widgetProperties": {
+        "i": "LiveLineChart",
+        "background": "#fff",
+        "fontColor": "#000000",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "25",
+        "title": "Gyroscope \u2014 3-axis (\u00b0/s)",
+        "titleAlign": "",
+        "contents": {
+          "liveChart": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "A7253834-E387-48AD-BF1A-97D5AAEC959D",
+                  "attributeName": "payload.Sequence",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "95",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "95"
+                },
+                {
+                  "attributeGuid": "C7C665A4-6AAB-4C7D-9889-9A672ED75294",
+                  "attributeName": "payload.Sinewave",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "1F4528DE-2649-49CD-9BBA-394D95E08BF3",
+                  "attributeName": "payload.version",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1"
+                },
+                {
+                  "attributeGuid": "87F619FD-FDFE-48C0-A784-0D388474A48F",
+                  "attributeName": "payload.payload_size",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "67",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "67"
+                },
+                {
+                  "attributeGuid": "3F22F811-14F8-4949-884A-1BF922A38DAE",
+                  "attributeName": "payload.sensor_data",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "24",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24"
+                },
+                {
+                  "attributeGuid": "CA9C2511-F00F-44C7-9F7D-92FFEBA19AF0",
+                  "attributeName": "payload.Temperature",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24"
+                },
+                {
+                  "attributeGuid": "C07F2780-27AB-4BFC-8148-2F9A1D0014F2",
+                  "attributeName": "payload.gps_time",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1468080172",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1468080172"
+                },
+                {
+                  "attributeGuid": "3BC5778E-D5E1-4486-ABFF-F43164939384",
+                  "attributeName": "payload.acc_x_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.04",
+                  "attributeColor": "#f5a623",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.04"
+                },
+                {
+                  "attributeGuid": "5D9ACE00-185A-43BF-8998-73A0906878E7",
+                  "attributeName": "payload.acc_y_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.029",
+                  "attributeColor": "#7ed321",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.029"
+                },
+                {
+                  "attributeGuid": "30336E9C-BE9D-44E4-9318-FDC7F010B075",
+                  "attributeName": "payload.acc_z_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.989",
+                  "attributeColor": "#4a90e2",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.989"
+                },
+                {
+                  "attributeGuid": "3873EC50-1C88-4E07-99F9-24B517911C02",
+                  "attributeName": "payload.gyr_x_dps",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-1.5",
+                  "attributeColor": "#f5a623",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-1.5",
+                  "showColorPicker": "false"
+                },
+                {
+                  "attributeGuid": "FAE14F2F-296F-47DD-AE02-774B5DDD4CBB",
+                  "attributeName": "payload.gyr_y_dps",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.3",
+                  "attributeColor": "#7ed321",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.3",
+                  "showColorPicker": "false"
+                },
+                {
+                  "attributeGuid": "D571D2B9-292E-4C7E-8799-B43CFC9723F5",
+                  "attributeName": "payload.gyr_z_dps",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.6",
+                  "attributeColor": "#4a90e2",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.6",
+                  "showColorPicker": "false"
+                },
+                {
+                  "attributeGuid": "A7AEC13C-F827-45DA-80A0-A0B6CC4574AD",
+                  "attributeName": "payload.temp_stts22h_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24.79",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24.79"
+                },
+                {
+                  "attributeGuid": "E952EE8B-3D5A-487A-9CE0-4E318AB5AEFD",
+                  "attributeName": "payload.temp_sht40_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24.91",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24.91"
+                },
+                {
+                  "attributeGuid": "652B4703-2222-4943-A53F-95A9C3B64EF0",
+                  "attributeName": "payload.humidity_sht40_pct",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "46.47",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "46.47"
+                },
+                {
+                  "attributeGuid": "64EC78E9-2D16-449D-B79A-77CA66D36160",
+                  "attributeName": "payload.pressure_hpa",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "973.77",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "973.77"
+                },
+                {
+                  "attributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+                  "attributeName": "payload.qvar",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "-64",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-64"
+                },
+                {
+                  "attributeGuid": "6D493E57-BD37-4567-87A9-B07611AF301E",
+                  "attributeName": "payload.mlc1_raw",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "4",
+                  "deviceUpdatedDate": "2026-07-14T16:02:35.607Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "4"
+                }
+              ]
+            },
+            "attrType": "1",
+            "key": "liveChart",
+            "recentEndPoints": "10"
+          }
+        }
+      },
+      "properties": {
+        "x": "57",
+        "y": "2",
+        "w": "15",
+        "h": "15",
+        "i": "LiveLineChart",
+        "minW": "15",
+        "minH": "15",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "467C0822-E1C7-4F0F-8361-DEC065A9FB1B",
+      "widgetProperties": {
+        "i": "bar",
+        "background": "#fff",
+        "fontColor": "#343434",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "25",
+        "title": "QVAR - electrostatic tamper",
+        "titleAlign": "",
+        "contents": {
+          "bar": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "A7253834-E387-48AD-BF1A-97D5AAEC959D",
+                  "attributeName": "payload.Sequence",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "7",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "7"
+                },
+                {
+                  "attributeGuid": "C7C665A4-6AAB-4C7D-9889-9A672ED75294",
+                  "attributeName": "payload.Sinewave",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "1F4528DE-2649-49CD-9BBA-394D95E08BF3",
+                  "attributeName": "payload.version",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1"
+                },
+                {
+                  "attributeGuid": "87F619FD-FDFE-48C0-A784-0D388474A48F",
+                  "attributeName": "payload.payload_size",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "67",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "67"
+                },
+                {
+                  "attributeGuid": "3F22F811-14F8-4949-884A-1BF922A38DAE",
+                  "attributeName": "payload.sensor_data",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "25",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25"
+                },
+                {
+                  "attributeGuid": "CA9C2511-F00F-44C7-9F7D-92FFEBA19AF0",
+                  "attributeName": "payload.Temperature",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "25",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25"
+                },
+                {
+                  "attributeGuid": "C07F2780-27AB-4BFC-8148-2F9A1D0014F2",
+                  "attributeName": "payload.gps_time",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1468082701",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1468082701"
+                },
+                {
+                  "attributeGuid": "3BC5778E-D5E1-4486-ABFF-F43164939384",
+                  "attributeName": "payload.acc_x_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.111",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.111"
+                },
+                {
+                  "attributeGuid": "5D9ACE00-185A-43BF-8998-73A0906878E7",
+                  "attributeName": "payload.acc_y_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "30336E9C-BE9D-44E4-9318-FDC7F010B075",
+                  "attributeName": "payload.acc_z_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.993",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.993"
+                },
+                {
+                  "attributeGuid": "3873EC50-1C88-4E07-99F9-24B517911C02",
+                  "attributeName": "payload.gyr_x_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-1.5",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-1.5"
+                },
+                {
+                  "attributeGuid": "FAE14F2F-296F-47DD-AE02-774B5DDD4CBB",
+                  "attributeName": "payload.gyr_y_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.3",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.3"
+                },
+                {
+                  "attributeGuid": "D571D2B9-292E-4C7E-8799-B43CFC9723F5",
+                  "attributeName": "payload.gyr_z_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.6",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.6"
+                },
+                {
+                  "attributeGuid": "A7AEC13C-F827-45DA-80A0-A0B6CC4574AD",
+                  "attributeName": "payload.temp_stts22h_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "25.6",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25.6"
+                },
+                {
+                  "attributeGuid": "E952EE8B-3D5A-487A-9CE0-4E318AB5AEFD",
+                  "attributeName": "payload.temp_sht40_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "25.48",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25.48"
+                },
+                {
+                  "attributeGuid": "652B4703-2222-4943-A53F-95A9C3B64EF0",
+                  "attributeName": "payload.humidity_sht40_pct",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "44.07",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "44.07"
+                },
+                {
+                  "attributeGuid": "64EC78E9-2D16-449D-B79A-77CA66D36160",
+                  "attributeName": "payload.pressure_hpa",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "973.6",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "973.6"
+                },
+                {
+                  "attributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+                  "attributeName": "payload.qvar",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "-208",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-208"
+                },
+                {
+                  "attributeGuid": "6D493E57-BD37-4567-87A9-B07611AF301E",
+                  "attributeName": "payload.mlc1_raw",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T16:44:44.923Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                }
+              ]
+            },
+            "barAttr": {
+              "barAttributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+              "barAttributeName": "payload.qvar",
+              "barAttributeColor": "#d0021b"
+            },
+            "barColor": "#00cc00",
+            "showCount": "",
+            "barCount": "5",
+            "attrType": "1",
+            "key": "bar",
+            "recentEndPoints": 10
+          }
+        }
+      },
+      "properties": {
+        "x": "72",
+        "y": "2",
+        "w": "16",
+        "h": "15",
+        "i": "bar",
+        "minW": "16",
+        "minH": "12",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "6A7BB4C8-1763-41EB-A490-0764F72A527F",
+      "widgetProperties": {
+        "i": "DeviceLatestValue",
+        "background": "#fff",
+        "fontColor": "#000000",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "25",
+        "title": "Amazon Sidewalk Device Info",
+        "titleAlign": "",
+        "contents": {
+          "devicelatestvalue": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "boxtypes": "3",
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "decoder_name",
+                  "attributeName": "decoder_name"
+                },
+                {
+                  "attributeGuid": "payload.link_type",
+                  "attributeName": "payload.link_type"
+                },
+                {
+                  "attributeGuid": "payload.payload_size",
+                  "attributeName": "payload.payload_size"
+                },
+                {
+                  "attributeGuid": "payload.version",
+                  "attributeName": "payload.version"
+                },
+                {
+                  "attributeGuid": "payload.id",
+                  "attributeName": "payload.id"
+                },
+                {
+                  "attributeGuid": "payload.gps_time",
+                  "attributeName": "payload.gps_time"
+                }
+              ]
+            },
+            "attrType": "1",
+            "key": "devicelatestvalue"
+          }
+        }
+      },
+      "properties": {
+        "x": "0",
+        "y": "13",
+        "w": "15",
+        "h": "16",
+        "i": "DeviceLatestValue",
+        "minW": "15",
+        "minH": "16",
+        "maxH": "16",
+        "maxW": "15",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "6FEFF6B7-15C4-4095-A156-87A1B38D2FF5",
+      "widgetProperties": {
+        "i": "Transformation",
+        "background": "#ffffff",
+        "fontColor": "#ffffff",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "10",
+        "title": "Transformation2",
+        "titleAlign": "",
+        "contents": {
+          "Transformation": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "536D0038-B894-4768-92EA-ABB4FFFE5B87",
+                  "attributeName": "payload.id",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "2-0-0",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "2-0-0"
+                },
+                {
+                  "attributeGuid": "A7253834-E387-48AD-BF1A-97D5AAEC959D",
+                  "attributeName": "payload.Sequence",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "238",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "238"
+                },
+                {
+                  "attributeGuid": "C7C665A4-6AAB-4C7D-9889-9A672ED75294",
+                  "attributeName": "payload.Sinewave",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "1F4528DE-2649-49CD-9BBA-394D95E08BF3",
+                  "attributeName": "payload.version",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1"
+                },
+                {
+                  "attributeGuid": "87F619FD-FDFE-48C0-A784-0D388474A48F",
+                  "attributeName": "payload.payload_size",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "67",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "67"
+                },
+                {
+                  "attributeGuid": "3F22F811-14F8-4949-884A-1BF922A38DAE",
+                  "attributeName": "payload.sensor_data",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "23",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "23"
+                },
+                {
+                  "attributeGuid": "CA9C2511-F00F-44C7-9F7D-92FFEBA19AF0",
+                  "attributeName": "payload.Temperature",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "23",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "23"
+                },
+                {
+                  "attributeGuid": "C07F2780-27AB-4BFC-8148-2F9A1D0014F2",
+                  "attributeName": "payload.gps_time",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1468090032",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1468090032"
+                },
+                {
+                  "attributeGuid": "90ED43C9-326A-4165-B44A-803CCDACD1F1",
+                  "attributeName": "payload.link_type",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "BLE",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "BLE"
+                },
+                {
+                  "attributeGuid": "3BC5778E-D5E1-4486-ABFF-F43164939384",
+                  "attributeName": "payload.acc_x_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.008",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.008"
+                },
+                {
+                  "attributeGuid": "5D9ACE00-185A-43BF-8998-73A0906878E7",
+                  "attributeName": "payload.acc_y_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.026",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.026"
+                },
+                {
+                  "attributeGuid": "30336E9C-BE9D-44E4-9318-FDC7F010B075",
+                  "attributeName": "payload.acc_z_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.998",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.998"
+                },
+                {
+                  "attributeGuid": "3873EC50-1C88-4E07-99F9-24B517911C02",
+                  "attributeName": "payload.gyr_x_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-1.5",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-1.5"
+                },
+                {
+                  "attributeGuid": "FAE14F2F-296F-47DD-AE02-774B5DDD4CBB",
+                  "attributeName": "payload.gyr_y_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.3",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.3"
+                },
+                {
+                  "attributeGuid": "D571D2B9-292E-4C7E-8799-B43CFC9723F5",
+                  "attributeName": "payload.gyr_z_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.6",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.6"
+                },
+                {
+                  "attributeGuid": "A7AEC13C-F827-45DA-80A0-A0B6CC4574AD",
+                  "attributeName": "payload.temp_stts22h_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "23.52",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "23.52"
+                },
+                {
+                  "attributeGuid": "E952EE8B-3D5A-487A-9CE0-4E318AB5AEFD",
+                  "attributeName": "payload.temp_sht40_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "23.51",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "23.51"
+                },
+                {
+                  "attributeGuid": "652B4703-2222-4943-A53F-95A9C3B64EF0",
+                  "attributeName": "payload.humidity_sht40_pct",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "47.22",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "47.22"
+                },
+                {
+                  "attributeGuid": "64EC78E9-2D16-449D-B79A-77CA66D36160",
+                  "attributeName": "payload.pressure_hpa",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "972.71",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "972.71"
+                },
+                {
+                  "attributeGuid": "48528F70-78EE-4899-99F4-686A9287DD5D",
+                  "attributeName": "payload.orientation",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "face_up",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "face_up"
+                },
+                {
+                  "attributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+                  "attributeName": "payload.qvar",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "-704",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-704"
+                },
+                {
+                  "attributeGuid": "6D493E57-BD37-4567-87A9-B07611AF301E",
+                  "attributeName": "payload.mlc1_raw",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "EB4583F4-3F7E-4ABC-8254-CEE642194F16",
+                  "attributeName": "payload.mlc1_label",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "stationary_upright",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "stationary_upright"
+                },
+                {
+                  "attributeGuid": "E957E9DF-ACCA-4AC3-825B-8E7CF15AEB4E",
+                  "attributeName": "decoder_name",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "sidewalk-mems-tlv",
+                  "deviceUpdatedDate": "2026-07-14T18:46:56.523Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "sidewalk-mems-tlv"
+                }
+              ]
+            },
+            "attrType": "1",
+            "key": "Transformation",
+            "transformations": [
+              {
+                "condition": "eq",
+                "conditionValue": "unknown",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/sidewalk/orient-unknown.png"
+              },
+              {
+                "condition": "eq",
+                "conditionValue": "landscape_right ",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/sidewalk/orient-landscape_right.png"
+              },
+              {
+                "condition": "eq",
+                "conditionValue": "landscape_left ",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/sidewalk/orient-landscape_left.png"
+              },
+              {
+                "condition": "eq",
+                "conditionValue": "portrait_up",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/sidewalk/orient-portrait_up.png"
+              },
+              {
+                "condition": "eq",
+                "conditionValue": "portrait_down ",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/sidewalk/orient-portrait_down.png"
+              },
+              {
+                "condition": "eq",
+                "conditionValue": "face_up",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/sidewalk/orient-face_up.png"
+              },
+              {
+                "condition": "eq",
+                "conditionValue": "face_down",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/sidewalk/orient-face_down.png"
+              }
+            ],
+            "position": "stretch"
+          }
+        }
+      },
+      "properties": {
+        "x": "15",
+        "y": "13",
+        "w": "27",
+        "h": "22",
+        "i": "Transformation",
+        "minW": "7",
+        "minH": "4",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "6FEFF6B7-15C4-4095-A156-87A1B38D2FF5",
+      "widgetProperties": {
+        "i": "Transformation",
+        "background": "#ffffff",
+        "fontColor": "#ffffff",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "10",
+        "title": "Orientation",
+        "titleAlign": "",
+        "contents": {
+          "Transformation": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "536D0038-B894-4768-92EA-ABB4FFFE5B87",
+                  "attributeName": "payload.id",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "2-0-0",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "2-0-0"
+                },
+                {
+                  "attributeGuid": "A7253834-E387-48AD-BF1A-97D5AAEC959D",
+                  "attributeName": "payload.Sequence",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "2",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "2"
+                },
+                {
+                  "attributeGuid": "C7C665A4-6AAB-4C7D-9889-9A672ED75294",
+                  "attributeName": "payload.Sinewave",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "1F4528DE-2649-49CD-9BBA-394D95E08BF3",
+                  "attributeName": "payload.version",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1"
+                },
+                {
+                  "attributeGuid": "87F619FD-FDFE-48C0-A784-0D388474A48F",
+                  "attributeName": "payload.payload_size",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "67",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "67"
+                },
+                {
+                  "attributeGuid": "3F22F811-14F8-4949-884A-1BF922A38DAE",
+                  "attributeName": "payload.sensor_data",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "24",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24"
+                },
+                {
+                  "attributeGuid": "CA9C2511-F00F-44C7-9F7D-92FFEBA19AF0",
+                  "attributeName": "payload.Temperature",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24"
+                },
+                {
+                  "attributeGuid": "C07F2780-27AB-4BFC-8148-2F9A1D0014F2",
+                  "attributeName": "payload.gps_time",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1468082626",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1468082626"
+                },
+                {
+                  "attributeGuid": "90ED43C9-326A-4165-B44A-803CCDACD1F1",
+                  "attributeName": "payload.link_type",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "BLE",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "BLE"
+                },
+                {
+                  "attributeGuid": "3BC5778E-D5E1-4486-ABFF-F43164939384",
+                  "attributeName": "payload.acc_x_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.131",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.131"
+                },
+                {
+                  "attributeGuid": "5D9ACE00-185A-43BF-8998-73A0906878E7",
+                  "attributeName": "payload.acc_y_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.027",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.027"
+                },
+                {
+                  "attributeGuid": "30336E9C-BE9D-44E4-9318-FDC7F010B075",
+                  "attributeName": "payload.acc_z_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.987",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.987"
+                },
+                {
+                  "attributeGuid": "3873EC50-1C88-4E07-99F9-24B517911C02",
+                  "attributeName": "payload.gyr_x_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-1.5",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-1.5"
+                },
+                {
+                  "attributeGuid": "FAE14F2F-296F-47DD-AE02-774B5DDD4CBB",
+                  "attributeName": "payload.gyr_y_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.3",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.3"
+                },
+                {
+                  "attributeGuid": "D571D2B9-292E-4C7E-8799-B43CFC9723F5",
+                  "attributeName": "payload.gyr_z_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.6",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.6"
+                },
+                {
+                  "attributeGuid": "A7AEC13C-F827-45DA-80A0-A0B6CC4574AD",
+                  "attributeName": "payload.temp_stts22h_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24.69",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24.69"
+                },
+                {
+                  "attributeGuid": "E952EE8B-3D5A-487A-9CE0-4E318AB5AEFD",
+                  "attributeName": "payload.temp_sht40_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24.52",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24.52"
+                },
+                {
+                  "attributeGuid": "652B4703-2222-4943-A53F-95A9C3B64EF0",
+                  "attributeName": "payload.humidity_sht40_pct",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "46.04",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "46.04"
+                },
+                {
+                  "attributeGuid": "64EC78E9-2D16-449D-B79A-77CA66D36160",
+                  "attributeName": "payload.pressure_hpa",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "973.55",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "973.55"
+                },
+                {
+                  "attributeGuid": "48528F70-78EE-4899-99F4-686A9287DD5D",
+                  "attributeName": "payload.orientation",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "face_down",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "face_down"
+                },
+                {
+                  "attributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+                  "attributeName": "payload.qvar",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "-608",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-608"
+                },
+                {
+                  "attributeGuid": "6D493E57-BD37-4567-87A9-B07611AF301E",
+                  "attributeName": "payload.mlc1_raw",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "4",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "4"
+                },
+                {
+                  "attributeGuid": "EB4583F4-3F7E-4ABC-8254-CEE642194F16",
+                  "attributeName": "payload.mlc1_label",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "stationary_not_upright",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "stationary_not_upright"
+                },
+                {
+                  "attributeGuid": "E957E9DF-ACCA-4AC3-825B-8E7CF15AEB4E",
+                  "attributeName": "decoder_name",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "STRING",
+                  "attributeLatestValue": "sidewalk-mems-tlv",
+                  "deviceUpdatedDate": "2026-07-14T16:43:29.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "sidewalk-mems-tlv"
+                }
+              ]
+            },
+            "attrType": "1",
+            "key": "Transformation",
+            "transformations": [
+              {
+                "condition": "eq",
+                "conditionValue": "shaken",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/aiotcraft/Shaken.png"
+              },
+              {
+                "condition": "eq",
+                "conditionValue": "motion",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/aiotcraft/Motion.png"
+              },
+              {
+                "condition": "eq",
+                "conditionValue": "stationary_not_upright",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/aiotcraft/tilt.png"
+              },
+              {
+                "condition": "eq",
+                "conditionValue": "stationary_upright",
+                "type": "Url",
+                "errors": "",
+                "typeValue": "https://iotcimage.s3.us-east-1.amazonaws.com/dashboards/STMicro/aiotcraft/upright.png"
+              }
+            ],
+            "position": "center"
+          }
+        }
+      },
+      "properties": {
+        "x": "42",
+        "y": "17",
+        "w": "26",
+        "h": "18",
+        "i": "Transformation",
+        "minW": "7",
+        "minH": "4",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "21A18C90-2DBC-4283-89D2-B01E1B70E363",
+      "widgetProperties": {
+        "i": "gauge",
+        "background": "#000000",
+        "fontColor": "#ffffff",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "25",
+        "title": "Room Temp (C)",
+        "titleAlign": "",
+        "contents": {
+          "gauge": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "A7253834-E387-48AD-BF1A-97D5AAEC959D",
+                  "attributeName": "payload.Sequence",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "158",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "158"
+                },
+                {
+                  "attributeGuid": "C7C665A4-6AAB-4C7D-9889-9A672ED75294",
+                  "attributeName": "payload.Sinewave",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "1F4528DE-2649-49CD-9BBA-394D95E08BF3",
+                  "attributeName": "payload.version",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1"
+                },
+                {
+                  "attributeGuid": "87F619FD-FDFE-48C0-A784-0D388474A48F",
+                  "attributeName": "payload.payload_size",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "67",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "67"
+                },
+                {
+                  "attributeGuid": "3F22F811-14F8-4949-884A-1BF922A38DAE",
+                  "attributeName": "payload.sensor_data",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "25",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25"
+                },
+                {
+                  "attributeGuid": "CA9C2511-F00F-44C7-9F7D-92FFEBA19AF0",
+                  "attributeName": "payload.Temperature",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "25",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25"
+                },
+                {
+                  "attributeGuid": "C07F2780-27AB-4BFC-8148-2F9A1D0014F2",
+                  "attributeName": "payload.gps_time",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1468084974",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1468084974"
+                },
+                {
+                  "attributeGuid": "3BC5778E-D5E1-4486-ABFF-F43164939384",
+                  "attributeName": "payload.acc_x_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.246",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.246"
+                },
+                {
+                  "attributeGuid": "5D9ACE00-185A-43BF-8998-73A0906878E7",
+                  "attributeName": "payload.acc_y_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.007",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.007"
+                },
+                {
+                  "attributeGuid": "30336E9C-BE9D-44E4-9318-FDC7F010B075",
+                  "attributeName": "payload.acc_z_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.966",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.966"
+                },
+                {
+                  "attributeGuid": "3873EC50-1C88-4E07-99F9-24B517911C02",
+                  "attributeName": "payload.gyr_x_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-1.5",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-1.5"
+                },
+                {
+                  "attributeGuid": "FAE14F2F-296F-47DD-AE02-774B5DDD4CBB",
+                  "attributeName": "payload.gyr_y_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.3",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.3"
+                },
+                {
+                  "attributeGuid": "D571D2B9-292E-4C7E-8799-B43CFC9723F5",
+                  "attributeName": "payload.gyr_z_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.6",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.6"
+                },
+                {
+                  "attributeGuid": "A7AEC13C-F827-45DA-80A0-A0B6CC4574AD",
+                  "attributeName": "payload.temp_stts22h_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "25.49",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25.49"
+                },
+                {
+                  "attributeGuid": "E952EE8B-3D5A-487A-9CE0-4E318AB5AEFD",
+                  "attributeName": "payload.temp_sht40_c",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "26.37",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "26.37"
+                },
+                {
+                  "attributeGuid": "652B4703-2222-4943-A53F-95A9C3B64EF0",
+                  "attributeName": "payload.humidity_sht40_pct",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "45.07",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "45.07"
+                },
+                {
+                  "attributeGuid": "64EC78E9-2D16-449D-B79A-77CA66D36160",
+                  "attributeName": "payload.pressure_hpa",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "973.47",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "973.47"
+                },
+                {
+                  "attributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+                  "attributeName": "payload.qvar",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "928",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "928"
+                },
+                {
+                  "attributeGuid": "6D493E57-BD37-4567-87A9-B07611AF301E",
+                  "attributeName": "payload.mlc1_raw",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T17:22:38.037Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                }
+              ]
+            },
+            "minValue": "0",
+            "maxValue": "45",
+            "version": "2.0",
+            "zones": [
+              {
+                "zoneName": "5",
+                "zoneColor": "#ec835a",
+                "upToValue": "15",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "4",
+                "zoneColor": "#fab219",
+                "upToValue": "18",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "55",
+                "zoneColor": "#0ca30c",
+                "upToValue": "25",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "6",
+                "zoneColor": "#fab219",
+                "upToValue": "30",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "7",
+                "zoneColor": "#d03b3b",
+                "upToValue": "45",
+                "showColorPicker": "false"
+              }
+            ],
+            "attrType": "1",
+            "key": "gauge"
+          }
+        }
+      },
+      "properties": {
+        "x": "68",
+        "y": "17",
+        "w": "10",
+        "h": "9",
+        "i": "gauge",
+        "minW": "10",
+        "minH": "9",
+        "maxH": "15",
+        "maxW": "16",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "21A18C90-2DBC-4283-89D2-B01E1B70E363",
+      "widgetProperties": {
+        "i": "gauge",
+        "background": "#000000",
+        "fontColor": "#ffffff",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "25",
+        "title": "Refrigerated (C) ",
+        "titleAlign": "",
+        "contents": {
+          "gauge": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "A7253834-E387-48AD-BF1A-97D5AAEC959D",
+                  "attributeName": "payload.Sequence",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "200",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "200"
+                },
+                {
+                  "attributeGuid": "C7C665A4-6AAB-4C7D-9889-9A672ED75294",
+                  "attributeName": "payload.Sinewave",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "1F4528DE-2649-49CD-9BBA-394D95E08BF3",
+                  "attributeName": "payload.version",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1"
+                },
+                {
+                  "attributeGuid": "87F619FD-FDFE-48C0-A784-0D388474A48F",
+                  "attributeName": "payload.payload_size",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "67",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "67"
+                },
+                {
+                  "attributeGuid": "3F22F811-14F8-4949-884A-1BF922A38DAE",
+                  "attributeName": "payload.sensor_data",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "21",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "21"
+                },
+                {
+                  "attributeGuid": "CA9C2511-F00F-44C7-9F7D-92FFEBA19AF0",
+                  "attributeName": "payload.Temperature",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "21",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "21"
+                },
+                {
+                  "attributeGuid": "C07F2780-27AB-4BFC-8148-2F9A1D0014F2",
+                  "attributeName": "payload.gps_time",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1468085606",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1468085606"
+                },
+                {
+                  "attributeGuid": "3BC5778E-D5E1-4486-ABFF-F43164939384",
+                  "attributeName": "payload.acc_x_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.473",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.473"
+                },
+                {
+                  "attributeGuid": "5D9ACE00-185A-43BF-8998-73A0906878E7",
+                  "attributeName": "payload.acc_y_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.089",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.089"
+                },
+                {
+                  "attributeGuid": "30336E9C-BE9D-44E4-9318-FDC7F010B075",
+                  "attributeName": "payload.acc_z_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.869",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.869"
+                },
+                {
+                  "attributeGuid": "3873EC50-1C88-4E07-99F9-24B517911C02",
+                  "attributeName": "payload.gyr_x_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-1.5",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-1.5"
+                },
+                {
+                  "attributeGuid": "FAE14F2F-296F-47DD-AE02-774B5DDD4CBB",
+                  "attributeName": "payload.gyr_y_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.3",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.3"
+                },
+                {
+                  "attributeGuid": "D571D2B9-292E-4C7E-8799-B43CFC9723F5",
+                  "attributeName": "payload.gyr_z_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.6",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.6"
+                },
+                {
+                  "attributeGuid": "A7AEC13C-F827-45DA-80A0-A0B6CC4574AD",
+                  "attributeName": "payload.temp_stts22h_c",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "21.04",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "21.04"
+                },
+                {
+                  "attributeGuid": "E952EE8B-3D5A-487A-9CE0-4E318AB5AEFD",
+                  "attributeName": "payload.temp_sht40_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "21.17",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "21.17"
+                },
+                {
+                  "attributeGuid": "652B4703-2222-4943-A53F-95A9C3B64EF0",
+                  "attributeName": "payload.humidity_sht40_pct",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "52.49",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "52.49"
+                },
+                {
+                  "attributeGuid": "64EC78E9-2D16-449D-B79A-77CA66D36160",
+                  "attributeName": "payload.pressure_hpa",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "973.45",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "973.45"
+                },
+                {
+                  "attributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+                  "attributeName": "payload.qvar",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "-1152",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-1152"
+                },
+                {
+                  "attributeGuid": "6D493E57-BD37-4567-87A9-B07611AF301E",
+                  "attributeName": "payload.mlc1_raw",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "4",
+                  "deviceUpdatedDate": "2026-07-14T17:33:10.553Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "4"
+                }
+              ]
+            },
+            "minValue": "-10",
+            "maxValue": "30",
+            "version": "2.0",
+            "zones": [
+              {
+                "zoneName": "1",
+                "zoneColor": "#d03b3b",
+                "upToValue": "2",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "44",
+                "zoneColor": "#0ca30c",
+                "upToValue": "8",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "3",
+                "zoneColor": "#fab219",
+                "upToValue": "15",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "5",
+                "zoneColor": "#d03b3b",
+                "upToValue": "30",
+                "showColorPicker": "false"
+              }
+            ],
+            "attrType": "1",
+            "key": "gauge"
+          }
+        }
+      },
+      "properties": {
+        "x": "78",
+        "y": "17",
+        "w": "10",
+        "h": "9",
+        "i": "gauge",
+        "minW": "10",
+        "minH": "9",
+        "maxH": "15",
+        "maxW": "16",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "21A18C90-2DBC-4283-89D2-B01E1B70E363",
+      "widgetProperties": {
+        "i": "gauge",
+        "background": "#000000",
+        "fontColor": "#ffffff",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "25",
+        "title": "Pressure (hPa)",
+        "titleAlign": "",
+        "contents": {
+          "gauge": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "A7253834-E387-48AD-BF1A-97D5AAEC959D",
+                  "attributeName": "payload.Sequence",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "113",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "113"
+                },
+                {
+                  "attributeGuid": "C7C665A4-6AAB-4C7D-9889-9A672ED75294",
+                  "attributeName": "payload.Sinewave",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "1F4528DE-2649-49CD-9BBA-394D95E08BF3",
+                  "attributeName": "payload.version",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1"
+                },
+                {
+                  "attributeGuid": "87F619FD-FDFE-48C0-A784-0D388474A48F",
+                  "attributeName": "payload.payload_size",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "67",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "67"
+                },
+                {
+                  "attributeGuid": "3F22F811-14F8-4949-884A-1BF922A38DAE",
+                  "attributeName": "payload.sensor_data",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "25",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25"
+                },
+                {
+                  "attributeGuid": "CA9C2511-F00F-44C7-9F7D-92FFEBA19AF0",
+                  "attributeName": "payload.Temperature",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "25",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25"
+                },
+                {
+                  "attributeGuid": "C07F2780-27AB-4BFC-8148-2F9A1D0014F2",
+                  "attributeName": "payload.gps_time",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1468080443",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1468080443"
+                },
+                {
+                  "attributeGuid": "3BC5778E-D5E1-4486-ABFF-F43164939384",
+                  "attributeName": "payload.acc_x_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.01",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.01"
+                },
+                {
+                  "attributeGuid": "5D9ACE00-185A-43BF-8998-73A0906878E7",
+                  "attributeName": "payload.acc_y_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.01",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.01"
+                },
+                {
+                  "attributeGuid": "30336E9C-BE9D-44E4-9318-FDC7F010B075",
+                  "attributeName": "payload.acc_z_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "1.014",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1.014"
+                },
+                {
+                  "attributeGuid": "3873EC50-1C88-4E07-99F9-24B517911C02",
+                  "attributeName": "payload.gyr_x_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-1.5",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-1.5"
+                },
+                {
+                  "attributeGuid": "FAE14F2F-296F-47DD-AE02-774B5DDD4CBB",
+                  "attributeName": "payload.gyr_y_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.3",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.3"
+                },
+                {
+                  "attributeGuid": "D571D2B9-292E-4C7E-8799-B43CFC9723F5",
+                  "attributeName": "payload.gyr_z_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.6",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.6"
+                },
+                {
+                  "attributeGuid": "A7AEC13C-F827-45DA-80A0-A0B6CC4574AD",
+                  "attributeName": "payload.temp_stts22h_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "25.06",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25.06"
+                },
+                {
+                  "attributeGuid": "E952EE8B-3D5A-487A-9CE0-4E318AB5AEFD",
+                  "attributeName": "payload.temp_sht40_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "25.29",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "25.29"
+                },
+                {
+                  "attributeGuid": "652B4703-2222-4943-A53F-95A9C3B64EF0",
+                  "attributeName": "payload.humidity_sht40_pct",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "47.22",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "47.22"
+                },
+                {
+                  "attributeGuid": "64EC78E9-2D16-449D-B79A-77CA66D36160",
+                  "attributeName": "payload.pressure_hpa",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "973.67",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "973.67"
+                },
+                {
+                  "attributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+                  "attributeName": "payload.qvar",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "112",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "112"
+                },
+                {
+                  "attributeGuid": "6D493E57-BD37-4567-87A9-B07611AF301E",
+                  "attributeName": "payload.mlc1_raw",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-14T16:07:06.360Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                }
+              ]
+            },
+            "minValue": "700",
+            "maxValue": "1050",
+            "version": "2.0",
+            "zones": [
+              {
+                "zoneColor": "#d03b3b",
+                "zoneName": "1",
+                "upToValue": "850",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "2",
+                "zoneColor": "#ec835a",
+                "upToValue": "950",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "3",
+                "zoneColor": "#0ca30c",
+                "upToValue": "1030",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "4",
+                "zoneColor": "#fab219",
+                "upToValue": "1050",
+                "showColorPicker": "false"
+              }
+            ],
+            "attrType": "1",
+            "key": "gauge"
+          }
+        }
+      },
+      "properties": {
+        "x": "68",
+        "y": "26",
+        "w": "10",
+        "h": "9",
+        "i": "gauge",
+        "minW": "10",
+        "minH": "9",
+        "maxH": "15",
+        "maxW": "16",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "21A18C90-2DBC-4283-89D2-B01E1B70E363",
+      "widgetProperties": {
+        "i": "gauge",
+        "background": "#000000",
+        "fontColor": "#ffffff",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "25",
+        "title": "Humidity (sht40) %",
+        "titleAlign": "",
+        "contents": {
+          "gauge": {
+            "device": {
+              "deviceGuid": "C81E21B1-F796-4E74-B43C-2EE57B37C59E",
+              "deviceUniqueId": "mclST5A1"
+            },
+            "attributes": {
+              "attribute": [
+                {
+                  "attributeGuid": "A7253834-E387-48AD-BF1A-97D5AAEC959D",
+                  "attributeName": "payload.Sequence",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "71",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "71"
+                },
+                {
+                  "attributeGuid": "C7C665A4-6AAB-4C7D-9889-9A672ED75294",
+                  "attributeName": "payload.Sinewave",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                },
+                {
+                  "attributeGuid": "1F4528DE-2649-49CD-9BBA-394D95E08BF3",
+                  "attributeName": "payload.version",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1"
+                },
+                {
+                  "attributeGuid": "87F619FD-FDFE-48C0-A784-0D388474A48F",
+                  "attributeName": "payload.payload_size",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "67",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "67"
+                },
+                {
+                  "attributeGuid": "3F22F811-14F8-4949-884A-1BF922A38DAE",
+                  "attributeName": "payload.sensor_data",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "23",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "23"
+                },
+                {
+                  "attributeGuid": "CA9C2511-F00F-44C7-9F7D-92FFEBA19AF0",
+                  "attributeName": "payload.Temperature",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "23",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "23"
+                },
+                {
+                  "attributeGuid": "C07F2780-27AB-4BFC-8148-2F9A1D0014F2",
+                  "attributeName": "payload.gps_time",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "1467637921",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "1467637921"
+                },
+                {
+                  "attributeGuid": "3BC5778E-D5E1-4486-ABFF-F43164939384",
+                  "attributeName": "payload.acc_x_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.133",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.133"
+                },
+                {
+                  "attributeGuid": "5D9ACE00-185A-43BF-8998-73A0906878E7",
+                  "attributeName": "payload.acc_y_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.004",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.004"
+                },
+                {
+                  "attributeGuid": "30336E9C-BE9D-44E4-9318-FDC7F010B075",
+                  "attributeName": "payload.acc_z_g",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.987",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.987"
+                },
+                {
+                  "attributeGuid": "3873EC50-1C88-4E07-99F9-24B517911C02",
+                  "attributeName": "payload.gyr_x_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "-0.2",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-0.2"
+                },
+                {
+                  "attributeGuid": "FAE14F2F-296F-47DD-AE02-774B5DDD4CBB",
+                  "attributeName": "payload.gyr_y_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.1",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.1"
+                },
+                {
+                  "attributeGuid": "D571D2B9-292E-4C7E-8799-B43CFC9723F5",
+                  "attributeName": "payload.gyr_z_dps",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "0.2",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0.2"
+                },
+                {
+                  "attributeGuid": "A7AEC13C-F827-45DA-80A0-A0B6CC4574AD",
+                  "attributeName": "payload.temp_stts22h_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "23.89",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "23.89"
+                },
+                {
+                  "attributeGuid": "E952EE8B-3D5A-487A-9CE0-4E318AB5AEFD",
+                  "attributeName": "payload.temp_sht40_c",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "24.47",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "24.47"
+                },
+                {
+                  "attributeGuid": "652B4703-2222-4943-A53F-95A9C3B64EF0",
+                  "attributeName": "payload.humidity_sht40_pct",
+                  "displayName": "",
+                  "checked": "true",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "44.52",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "44.52"
+                },
+                {
+                  "attributeGuid": "64EC78E9-2D16-449D-B79A-77CA66D36160",
+                  "attributeName": "payload.pressure_hpa",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "DECIMAL",
+                  "attributeLatestValue": "994.08",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "994.08"
+                },
+                {
+                  "attributeGuid": "1E7AE95E-2888-4C48-83AD-7EA96CC227B1",
+                  "attributeName": "payload.qvar",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "-16",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "-16"
+                },
+                {
+                  "attributeGuid": "6D493E57-BD37-4567-87A9-B07611AF301E",
+                  "attributeName": "payload.mlc1_raw",
+                  "displayName": "",
+                  "checked": "false",
+                  "dataType": "INTEGER",
+                  "attributeLatestValue": "0",
+                  "deviceUpdatedDate": "2026-07-09T13:11:45.273Z",
+                  "gatewayUpdatedDate": "NA",
+                  "attributeValue": "0"
+                }
+              ]
+            },
+            "minValue": "0",
+            "maxValue": "100",
+            "version": "2.0",
+            "zones": [
+              {
+                "zoneColor": "#8b572a",
+                "zoneName": "1",
+                "upToValue": "20",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "2",
+                "zoneColor": "#f8e71c",
+                "upToValue": "40",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "3",
+                "zoneColor": "#7ed321",
+                "upToValue": "60",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "4",
+                "zoneColor": "#50e3c2",
+                "upToValue": "80",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "5",
+                "zoneColor": "#4a90e2",
+                "upToValue": "100",
+                "showColorPicker": "false"
+              }
+            ],
+            "attrType": "1",
+            "key": "gauge"
+          }
+        }
+      },
+      "properties": {
+        "x": "78",
+        "y": "26",
+        "w": "10",
+        "h": "9",
+        "i": "gauge",
+        "minW": "10",
+        "minH": "9",
+        "maxH": "15",
+        "maxW": "16",
+        "isStatic": "false"
+      }
+    },
+    {
+      "widgetGuid": "189602F6-0456-4573-9EFA-F6C6B27D7871",
+      "widgetProperties": {
+        "i": "Notifications",
+        "background": "#fff",
+        "fontColor": "#000000",
+        "fontFamily": "Proxima Nova",
+        "fontSize": "25",
+        "title": "Notifications",
+        "titleAlign": "",
+        "contents": {
+          "numberOfRow": {
+            "row": "10",
+            "key": "numberOfRow"
+          },
+          "matchedDate": {
+            "fontColor": "#2e71be",
+            "fontFamily": "Proxima Nova",
+            "fontSize": "16",
+            "title": "Date",
+            "contentTitle": "Matched Date",
+            "key": "matchedDate"
+          },
+          "eventName": {
+            "fontColor": "#2e71be",
+            "fontFamily": "Proxima Nova",
+            "fontSize": "16",
+            "title": "Event Name",
+            "contentTitle": "Event Name",
+            "key": "eventName"
+          },
+          "matchedCondition": {
+            "fontColor": "#2e71be",
+            "fontFamily": "Proxima Nova",
+            "fontSize": "16",
+            "title": "Condition",
+            "contentTitle": "Matched Condition",
+            "key": "matchedCondition"
+          },
+          "uniqueId": {
+            "fontColor": "#2e71be",
+            "fontFamily": "Proxima Nova",
+            "fontSize": "16",
+            "title": "Resource",
+            "contentTitle": "Resource",
+            "key": "uniqueId"
+          },
+          "severity": {
+            "fontColor": "#2e71be",
+            "fontFamily": "Proxima Nova",
+            "fontSize": "16",
+            "title": "Severity",
+            "contentTitle": "Severity",
+            "key": "severity"
+          }
+        }
+      },
+      "properties": {
+        "x": "0",
+        "y": "29",
+        "w": "15",
+        "h": "6",
+        "i": "Notifications",
+        "minW": "10",
+        "minH": "5",
+        "maxH": "902",
+        "maxW": "838",
+        "isStatic": "false"
+      }
+    }
+  ]
+}

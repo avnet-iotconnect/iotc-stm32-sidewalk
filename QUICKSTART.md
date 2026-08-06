@@ -103,7 +103,7 @@ _(Screen: Create Device)_
 
 After saving, the device appears in the Sidewalk device list, ready to be provisioned and flashed.
 
-![Sidewalk Device List screen](https://docs.iotconnect.io/wp-content/uploads/2023/12/image4.png)
+![Sidewalk Device List screen](media/device-list.png)
 
 _(Screen: Sidewalk Device List)_
 
@@ -113,8 +113,8 @@ _(Screen: Sidewalk Device List)_
 
 Amazon Sidewalk provisions each device with a unique **certificate JSON** (the Sidewalk manufacturing credentials). You will convert this into a board-flashable manufacturing image in the next step.
 
-1. Open the device you just created.
-2. Download the **device certificate JSON** generated for it (provided by /IOTCONNECT / AWS IoT Wireless during device creation). Save it to your working directory, e.g. `~/Downloads/wba55-mems-01.json`.
+1. In the **Wireless Device** list, find your device and locate the **Actions** column on the right.
+2. Click the green **HEX certificate** icon to download the **device certificate JSON** generated for this device (provided by /IOTCONNECT / AWS IoT Wireless during device creation). Save it to your working directory, e.g. `~/Downloads/wba55-mems-01.json`.<br>![Download the device certificate JSON from the green HEX icon in the Actions column](media/device-list-certificate-download.png)
 
 > [!IMPORTANT]
 > The certificate JSON contains **device private keys**. Treat it like an SSH key: never commit it, never paste it into chat/email/tickets, and delete it from shared machines after flashing. This repository already `.gitignore`s the `binaries/sidewalk-mfg/` directory where the generated artifacts land.
@@ -260,7 +260,25 @@ Both boards share the same TLV wire format and the single `STswMEMS` template; t
 
 ---
 
-## 11. Send a Command (Downlink)
+## 11. Import the Dashboard
+
+/IOTCONNECT dashboards visualize your device's telemetry with charts, gauges, and widgets. This repo includes a ready-made dashboard for the MEMS demo — accelerometer / gyroscope / QVAR charts, a live 3D orientation cube, and Room Temp, Refrigerated, Pressure, and Humidity gauges.
+
+1. Download the dashboard export from this repo: [`dashboard-templates/sidewalk_st_WBA55+MEMS_dashboard_export.json`](dashboard-templates/sidewalk_st_WBA55+MEMS_dashboard_export.json).
+2. In /IOTCONNECT, open the **Dashboards** menu at the top of the page and choose **Create Dashboard**.
+3. Choose **Import**, then **Browse** to the downloaded `sidewalk_st_WBA55+MEMS_dashboard_export.json`.
+4. When prompted, bind the widgets to your device — select the template `STswMEMS` and your device's **Unique ID** — then give the dashboard a name and **Save**.
+
+![Sidewalk MEMS example dashboard in /IOTCONNECT](media/sidewalk-dashboard-example.png)
+
+_(Screen: the imported dashboard populated with live MEMS telemetry — motion / shock / tamper charts, a 3D orientation cube, and environmental gauges.)_
+
+> [!NOTE]
+> The dashboard binds to the `STswMEMS` template attributes, so import the template (Step 4) and confirm telemetry is flowing (Step 10) first. Some widgets (SHT40 temperature/humidity, orientation, MLC activity) only populate on **IKS4A1** boards — see the per-board table in Step 10.
+
+---
+
+## 12. Send a Command (Downlink)
 
 The template ships with three downlink commands that travel from the cloud back to the device over Sidewalk:
 
@@ -281,7 +299,7 @@ _(Screen: Command)_
 
 ---
 
-## 12. Resources
+## 13. Resources
 
 * [MEMS Sensor Demo — full example README](examples/sidewalk-mems-wba55/README.md) (build-from-source, payload wire format, troubleshooting)
 * [Pre-built binaries & provisioning details](binaries/README.md)
