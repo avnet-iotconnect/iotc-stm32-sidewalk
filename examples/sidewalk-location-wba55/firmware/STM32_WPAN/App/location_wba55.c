@@ -21,6 +21,12 @@
 
 #include "location_wba55.h"
 
+/* Compile to an empty translation unit unless the build enables location —
+ * same pattern as sensors_iks4a1.c. This lets the file live permanently in
+ * the SDK App folder: builds linking the basic (non-location) Sidewalk
+ * archive still link cleanly because no sid_location_* references remain. */
+#if defined(SID_APP_LOCATION_ENABLED) && (SID_APP_LOCATION_ENABLED == 1)
+
 #include <sid_api.h>
 #include <sid_location.h>
 #include <sid_pal_log_ifc.h>   /* SID_PAL_LOG_* — same source app_sidewalk.c uses */
@@ -180,3 +186,5 @@ sid_error_t location_wba55_deinit(struct sid_handle *handle)
     s_last_run_gps_s = 0u;
     return ret;
 }
+
+#endif /* SID_APP_LOCATION_ENABLED */

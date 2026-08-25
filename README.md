@@ -100,6 +100,9 @@ Typical STM32 Sidewalk hardware pairings (WBA55 with common radio options):
 - **BLE Network Location Demo: WBA55 (AWS IoT Core Device Location)**  
   [examples/sidewalk-location-wba55/README.md](examples/sidewalk-location-wba55/README.md)
 
+- **MEMS + Location Combined Demo: one device, sensors *and* position**  
+  [examples/sidewalk-mems-location-wba55/README.md](examples/sidewalk-mems-location-wba55/README.md)
+
 - **Geolocation: Teseo GNSS (WBA55)**  
   [examples/geolocation-teseo/README.md](examples/geolocation-teseo/README.md)
 
