@@ -4,6 +4,22 @@ This repository provides **/IOTCONNECT** assets and documentation for **STM32 Si
 
 ---
 
+## Start Here
+
+New to this repo? The **[QuickStart](QUICKSTART.md)** takes a NUCLEO-WBA55CG or NUCLEO-WBA65RI with a MEMS sensor shield from unboxing to live telemetry on an /IOTCONNECT dashboard.
+
+**[Download this repository as a ZIP](https://github.com/avnet-iotconnect/iotc-stm32-sidewalk/archive/refs/heads/main.zip)** and extract it — that is all you need to follow the guides. This is a public repository, so the download works for anyone with **no GitHub account and no `git` installation**. If you prefer Git:
+
+```bash
+git clone https://github.com/avnet-iotconnect/iotc-stm32-sidewalk.git
+```
+
+**Hardware:** [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) · [NUCLEO-WBA65RI](https://www.newark.com/stmicroelectronics/nucleo-wba65ri/dev-brd-nucleo-64-arm-cortex-m33f/dp/25AM5396) · [X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) · [X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
+
+A device also needs an **Amazon Sidewalk gateway** (a compatible Amazon Echo or Ring device) in range — see [Amazon Sidewalk gateway](QUICKSTART.md#amazon-sidewalk-gateway) for the compatible models and their one-time setup.
+
+---
+
 ## Amazon Sidewalk Production Support in /IOTCONNECT
 
 Production is supported in customer **/IOTCONNECT** instances, but this repository documents **prototype onboarding steps only**. Before production rollout, engage **AWS and the /IOTCONNECT team first** to coordinate Amazon Sidewalk manufacturing-flow enablement in your AWS account/environment.
@@ -37,7 +53,7 @@ For production onboarding, work with the **/IOTCONNECT team** to integrate the *
 
 | Area | Prototype flow (documented in this repo) | Production flow (Amazon Sidewalk manufacturing) |
 |---|---|---|
-| Provisioning method | Per-device certificate JSON + provisioning script (`provision.py`) | Factory provisioning with HSM, control logs, and SMSN |
+| Provisioning method | Per-device certificate JSON + provisioning script (`scripts/provision-device.py`) | Factory provisioning with HSM, control logs, and SMSN |
 | Device scale | Up to 1,000 prototype devices | Production scale (manufacturing flow) |
 | Onboarding style | One device at a time | Bulk onboarding using import tasks |
 | Intended use | Development, testing, demos | Commercial production deployments |
@@ -61,6 +77,11 @@ For production onboarding, work with the **/IOTCONNECT team** to integrate the *
 
 - `examples`  
   Per‑example, step‑by‑step instructions that cover building, provisioning, and flashing.
+
+- `scripts`
+  Helper scripts for provisioning and building. `provision-device.py` runs on
+  Windows, macOS, and Linux; `provision-device.sh` and `build-firmware.sh` are
+  bash equivalents for Linux, macOS, WSL, or Git Bash.
 
 ---
 

@@ -8,6 +8,11 @@
 #   WBA55xG (default) -> 0x080FE000   (NUCLEO-WBA55CG, 1 MB)
 #   WBA65xI           -> 0x081FE000   (NUCLEO-WBA65RI, 2 MB)
 #
+# This is the POSIX-shell variant and needs bash (Linux, macOS, WSL, or Git Bash
+# on Windows). For a version that runs anywhere Python does -- including Windows
+# PowerShell and cmd -- use the equivalent provision-device.py instead:
+#   python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
+#
 # Usage:
 #   ./scripts/provision-device.sh <device-name> <path-to-cert.json> [chip]
 # Examples:
@@ -45,8 +50,12 @@ chmod 700 "$REPO_ROOT/binaries/sidewalk-mfg" "$OUT_DIR"
 cp "$CERT_IN" "$OUT_DIR/cert.json"
 chmod 600 "$OUT_DIR/cert.json"
 
+# Some installs (notably Git Bash on Windows) only ship `python`, not `python3`.
+PYTHON="$(command -v python3 || command -v python || true)"
+[[ -n "$PYTHON" ]] || { echo "python3 (or python) not found on PATH" >&2; exit 1; }
+
 cd "$OUT_DIR"
-python3 "$PROVISION_PY" st aws --chip "$CHIP" \
+"$PYTHON" "$PROVISION_PY" st aws --chip "$CHIP" \
     --certificate_json cert.json \
     --output_bin mfg.bin \
     --output_hex mfg.hex

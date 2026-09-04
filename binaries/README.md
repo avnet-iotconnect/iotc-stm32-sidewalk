@@ -26,7 +26,8 @@ gitignored. To populate this directory:
   STM32-Sidewalk-SDK + STM32CubeIDE + X-CUBE-CRYPTOLIB to be set up; see
   the example READMEs under `../examples/`).
 * Per-device manufacturing data: run
-  `../scripts/provision-device.sh <device-name> <path-to-cert.json>`.
+  `python ../scripts/provision-device.py <device-name> <path-to-cert.json>`
+  (the `.sh` variant is the same thing for bash shells).
 
 ## Why pre-built binaries are not distributed in this repository
 
@@ -53,22 +54,32 @@ device-bound Sidewalk private keys.
 
 * **STM32CubeProgrammer CLI** on PATH as `STM32_Programmer_CLI`
 * **Python 3** (for `provision.py`)
-* **STM32-Sidewalk-SDK** checked out — defaults to `~/dev/sidewalk/STM32-Sidewalk-SDK`. The provisioning script uses its bundled `tools/provision/provision.py`.
+* **STM32-Sidewalk-SDK** available locally — auto-detected next to this repo or at
+  `~/dev/sidewalk/STM32-Sidewalk-SDK`; override with `--sdk-root` or `SDK_ROOT`. The
+  provisioning script uses its bundled `tools/provision/provision.py`, which needs
+  `pyyaml` and `intelhex` (`python -m pip install pyyaml intelhex`).
 
 ## Step 1 — Generate the manufacturing image for a new device
 
 You should have a cert JSON file from AWS IoT Wireless when you provisioned the
 Sidewalk device (e.g. `mclST5A3.json` downloaded to `~/Downloads/`).
 
-```bash
-cd ~/dev/sidewalk/iotc-stm32-sidewalk
-./scripts/provision-device.sh <device-name> <path-to-cert.json>
+Run from the repository root. `<device-name>` is the device's /IOTCONNECT **Unique ID**
+— it names the output folder. `<path-to-cert.json>` is the certificate downloaded from
+the device page, normally named `certificate.json`.
+
 ```
+python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
+```
+
+`provision-device.py` runs on Windows, macOS, and Linux. The equivalent
+`provision-device.sh` is a bash script — run it with `bash`, never with `python`.
 
 Example:
 
-```bash
-./scripts/provision-device.sh mclST5A3 ~/Downloads/mclST5A3.json
+```
+python scripts/provision-device.py mclST5A3 certificate.json            # WBA55 (default)
+python scripts/provision-device.py mclST5A3 certificate.json WBA65xI    # WBA65
 ```
 
 This will produce:

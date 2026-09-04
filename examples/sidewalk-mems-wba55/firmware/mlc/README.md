@@ -25,7 +25,7 @@ original; the ISM6HG256X variant is identical in behavior and classes).
 
 This example combines Machine Learning Core (MLC) and Finite State Machine (FSM) capabilities to implement a Smart Asset Tracking algorithm able to detect and track the various states of a package (Stationary - Upright, Stationary - Not upright, In motion, Shaken) and detect some possible events (Impact, Free-fall).
 
-A limited subset of data logs for this example is available [here](./datalogs/).
+A limited subset of data logs for this example is available in the upstream ST repository: [lsm6dsv16x/asset_tracking/datalogs](https://github.com/STMicroelectronics/STMems_Machine_Learning_Core/tree/master/application_examples/lsm6dsv16x/asset_tracking/datalogs).
 
 For information on how to integrate this algorithm in the target platform, please follow the instructions available in the README files of [MLC application_examples]( https://github.com/STMicroelectronics/STMems_Machine_Learning_Core/tree/master/application_examples ) and [FSM application_examples]( https://github.com/STMicroelectronics/STMems_Finite_State_Machine/tree/master/application_examples ) folders. 
 

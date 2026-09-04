@@ -116,9 +116,10 @@ python3 <WORKSPACE_ROOT>/STM32-Sidewalk-SDK/tools/provision/provision.py \
 ```
 
 The MFG image flashes to a **different address per board** — `0x080FE000` on
-WBA55, `0x081FE000` on WBA65. The repo helper `scripts/provision-device.sh`
-takes an optional 3rd arg `[chip]` (default `WBA55xG`; pass `WBA65xI` for WBA65)
-and auto-selects the correct mfg flash address.
+WBA55, `0x081FE000` on WBA65. The repo helper `scripts/provision-device.py`
+(cross-platform; `provision-device.sh` is the bash equivalent) takes an optional
+3rd arg `[chip]` (default `WBA55xG`; pass `WBA65xI` for WBA65) and auto-selects
+the correct mfg flash address.
 
 See [sidewalk-mems-wba55 README §5–6](../sidewalk-mems-wba55/README.md) for the
 provisioning + `connect-under-reset` flashing details (unchanged here).

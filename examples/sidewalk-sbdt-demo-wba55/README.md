@@ -15,9 +15,8 @@ SDK: STM32-Sidewalk-SDK
 > signed SBDT demo application, and the OTA-delivery image) incorporate
 > compiled code from X-CUBE-CRYPTOLIB (CMOX) and the Amazon Sidewalk SDK,
 > whose upstream licenses constrain binary redistribution. See
-> [../../NOTICE.md](../../NOTICE.md) for the SBOM. Workshop participants
-> receive pre-flashed boards from the facilitator; everyone else rebuilds
-> the artifacts locally per the instructions below.
+> [../../NOTICE.md](../../NOTICE.md) for the SBOM. Rebuild the artifacts
+> locally per the instructions below.
 
 ---
 

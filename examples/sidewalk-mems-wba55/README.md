@@ -277,7 +277,7 @@ Generated .../mfg_wba55.hex
 
 For WBA65 the address in the log is `0x81fe000` instead.
 
-> Do **not** flash the raw `mfg.bin` from /IOTCONNECT. Always run `provision.py st aws --chip WBA55xG` (WBA65: `--chip WBA65xI`) first. The companion `scripts/provision-device.sh` takes an optional 3rd arg `[chip]` (default `WBA55xG`; pass `WBA65xI`) and auto‑picks the matching mfg address.
+> Do **not** flash the raw `mfg.bin` from /IOTCONNECT. Always run `provision.py st aws --chip WBA55xG` (WBA65: `--chip WBA65xI`) first. The companion `scripts/provision-device.py` (cross-platform; `provision-device.sh` is the bash equivalent) takes an optional 3rd arg `[chip]` (default `WBA55xG`; pass `WBA65xI`) and auto‑picks the matching mfg address.
 
 ---
 
