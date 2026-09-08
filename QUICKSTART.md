@@ -3,7 +3,7 @@
 [Purchase the NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) &nbsp;•&nbsp; [Purchase the NUCLEO-WBA65RI](https://www.newark.com/stmicroelectronics/nucleo-wba65ri/dev-brd-nucleo-64-arm-cortex-m33f/dp/25AM5396) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
 
 > [!NOTE]
-> **Two host boards are supported.** This guide is written around the **NUCLEO-WBA55CG**, but the **NUCLEO-WBA65RI** (STM32WBA65RI, 2 MB flash) works too and follows the exact same steps. Wherever a WBA55-specific value appears — the firmware hex names, the `provision-device.py` chip argument, the `BOARD=` build flag, and the raw `mfg.bin` flash address — the WBA65 equivalent is noted alongside it. Pick one board and follow the matching values throughout.
+> **Two host boards are supported.** This guide is written around the **NUCLEO-WBA55CG**, but the **NUCLEO-WBA65RI** (STM32WBA65RI, 2 MB flash) works too and follows the exact same steps. Wherever a WBA55-specific value appears — the firmware hex names, the `provision-device.sh` chip argument, the `BOARD=` build flag, and the raw `mfg.bin` flash address — the WBA65 equivalent is noted alongside it. Pick one board and follow the matching values throughout.
 
 ![NUCLEO-WBA55CG with the X-NUCLEO-IKS MEMS sensor shield stacked on its Arduino headers](media/wba55-iks-stack.png)
 
@@ -44,6 +44,7 @@ Because the data travels over Amazon Sidewalk, your device reaches the cloud thr
 * [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (provides the `STM32_Programmer_CLI` used for flashing)
 * [Python 3.10+](https://www.python.org/downloads/) (used to generate the per-device manufacturing image)
 * A Serial Terminal application such as [Tera Term](https://teratermproject.github.io/index-en.html), [PuTTY](https://www.putty.org/), or `screen` (115200 8N1)
+* **Windows only:** [Git for Windows](https://git-scm.com/download/win), which installs **Git Bash**. The provisioning, build, and flash helpers in this repo are bash scripts — run them from a Git Bash prompt. macOS and Linux already have a suitable shell.
 
 ### Get this repository
 
@@ -213,7 +214,7 @@ Downloads/
 └── STM32-Sidewalk-SDK/           <-- the SDK, extracted alongside it
 ```
 
-The script finds the SDK there automatically. If you keep it elsewhere, point at it with `--sdk-root` or the `SDK_ROOT` environment variable.
+The script finds the SDK there automatically. If you keep it elsewhere, set the `SDK_ROOT` environment variable to its path.
 
 The SDK's provisioning tool needs two Python packages:
 
@@ -223,10 +224,10 @@ python -m pip install pyyaml intelhex
 
 ### Run the provisioning script
 
-Run this **from the root of the extracted repo folder**:
+From the root of the extracted repo folder (a **Git Bash** prompt on Windows):
 
-```
-python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
+```bash
+./scripts/provision-device.sh <device-name> <path-to-cert.json> [chip]
 ```
 
 * `<device-name>` — the device's **Unique ID** from Step 5 (e.g. `wba55-mems-01`). It names the output folder, so using the Unique ID is what lets you match a generated image back to the device it belongs to. It is *not* read from the certificate, so a typo here silently produces a confusingly-named folder rather than an error.
@@ -235,9 +236,9 @@ python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
 
 Examples:
 
-```
-python scripts/provision-device.py wba55-mems-01 certificate.json            # WBA55 (default)
-python scripts/provision-device.py wba65-mems-01 certificate.json WBA65xI    # WBA65
+```bash
+./scripts/provision-device.sh wba55-mems-01 certificate.json            # WBA55 (default)
+./scripts/provision-device.sh wba65-mems-01 certificate.json WBA65xI    # WBA65
 ```
 
 This produces (WBA55 shown; on WBA65 the `mfg.bin` flashes @ `0x081FE000`):
@@ -249,8 +250,8 @@ binaries/sidewalk-mfg/wba55-mems-01/
 └── mfg.hex
 ```
 
-> [!IMPORTANT]
-> Use the `.py` script with `python`. The `provision-device.sh` beside it is a **bash** script — run that one with `bash`, never with `python`, or you get a `SyntaxError` from Python trying to parse shell.
+> [!NOTE]
+> If you would rather not use a shell at all, `scripts/provision-device.py` takes the same arguments and runs under plain `python` on any platform.
 
 > [!NOTE]
 > Do **not** flash the raw certificate JSON, and do not reuse a `mfg.bin` from anywhere else — each image is bound to one device. Always generate it with the provisioning script (which runs `provision.py st aws --chip WBA55xG`, or `--chip WBA65xI` for the WBA65) first.
@@ -297,7 +298,7 @@ BOARD=wba65 ./scripts/build-firmware.sh   # build the WBA65 hex(es) instead (BOA
 The `BOARD` env var selects the host board (default `wba55`); `BOARD=wba65` builds the WBA65 variants from the STM32WBA65 CubeIDE project (`STM32CubeIDE/STM32WBA65`, `Debug_Nucleo-WBA65` config) that the SDK already ships.
 
 > [!NOTE]
-> This build helper is a **bash** script and drives STM32CubeIDE's headless builder. On Windows, run it from **Git Bash** or WSL. If you would rather not, open the CubeIDE project in the IDE and build it from the GUI — the [example README](examples/sidewalk-mems-wba55/README.md) walks through that path and produces the same hex.
+> This helper drives STM32CubeIDE's headless builder. You can also open the CubeIDE project and build it from the GUI — the [example README](examples/sidewalk-mems-wba55/README.md) walks through that path and produces the same hex.
 
 Prerequisites — STM32CubeIDE, the STM32-Sidewalk-SDK adjacent to this repo, X-CUBE-MEMS1 BSP drivers, and X-CUBE-CRYPTOLIB (CMOX) downloaded from st.com with click-through accepted. See [examples/sidewalk-mems-wba55/README.md](examples/sidewalk-mems-wba55/README.md) for the full setup. Output lands at:
 
@@ -317,30 +318,26 @@ Pick the one that matches your host board + sensor board:
 
 ### Flash the two images
 
-Three commands, in this order — erase, firmware, manufacturing data. These run anywhere `STM32_Programmer_CLI` is on your `PATH`, including Windows PowerShell (WBA55 + IKS4A1 shown; swap the firmware hex for the IKS5A1 or WBA65 build if needed):
-
-```
-STM32_Programmer_CLI -c port=SWD mode=UR -e all
-STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sid_ble_wba55_iks4a1.hex -v
-STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sidewalk-mfg/wba55-mems-01/mfg.hex -v
-```
-
-The `mfg.hex` carries its own flash address, so nothing extra is needed. If you flash the raw `mfg.bin` instead, you must supply the address yourself — `0x080FE000` on WBA55, `0x081FE000` on WBA65:
-
-```
-STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sidewalk-mfg/wba55-mems-01/mfg.bin 0x080FE000 -v
-```
-
-> [!NOTE]
-> **Windows:** if `STM32_Programmer_CLI` is not recognized, either add its folder to your `PATH` or call it by full path — by default `C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe`.
-
-On Linux, macOS, WSL, or Git Bash you can instead use [`tools/flash_wba55.sh`](tools/flash_wba55.sh), which runs the same three steps with an automatic one-shot retry on each. It is board-agnostic — pass whichever firmware hex and `mfg.hex` you built:
+[`tools/flash_wba55.sh`](tools/flash_wba55.sh) erases the chip, writes the firmware, then writes the manufacturing image — each step under connect-under-reset with an automatic one-shot retry. It is board-agnostic: pass whichever firmware hex and `mfg.hex` you built.
 
 ```bash
 tools/flash_wba55.sh \
   binaries/sid_ble_wba55_iks4a1.hex \
   binaries/sidewalk-mfg/wba55-mems-01/mfg.hex
 ```
+
+The equivalent three commands, if you would rather run them yourself:
+
+```bash
+STM32_Programmer_CLI -c port=SWD mode=UR -e all
+STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sid_ble_wba55_iks4a1.hex -v
+STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sidewalk-mfg/wba55-mems-01/mfg.hex -v
+```
+
+The `mfg.hex` carries its own flash address. If you flash the raw `mfg.bin` instead, supply the address yourself — `0x080FE000` on WBA55, `0x081FE000` on WBA65.
+
+> [!NOTE]
+> **Windows:** if `STM32_Programmer_CLI` is not recognized, add its folder to your `PATH` — by default `C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin`.
 
 After flashing, **press the black RESET button** (or power-cycle) to start the firmware.
 

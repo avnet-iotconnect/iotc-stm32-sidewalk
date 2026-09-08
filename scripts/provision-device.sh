@@ -22,7 +22,36 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SDK_ROOT="${SDK_ROOT:-$HOME/dev/sidewalk/STM32-Sidewalk-SDK}"
+
+# Locate the STM32-Sidewalk-SDK: SDK_ROOT wins, else the conventional spots.
+find_sdk() {
+    local candidates=(
+        "$(dirname "$REPO_ROOT")/STM32-Sidewalk-SDK"   # sibling of this repo
+        "$HOME/dev/sidewalk/STM32-Sidewalk-SDK"
+        "$HOME/STM32-Sidewalk-SDK"
+    )
+    [[ -n "${SDK_ROOT:-}" ]] && candidates=("$SDK_ROOT")
+    for root in "${candidates[@]}"; do
+        if [[ -f "$root/tools/provision/provision.py" ]]; then
+            echo "$root"
+            return 0
+        fi
+    done
+    {
+        echo "error: could not find the STM32-Sidewalk-SDK."
+        echo
+        echo "This script uses the SDK's bundled tools/provision/provision.py."
+        echo "Download or clone it from"
+        echo "    https://github.com/stm32-hotspot/STM32-Sidewalk-SDK"
+        echo "and extract it next to this repo, or set SDK_ROOT to its path."
+        echo
+        echo "Looked in:"
+        printf '    %s\n' "${candidates[@]}"
+    } >&2
+    return 1
+}
+
+SDK_ROOT="$(find_sdk)"
 PROVISION_PY="$SDK_ROOT/tools/provision/provision.py"
 
 if [[ $# -lt 2 || $# -gt 3 ]]; then

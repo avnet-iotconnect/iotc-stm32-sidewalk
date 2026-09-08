@@ -53,7 +53,7 @@ For production onboarding, work with the **/IOTCONNECT team** to integrate the *
 
 | Area | Prototype flow (documented in this repo) | Production flow (Amazon Sidewalk manufacturing) |
 |---|---|---|
-| Provisioning method | Per-device certificate JSON + provisioning script (`scripts/provision-device.py`) | Factory provisioning with HSM, control logs, and SMSN |
+| Provisioning method | Per-device certificate JSON + provisioning script (`scripts/provision-device.sh`) | Factory provisioning with HSM, control logs, and SMSN |
 | Device scale | Up to 1,000 prototype devices | Production scale (manufacturing flow) |
 | Onboarding style | One device at a time | Bulk onboarding using import tasks |
 | Intended use | Development, testing, demos | Commercial production deployments |
@@ -79,9 +79,10 @@ For production onboarding, work with the **/IOTCONNECT team** to integrate the *
   Per‑example, step‑by‑step instructions that cover building, provisioning, and flashing.
 
 - `scripts`
-  Helper scripts for provisioning and building. `provision-device.py` runs on
-  Windows, macOS, and Linux; `provision-device.sh` and `build-firmware.sh` are
-  bash equivalents for Linux, macOS, WSL, or Git Bash.
+  Helper scripts for provisioning and building. These are bash scripts — run them
+  from a shell on macOS/Linux, or from **Git Bash** on Windows. A
+  `provision-device.py` equivalent is included for anyone who would rather not
+  use a shell.
 
 ---
 

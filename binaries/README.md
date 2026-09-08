@@ -26,8 +26,8 @@ gitignored. To populate this directory:
   STM32-Sidewalk-SDK + STM32CubeIDE + X-CUBE-CRYPTOLIB to be set up; see
   the example READMEs under `../examples/`).
 * Per-device manufacturing data: run
-  `python ../scripts/provision-device.py <device-name> <path-to-cert.json>`
-  (the `.sh` variant is the same thing for bash shells).
+  `../scripts/provision-device.sh <device-name> <path-to-cert.json>`
+  (a `provision-device.py` equivalent is there for plain `python`).
 
 ## Why pre-built binaries are not distributed in this repository
 
@@ -55,9 +55,10 @@ device-bound Sidewalk private keys.
 * **STM32CubeProgrammer CLI** on PATH as `STM32_Programmer_CLI`
 * **Python 3** (for `provision.py`)
 * **STM32-Sidewalk-SDK** available locally — auto-detected next to this repo or at
-  `~/dev/sidewalk/STM32-Sidewalk-SDK`; override with `--sdk-root` or `SDK_ROOT`. The
-  provisioning script uses its bundled `tools/provision/provision.py`, which needs
-  `pyyaml` and `intelhex` (`python -m pip install pyyaml intelhex`).
+  `~/dev/sidewalk/STM32-Sidewalk-SDK`; override with `SDK_ROOT`. The provisioning
+  script uses its bundled `tools/provision/provision.py`, which needs `pyyaml` and
+  `intelhex` (`python -m pip install pyyaml intelhex`).
+* **bash** — already present on macOS and Linux; on Windows use **Git Bash**.
 
 ## Step 1 — Generate the manufacturing image for a new device
 
@@ -68,18 +69,18 @@ Run from the repository root. `<device-name>` is the device's /IOTCONNECT **Uniq
 — it names the output folder. `<path-to-cert.json>` is the certificate downloaded from
 the device page, normally named `certificate.json`.
 
-```
-python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
+```bash
+./scripts/provision-device.sh <device-name> <path-to-cert.json> [chip]
 ```
 
-`provision-device.py` runs on Windows, macOS, and Linux. The equivalent
-`provision-device.sh` is a bash script — run it with `bash`, never with `python`.
+`scripts/provision-device.py` takes the same arguments and runs under plain `python`
+if you would rather not use a shell.
 
 Example:
 
-```
-python scripts/provision-device.py mclST5A3 certificate.json            # WBA55 (default)
-python scripts/provision-device.py mclST5A3 certificate.json WBA65xI    # WBA65
+```bash
+./scripts/provision-device.sh mclST5A3 certificate.json            # WBA55 (default)
+./scripts/provision-device.sh mclST5A3 certificate.json WBA65xI    # WBA65
 ```
 
 This will produce:
