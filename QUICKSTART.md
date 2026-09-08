@@ -250,17 +250,7 @@ binaries/sidewalk-mfg/wba55-mems-01/
 ```
 
 > [!IMPORTANT]
-> **`provision-device.py` is a Python script — run it with `python`.** There is also a `provision-device.sh` in the same folder. That one is a **bash** script for Linux, macOS, WSL, or Git Bash, and it must be run with `bash` (or `./`), never with `python`. Handing the `.sh` file to Python produces a confusing syntax error, because Python is trying to parse shell:
->
-> ```
-> PS> python ./scripts/provision-device.sh StevensWBA55 certificate.json
->   File "...\scripts\provision-device.sh", line 34
->     WBA65xI|WBA64xI|WBA63xI|WBA62xI) MFG_ADDR="0x081FE000" ;;
->                                    ^
-> SyntaxError: closing parenthesis ')' does not match opening parenthesis '['
-> ```
->
-> On Windows, use `python scripts/provision-device.py …` — it needs nothing beyond the Python you already installed, and works the same in PowerShell, cmd, and a terminal inside VS Code.
+> Use the `.py` script with `python`. The `provision-device.sh` beside it is a **bash** script — run that one with `bash`, never with `python`, or you get a `SyntaxError` from Python trying to parse shell.
 
 > [!NOTE]
 > Do **not** flash the raw certificate JSON, and do not reuse a `mfg.bin` from anywhere else — each image is bound to one device. Always generate it with the provisioning script (which runs `provision.py st aws --chip WBA55xG`, or `--chip WBA65xI` for the WBA65) first.

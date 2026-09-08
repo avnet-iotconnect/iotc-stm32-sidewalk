@@ -17,8 +17,8 @@ Usage:
     python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
 
 Examples:
-    python scripts/provision-device.py StevensWBA55 certificate.json
-    python scripts/provision-device.py StevensWBA65 certificate.json WBA65xI
+    python scripts/provision-device.py wba55-mems-01 certificate.json
+    python scripts/provision-device.py wba65-mems-01 certificate.json WBA65xI
 
 <device-name> is just the output folder name -- use the device's /IOTCONNECT
 **Unique ID** so the generated image is easy to match back to the device.
@@ -111,8 +111,8 @@ def main() -> int:
         "from an /IOTCONNECT device certificate JSON.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="example:\n"
-        "  python scripts/provision-device.py StevensWBA55 certificate.json\n"
-        "  python scripts/provision-device.py StevensWBA65 certificate.json WBA65xI",
+        "  python scripts/provision-device.py wba55-mems-01 certificate.json\n"
+        "  python scripts/provision-device.py wba65-mems-01 certificate.json WBA65xI",
     )
     parser.add_argument(
         "device_name",
