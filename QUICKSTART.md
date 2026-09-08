@@ -35,7 +35,7 @@ Because the data travels over Amazon Sidewalk, your device reaches the cloud thr
 
 * [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) — Sidewalk host MCU (STM32WBA55CG, 1 MB flash; programmed over the on-board ST-LINK). **Or** a [NUCLEO-WBA65RI](https://www.newark.com/stmicroelectronics/nucleo-wba65ri/dev-brd-nucleo-64-arm-cortex-m33f/dp/25AM5396) (STM32WBA65RI, 2 MB flash) — same steps, using the WBA65 values noted throughout this guide.
 * **One of:** [X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) *or* [X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356) MEMS sensor expansion board
-* USB micro-B cable (ST-LINK programming + UART log)
+* USB Type-C cable (ST-LINK programming + UART log)
 * A compatible **Amazon Sidewalk gateway** in range — see the next subsection
 
 **Software**
@@ -266,7 +266,7 @@ binaries/sidewalk-mfg/wba55-mems-01/
    Support the panel flat with the add-on just past the edge of a table, hold it close to the tabs, and **flex it straight down until the tabs snap** — do not twist, and keep your fingers off the components and pin headers. The tabs are scored to break cleanly by hand; no cutting tool is needed. Keep the add-on board: its pin headers plug into the **DIL24 socket** on the shield when you want to use the sensor it carries.
 
 2. **Stack** the MEMS expansion board onto the NUCLEO-WBA55CG (or NUCLEO-WBA65RI): align the **X-NUCLEO-IKS4A1** (or **IKS5A1**) onto the Arduino headers and press firmly until fully seated. No jumpers or extra wiring are needed — the sensors talk over the Arduino I²C connector.
-3. **Connect** the USB micro-B cable from your PC to the board's ST-LINK port.
+3. **Connect** the USB Type-C cable from your PC to the board's ST-LINK port.
 4. Confirm the board powers up (the ST-LINK LED illuminates).
 
 > [!NOTE]

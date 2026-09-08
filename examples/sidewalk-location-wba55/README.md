@@ -63,7 +63,7 @@ disclaimer as the other examples in this repo.)
 | Item | Notes |
 |---|---|
 | NUCLEO-WBA55CG **or** NUCLEO-WBA65RI | Sidewalk host MCU (STM32WBA55CG, 1 MB flash / STM32WBA65RI, 2 MB flash). SWD via on-board ST-LINK. Either board runs this example. |
-| USB micro-B cable | ST-LINK programming + UART log. |
+| USB Type-C cable | ST-LINK programming + UART log. |
 | A Community-Finding Sidewalk gateway in range | **Required for any coordinates to resolve.** Echo (4th-gen+) / supported Ring devices with Amazon Sidewalk + Community Finding enabled. |
 
 No expansion shield. No sub-GHz radio. No GNSS.
