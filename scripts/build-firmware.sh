@@ -131,11 +131,23 @@ build_one() {
     fi
 
     echo "== building $BOARD $suffix =="
-    "$CUBE_IDE" \
+    # A workspace left over from a build against a different SDK path makes
+    # the import fail (same project name, different location), so start clean.
+    rm -rf "$ws"
+    local log="$OUT_DIR/build_${PROJ_NAME}_${suffix}.log"
+    if "$CUBE_IDE" \
         -data "$(ide_path "$ws")" \
         -import "$(ide_path "$PROJ_DIR")" \
         -cleanBuild "$PROJ_NAME/$BUILD_CFG" \
-        -no-indexer | tail -3
+        -no-indexer > "$log" 2>&1 && grep -q "Build Finished" "$log" && [[ -f "$hex" ]]
+    then
+        grep "Build Finished" "$log" | tail -1
+    else
+        echo "build FAILED -- compiler errors:" >&2
+        grep -E "error:|undefined reference|multiple definition|No such file|\*\*\* \[" "$log" >&2 || tail -20 "$log" >&2
+        echo "full log: $log" >&2
+        return 1
+    fi
 
     cp "$hex" "$OUT_DIR/${PROJ_NAME}_${suffix}.hex"
     echo "wrote $OUT_DIR/${PROJ_NAME}_${suffix}.hex"

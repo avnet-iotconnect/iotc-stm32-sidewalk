@@ -166,7 +166,7 @@ This section applies to **both boards**. Substitute the per‑board names below;
 | Build config (active) | `Debug_Nucleo-WBA55` (or `Release_Nucleo-WBA55`) | `Debug_Nucleo-WBA65` (or `Release_Nucleo-WBA65`) |
 | Board compile macro (set by the SDK project) | `NUCLEO_WBA55_BOARD` | `NUCLEO_WBA65_BOARD` |
 
-> **Pre-wiring differs per board.** The IKS4A1/IKS5A1 BSP linked-resource entries, include paths, and the `SID_APP_IKS4A1_ENABLED=1` symbol are already committed to `.project` / `.cproject` **for the STM32WBA55 project only** (both its Nucleo configs, Debug and Release). For that board you just import and click Build. The stock SDK **STM32WBA65** `sid_ble` project ships **without** the MEMS wiring — you must apply the same linked resources, include paths, and `SID_APP_IKS4A1_ENABLED` / `HAL_I2C_MODULE_ENABLED` wiring to its `Debug_Nucleo-WBA65` / `Release_Nucleo-WBA65` configs (see "What's already wired up for you" below for the exact list, and `firmware/README.md` → *Build-system changes*).
+> **The stock SDK has none of this wiring.** The BSP linked-resource entries, include paths, `SID_APP_IKS4A1_ENABLED` / `SID_APP_IKS5A1_ENABLED` symbols, and `HAL_I2C_MODULE_ENABLED` are applied to **both** the STM32WBA55 and STM32WBA65 `sid_ble` projects by [`scripts/prepare-sdk.sh`](../../scripts/prepare-sdk.sh), which also stages Sections 2 and 3 for you (patch: [`scripts/sdk-overlay/sid_ble_mems.patch`](../../scripts/sdk-overlay/sid_ble_mems.patch)). Run it once on a fresh SDK — see [`BUILD_SETUP.md`](../../BUILD_SETUP.md) — then import and click Build. The list under "What's wired up" below is what that patch adds, for anyone doing it by hand.
 
 ### One‑time GUI bring‑up
 
@@ -195,7 +195,7 @@ WBA65:
 
 ### Headless / CLI build
 
-A headless build works once the project's CubeMX natures have been removed from `.project` (already done in this repo). With CubeIDE 1.18+ installed at `/opt/st/stm32cubeide_1.18.0/` (adjust to your install path). WBA55:
+A headless build works once the project's CubeMX natures have been removed from `.project` (the overlay patch does this). `scripts/build-firmware.sh` finds CubeIDE's headless launcher automatically on Windows, Linux, and macOS; the raw invocation it runs is shown below with a Linux install path. WBA55:
 
 ```
 /opt/st/stm32cubeide_1.18.0/headless-build.sh \
@@ -228,9 +228,9 @@ Both variants are built from the same source tree by flipping one pair of `.cpro
 
 The flags are mutually exclusive at link time (the IKS4A1 and IKS5A1 BSP component objects use the same global names). The companion `scripts/build-firmware.sh` in this repo flips the flag automatically and produces both hexes in one invocation. It takes a `BOARD=wba55|wba65` env var (default `wba55`) to pick the board: WBA55 emits `sid_ble_wba55_iks4a1.hex` / `sid_ble_wba55_iks5a1.hex`, and `BOARD=wba65` emits `sid_ble_wba65_iks4a1.hex` / `sid_ble_wba65_iks5a1.hex`. See [Section 4 → Headless / CLI build](#headless--cli-build).
 
-### What's already wired up for you (for transparency)
+### What's wired up by `prepare-sdk.sh` (for transparency)
 
-> The wiring below is committed to the **STM32WBA55** `sid_ble` project. For **STM32WBA65** the stock SDK project does **not** ship this wiring — apply the same entries to its `Debug_Nucleo-WBA65` / `Release_Nucleo-WBA65` configs before building.
+> Everything below is added by `scripts/sdk-overlay/sid_ble_mems.patch`, to both the STM32WBA55 and STM32WBA65 `sid_ble` projects. The stock SDK ships none of it.
 
 - `Drivers/BSP/IKS4A1`, `Drivers/BSP/IKS5A1`, and `Drivers/BSP/Components` are linked into the project tree (as virtual folders pointing at `APP_ROOT_DIR/Drivers/BSP/...`).
 - The Nucleo bus glue file `Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.c` is linked as an individual source. The matching `.h` picks the pin mapping by board macro (`NUCLEO_WBA55_BOARD` vs `NUCLEO_WBA65_BOARD`) — see the WBA65 I²C caveat in Section 1.

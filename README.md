@@ -6,7 +6,7 @@ This repository provides **/IOTCONNECT** assets and documentation for **STM32 Si
 
 ## Start Here
 
-New to this repo? **[Getting Started](GETTING_STARTED.md)** takes a NUCLEO-WBA55CG or NUCLEO-WBA65RI with a MEMS sensor shield from unboxing to live telemetry on an /IOTCONNECT dashboard.
+New to this repo? **[Getting Started](GETTING_STARTED.md)** takes a NUCLEO-WBA55CG or NUCLEO-WBA65RI with a MEMS sensor shield from unboxing to live telemetry on an /IOTCONNECT dashboard. **[Build Setup](BUILD_SETUP.md)** is the one-time toolchain setup for compiling the firmware.
 
 **[Download this repository as a ZIP](https://github.com/avnet-iotconnect/iotc-stm32-sidewalk/archive/refs/heads/main.zip)** and extract it — that is all you need to follow the guides. This is a public repository, so the download works for anyone with **no GitHub account and no `git` installation**. If you prefer Git:
 
@@ -79,10 +79,13 @@ For production onboarding, work with the **/IOTCONNECT team** to integrate the *
   Per‑example, step‑by‑step instructions that cover building, provisioning, and flashing.
 
 - `scripts`
-  Helper scripts for provisioning and building. These are bash scripts — run them
-  from a shell on macOS/Linux, or from **Git Bash** on Windows. A
-  `provision-device.py` equivalent is included for anyone who would rather not
-  use a shell.
+  Helper scripts for provisioning and building: `provision-device.sh` (device
+  manufacturing image), `prepare-sdk.sh` (stages a fresh STM32-Sidewalk-SDK for
+  the MEMS build — see [BUILD_SETUP.md](BUILD_SETUP.md)), and `build-firmware.sh`.
+  `sdk-overlay/` holds the SDK patch `prepare-sdk.sh` applies. These are bash
+  scripts — run them from a shell on macOS/Linux, or from **Git Bash** on
+  Windows. A `provision-device.py` equivalent is included for anyone who would
+  rather not use a shell.
 
 ---
 

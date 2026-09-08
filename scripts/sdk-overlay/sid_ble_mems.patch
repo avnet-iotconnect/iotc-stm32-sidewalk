@@ -1,0 +1,587 @@
+diff --git a/apps/st/stm32wba/sid_ble/Config/app_conf.h b/apps/st/stm32wba/sid_ble/Config/app_conf.h
+index d4d6538..e034d62 100644
+--- a/apps/st/stm32wba/sid_ble/Config/app_conf.h
++++ b/apps/st/stm32wba/sid_ble/Config/app_conf.h
+@@ -351,7 +351,7 @@ extern UART_HandleTypeDef            huart1;
+  *   - 2 : Debugger available in low power mode.
+  *
+  ******************************************************************************/
+-#define CFG_DEBUGGER_LEVEL                  (1)
++#define CFG_DEBUGGER_LEVEL                  (2)
+ 
+ /******************************************************************************
+  * RealTime GPIO debug module configuration
+diff --git a/apps/st/stm32wba/sid_ble/Config/stm32wbaxx_hal_conf.h b/apps/st/stm32wba/sid_ble/Config/stm32wbaxx_hal_conf.h
+index e0cc516..372731f 100644
+--- a/apps/st/stm32wba/sid_ble/Config/stm32wbaxx_hal_conf.h
++++ b/apps/st/stm32wba/sid_ble/Config/stm32wbaxx_hal_conf.h
+@@ -41,7 +41,7 @@
+ /*#define HAL_GTZC_MODULE_ENABLED   */
+ /*#define HAL_HASH_MODULE_ENABLED   */
+ /*#define HAL_HSEM_MODULE_ENABLED   */
+-/*#define HAL_I2C_MODULE_ENABLED   */
++#define HAL_I2C_MODULE_ENABLED
+ #define HAL_ICACHE_MODULE_ENABLED
+ /*#define HAL_IRDA_MODULE_ENABLED   */
+ /*#define HAL_IWDG_MODULE_ENABLED   */
+diff --git a/apps/st/stm32wba/sid_ble/Core/Src/app_entry.c b/apps/st/stm32wba/sid_ble/Core/Src/app_entry.c
+index 7496a5a..2bd3bce 100644
+--- a/apps/st/stm32wba/sid_ble/Core/Src/app_entry.c
++++ b/apps/st/stm32wba/sid_ble/Core/Src/app_entry.c
+@@ -469,19 +469,15 @@ static void System_Init( void )
+ #endif /* (CFG_RT_DEBUG_GPIO_MODULE) */
+ 
+ #if (CFG_DEBUGGER_LEVEL > 1)
+-  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0u)
+-  {
+-    /* Keep debug facilities up & running in Stop and Standby modes if a debugger is attached at startup */
+-    LL_DBGMCU_EnableDBGStopMode();
+-    LL_DBGMCU_EnableDBGStandbyMode();
+-  }
+-  else
++  /* Keep debug facilities up in Stop/Standby unconditionally so cold-boot
++   * (no debugger attached) sessions remain SWD-reachable across LPM. */
++  LL_DBGMCU_EnableDBGStopMode();
++  LL_DBGMCU_EnableDBGStandbyMode();
++#else
++  /* Disable debug facilities in Stop and Standby modes to allow more accurate power consumption measurements in LPM */
++  LL_DBGMCU_DisableDBGStopMode();
++  LL_DBGMCU_DisableDBGStandbyMode();
+ #endif /* CFG_DEBUGGER_LEVEL */
+-  {
+-    /* Disable debug facilities in Stop and Standby modes to allow more accurate power consumption measurements in LPM */
+-    LL_DBGMCU_DisableDBGStopMode();
+-    LL_DBGMCU_DisableDBGStandbyMode();
+-  }
+ 
+   return;
+ }
+diff --git a/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/.cproject b/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/.cproject
+index 8123b8b..ec8ceee 100644
+--- a/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/.cproject
++++ b/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/.cproject
+@@ -45,6 +45,8 @@
+ 									<listOptionValue builtIn="false" value="NUCLEO_WBA55_BOARD"/>
+ 									<listOptionValue builtIn="false" value="SID_APP_VERSION_HEADER=&quot;sid_app_version_cubeide.h&quot;"/>
+ 									<listOptionValue builtIn="false" value="SID_PAL_ENABLE_SCHEDULER_DELAY"/>
++									<listOptionValue builtIn="false" value="SID_APP_IKS4A1_ENABLED=1"/>
++									<listOptionValue builtIn="false" value="SID_APP_IKS5A1_ENABLED=0"/>
+ 									<listOptionValue builtIn="false" value="SID_PAL_LOG_LEVEL=SID_PAL_LOG_SEVERITY_DEBUG"/>
+ 									<listOptionValue builtIn="false" value="SID_PAL_LOG_MSG_LENGTH_MAX=120"/>
+ 									<listOptionValue builtIn="false" value="USE_TINY_PRINTF=1"/>
+@@ -100,6 +102,20 @@
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/littlefs"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS4A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/Common"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lsm6dsv16x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lis2duxs12"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS5A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism6hg256x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism330is"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2dulpx"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2mdc"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ilps22qs"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lps22df"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/sht40ad1b"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/stts22h"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Device/ST/STM32WBAxx/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/STM32WBAxx_HAL_Driver/Inc"/>
+@@ -226,6 +242,8 @@
+ 									<listOptionValue builtIn="false" value="SID_PAL_ASSERT_DISABLED"/>
+ 									<listOptionValue builtIn="false" value="DUAL_LINK_SUPPORT=0"/>
+ 									<listOptionValue builtIn="false" value="NUCLEO_WBA55_BOARD"/>
++									<listOptionValue builtIn="false" value="SID_APP_IKS4A1_ENABLED=1"/>
++									<listOptionValue builtIn="false" value="SID_APP_IKS5A1_ENABLED=0"/>
+ 									<listOptionValue builtIn="false" value="SID_APP_VERSION_HEADER=&quot;sid_app_version_cubeide.h&quot;"/>
+ 									<listOptionValue builtIn="false" value="SID_PAL_ENABLE_SCHEDULER_DELAY"/>
+ 									<listOptionValue builtIn="false" value="SID_PAL_LOG_LEVEL=SID_PAL_LOG_SEVERITY_INFO"/>
+@@ -282,6 +300,20 @@
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/littlefs"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS4A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/Common"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lsm6dsv16x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lis2duxs12"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS5A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism6hg256x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism330is"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2dulpx"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2mdc"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ilps22qs"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lps22df"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/sht40ad1b"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/stts22h"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Device/ST/STM32WBAxx/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/STM32WBAxx_HAL_Driver/Inc"/>
+@@ -464,6 +496,20 @@
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/littlefs"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS4A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/Common"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lsm6dsv16x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lis2duxs12"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS5A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism6hg256x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism330is"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2dulpx"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2mdc"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ilps22qs"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lps22df"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/sht40ad1b"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/stts22h"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Device/ST/STM32WBAxx/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/STM32WBAxx_HAL_Driver/Inc"/>
+@@ -646,6 +692,20 @@
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/littlefs"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS4A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/Common"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lsm6dsv16x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lis2duxs12"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS5A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism6hg256x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism330is"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2dulpx"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2mdc"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ilps22qs"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lps22df"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/sht40ad1b"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/stts22h"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Device/ST/STM32WBAxx/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/STM32WBAxx_HAL_Driver/Inc"/>
+diff --git a/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/.project b/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/.project
+index 73aed56..8a24748 100644
+--- a/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/.project
++++ b/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/.project
+@@ -20,9 +20,7 @@
+ 	</buildSpec>
+ 	<natures>
+ 		<nature>com.st.stm32cube.ide.mcu.MCUProjectNature</nature>
+-		<nature>com.st.stm32cube.ide.mcu.MCUCubeProjectNature</nature>
+ 		<nature>org.eclipse.cdt.core.cnature</nature>
+-		<nature>com.st.stm32cube.ide.mcu.MCUCubeIdeServicesRevAev2ProjectNature</nature>
+ 		<nature>com.st.stm32cube.ide.mcu.MCUAdvancedStructureProjectNature</nature>
+ 		<nature>com.st.stm32cube.ide.mcu.MCUEndUserDisabledTrustZoneProjectNature</nature>
+ 		<nature>com.st.stm32cube.ide.mcu.MCUNonSecureProjectNature</nature>
+@@ -357,6 +355,26 @@
+ 			<type>1</type>
+ 			<locationURI>FREERTOS_ROOT_DIR/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c</locationURI>
+ 		</link>
++		<link>
++			<name>Drivers/BSP/IKS4A1</name>
++			<type>2</type>
++			<locationURI>APP_ROOT_DIR/Drivers/BSP/IKS4A1</locationURI>
++		</link>
++		<link>
++			<name>Drivers/BSP/IKS5A1</name>
++			<type>2</type>
++			<locationURI>APP_ROOT_DIR/Drivers/BSP/IKS5A1</locationURI>
++		</link>
++		<link>
++			<name>Drivers/BSP/Components</name>
++			<type>2</type>
++			<locationURI>APP_ROOT_DIR/Drivers/BSP/Components</locationURI>
++		</link>
++		<link>
++			<name>Drivers/BSP/stm32wbaxx_nucleo_bus.c</name>
++			<type>1</type>
++			<locationURI>APP_ROOT_DIR/Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.c</locationURI>
++		</link>
+ 	</linkedResources>
+ 	<filteredResources>
+ 		<filter>
+diff --git a/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/.cproject b/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/.cproject
+index 05b7248..43617f9 100644
+--- a/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/.cproject
++++ b/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/.cproject
+@@ -43,6 +43,8 @@
+ 									<listOptionValue builtIn="false" value="DEBUG"/>
+ 									<listOptionValue builtIn="false" value="DUAL_LINK_SUPPORT=0"/>
+ 									<listOptionValue builtIn="false" value="NUCLEO_WBA65_BOARD"/>
++									<listOptionValue builtIn="false" value="SID_APP_IKS4A1_ENABLED=1"/>
++									<listOptionValue builtIn="false" value="SID_APP_IKS5A1_ENABLED=0"/>
+ 									<listOptionValue builtIn="false" value="SID_APP_VERSION_HEADER=&quot;sid_app_version_cubeide.h&quot;"/>
+ 									<listOptionValue builtIn="false" value="SID_PAL_ENABLE_SCHEDULER_DELAY"/>
+ 									<listOptionValue builtIn="false" value="SID_PAL_LOG_LEVEL=SID_PAL_LOG_SEVERITY_DEBUG"/>
+@@ -100,6 +102,20 @@
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/littlefs"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS4A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/Common"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lsm6dsv16x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lis2duxs12"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS5A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism6hg256x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism330is"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2dulpx"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2mdc"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ilps22qs"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lps22df"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/sht40ad1b"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/stts22h"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Device/ST/STM32WBAxx/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/STM32WBAxx_HAL_Driver/Inc"/>
+@@ -226,6 +242,8 @@
+ 									<listOptionValue builtIn="false" value="SID_PAL_ASSERT_DISABLED"/>
+ 									<listOptionValue builtIn="false" value="DUAL_LINK_SUPPORT=0"/>
+ 									<listOptionValue builtIn="false" value="NUCLEO_WBA65_BOARD"/>
++									<listOptionValue builtIn="false" value="SID_APP_IKS4A1_ENABLED=1"/>
++									<listOptionValue builtIn="false" value="SID_APP_IKS5A1_ENABLED=0"/>
+ 									<listOptionValue builtIn="false" value="SID_APP_VERSION_HEADER=&quot;sid_app_version_cubeide.h&quot;"/>
+ 									<listOptionValue builtIn="false" value="SID_PAL_ENABLE_SCHEDULER_DELAY"/>
+ 									<listOptionValue builtIn="false" value="SID_PAL_LOG_LEVEL=SID_PAL_LOG_SEVERITY_INFO"/>
+@@ -282,6 +300,20 @@
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/littlefs"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS4A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/Common"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lsm6dsv16x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lis2duxs12"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS5A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism6hg256x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism330is"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2dulpx"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2mdc"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ilps22qs"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lps22df"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/sht40ad1b"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/stts22h"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Device/ST/STM32WBAxx/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/STM32WBAxx_HAL_Driver/Inc"/>
+@@ -464,6 +496,20 @@
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/littlefs"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS4A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/Common"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lsm6dsv16x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lis2duxs12"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS5A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism6hg256x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism330is"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2dulpx"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2mdc"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ilps22qs"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lps22df"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/sht40ad1b"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/stts22h"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Device/ST/STM32WBAxx/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/STM32WBAxx_HAL_Driver/Inc"/>
+@@ -646,6 +692,20 @@
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32common/Middlewares/Third_Party/littlefs"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS4A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/STM32WBAxx_Nucleo"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/Common"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lsm6dsv16x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lis2duxs12"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/IKS5A1"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism6hg256x"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ism330is"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2dulpx"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/iis2mdc"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/ilps22qs"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/lps22df"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/sht40ad1b"/>
++									<listOptionValue builtIn="false" value="../../../Drivers/BSP/Components/stts22h"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/CMSIS/Device/ST/STM32WBAxx/Include"/>
+ 									<listOptionValue builtIn="false" value="../../../../../../../platform/sid_mcu/st/stm32wba/Drivers/STM32WBAxx_HAL_Driver/Inc"/>
+diff --git a/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/.project b/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/.project
+index e562d9c..9621f4b 100644
+--- a/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/.project
++++ b/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/.project
+@@ -20,9 +20,7 @@
+ 	</buildSpec>
+ 	<natures>
+ 		<nature>com.st.stm32cube.ide.mcu.MCUProjectNature</nature>
+-		<nature>com.st.stm32cube.ide.mcu.MCUCubeProjectNature</nature>
+ 		<nature>org.eclipse.cdt.core.cnature</nature>
+-		<nature>com.st.stm32cube.ide.mcu.MCUCubeIdeServicesRevAev2ProjectNature</nature>
+ 		<nature>com.st.stm32cube.ide.mcu.MCUAdvancedStructureProjectNature</nature>
+ 		<nature>com.st.stm32cube.ide.mcu.MCUEndUserDisabledTrustZoneProjectNature</nature>
+ 		<nature>com.st.stm32cube.ide.mcu.MCUNonSecureProjectNature</nature>
+@@ -177,6 +175,26 @@
+ 			<type>1</type>
+ 			<locationURI>ST_MCU_DRIVERS_ROOT_DIR/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo.c</locationURI>
+ 		</link>
++		<link>
++			<name>Drivers/BSP/stm32wbaxx_nucleo_bus.c</name>
++			<type>1</type>
++			<locationURI>APP_ROOT_DIR/Drivers/BSP/STM32WBAxx_Nucleo/stm32wbaxx_nucleo_bus.c</locationURI>
++		</link>
++		<link>
++			<name>Drivers/BSP/IKS4A1</name>
++			<type>2</type>
++			<locationURI>APP_ROOT_DIR/Drivers/BSP/IKS4A1</locationURI>
++		</link>
++		<link>
++			<name>Drivers/BSP/IKS5A1</name>
++			<type>2</type>
++			<locationURI>APP_ROOT_DIR/Drivers/BSP/IKS5A1</locationURI>
++		</link>
++		<link>
++			<name>Drivers/BSP/Components</name>
++			<type>2</type>
++			<locationURI>APP_ROOT_DIR/Drivers/BSP/Components</locationURI>
++		</link>
+ 		<link>
+ 			<name>Drivers/CMSIS/system_stm32wbaxx.c</name>
+ 			<type>1</type>
+diff --git a/apps/st/stm32wba/sid_ble/STM32_WPAN/App/app_sidewalk.c b/apps/st/stm32wba/sid_ble/STM32_WPAN/App/app_sidewalk.c
+index b05149a..270bd08 100644
+--- a/apps/st/stm32wba/sid_ble/STM32_WPAN/App/app_sidewalk.c
++++ b/apps/st/stm32wba/sid_ble/STM32_WPAN/App/app_sidewalk.c
+@@ -54,6 +54,16 @@
+ #  include <sid_pal_gpio_ext_ifc.h>
+ #endif /* (CFG_BUTTON_SUPPORTED != 0) && (CFG_LPM_STDBY_SUPPORTED != 0) */
+ 
++#if (defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)) || \
++    (defined(SID_APP_IKS5A1_ENABLED) && (SID_APP_IKS5A1_ENABLED == 1))
++#  include "sensors_iks4a1.h"
++#  include "commands_iks4a1.h"
++#endif
++
++#if defined(SID_APP_LOCATION_ENABLED) && (SID_APP_LOCATION_ENABLED == 1)
++#  include "location_wba55.h"
++#endif
++
+ /* Private defines -----------------------------------------------------------*/
+ 
+ #define SID_MSG_QUEUE_LEN            (10u)
+@@ -131,6 +141,22 @@ static osThreadId_t demo_counter_task;
+ /* Indicates if Sidewalk registration process is pending */
+ static bool registration_pending = false;
+ 
++#if (defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)) || \
++    (defined(SID_APP_IKS5A1_ENABLED) && (SID_APP_IKS5A1_ENABLED == 1))
++/* sid_demo capability-discovery handshake state. Cleared on Sidewalk link
++ * teardown so the next session sends capability first, just like the Nordic
++ * reference firmware. Set when the cloud responds with msg_desc 0xE0
++ * (RESP|CAP_DISCOVERY, status_code=0). */
++static volatile bool s_iks_cap_response_received = false;
++
++/* Max capability-discovery attempts before falling back to action frames
++ * even without a 0xE0 response. Keeps decode-only backends (those that
++ * don't run the sid_demo capability responder) from getting stuck in the
++ * handshake forever. */
++#define IKS4A1_CAP_ATTEMPTS_MAX  6u
++static uint8_t s_iks_cap_attempts = 0u;
++#endif
++
+ /* Private constants ---------------------------------------------------------*/
+ 
+ static const osThreadAttr_t sidewalk_stack_task_attributes = {
+@@ -219,6 +245,25 @@ static void on_sidewalk_msg_received(const struct sid_msg_desc *msg_desc, const
+ #if CFG_LED_SUPPORTED
+     (void)led_indication_set(LED_INDICATE_RCV_OK);
+ #endif /* CFG_LED_SUPPORTED */
++
++#if (defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)) || \
++    (defined(SID_APP_IKS5A1_ENABLED) && (SID_APP_IKS5A1_ENABLED == 1))
++    /* sid_demo capability-discovery response detection. Cloud sends msg_desc
++     * 0xE0 (status_hdr=1, opc=3 RESP, cmd_class=0 DEMO_APP, cmd_id=0 CAP)
++     * followed by a status_code byte. Once received, switch from emitting
++     * capability notifications to action notifications. */
++    if ((msg->size >= 1u) && (((const uint8_t *)msg->data)[0] == SENSORS_IKS4A1_MSG_DESC_RESP_CAP)) {
++        if (!s_iks_cap_response_received) {
++            SID_PAL_LOG_INFO("IKS4A1: capability-discovery response received (status=%u); switching to action notifications",
++                             (msg->size >= 2u) ? (unsigned)((const uint8_t *)msg->data)[1] : 0u);
++        }
++        s_iks_cap_response_received = true;
++    }
++
++    if ((msg_desc->type != SID_MSG_TYPE_RESPONSE) || (msg_desc->msg_desc_attr.rx_attr.is_msg_ack == false)) {
++        (void)commands_iks4a1_dispatch((const uint8_t *)msg->data, (size_t)msg->size);
++    }
++#endif
+ }
+ 
+ /*----------------------------------------------------------------------------*/
+@@ -269,6 +314,12 @@ static void on_sidewalk_status_changed(const struct sid_status *status, void *co
+             (void)led_indication_set(LED_INDICATE_BONDING);
+ #endif /* CFG_LED_SUPPORTED */
+             app_context->state = STATE_SIDEWALK_NOT_READY;
++#if (defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)) || \
++    (defined(SID_APP_IKS5A1_ENABLED) && (SID_APP_IKS5A1_ENABLED == 1))
++            /* Re-do capability handshake after each link loss. */
++            s_iks_cap_response_received = false;
++            s_iks_cap_attempts = 0u;
++#endif
+             break;
+ 
+         case SID_STATE_ERROR:
+@@ -322,8 +373,58 @@ static void send_ping(app_context_t *app_context)
+ {
+     if (app_context->state == STATE_SIDEWALK_READY ||
+         app_context->state == STATE_SIDEWALK_SECURE_CONNECTION) {
++#if (defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)) || \
++    (defined(SID_APP_IKS5A1_ENABLED) && (SID_APP_IKS5A1_ENABLED == 1))
++        static uint8_t iks_payload[SENSORS_IKS4A1_PAYLOAD_MAX_SIZE];
++        uint32_t payload_len;
++        const bool in_cap_phase = !s_iks_cap_response_received &&
++                                  (s_iks_cap_attempts < IKS4A1_CAP_ATTEMPTS_MAX);
++        if (in_cap_phase) {
++            /* Capability discovery — sid_demo handshake step 1. Sent up to
++             * IKS4A1_CAP_ATTEMPTS_MAX times. If the cloud never replies with
++             * msg_desc 0xE0 (decode-only backends), we still transition to
++             * action frames so the device emits sensor data. */
++            payload_len = sensors_iks4a1_pack_capability(iks_payload, sizeof(iks_payload));
++            s_iks_cap_attempts++;
++            SID_PAL_LOG_INFO("IKS4A1 capability discovery uplink (len=%lu, attempt=%u/%u)",
++                             (unsigned long)payload_len,
++                             (unsigned)s_iks_cap_attempts,
++                             (unsigned)IKS4A1_CAP_ATTEMPTS_MAX);
++        } else {
++            sensors_iks4a1_reading_t reading;
++            (void)sensors_iks4a1_read(&reading);
++            struct sid_timespec curr_time = {0};
++            (void)sid_get_time(app_context->sidewalk_handle, SID_GET_GPS_TIME, &curr_time);
++            payload_len = sensors_iks4a1_pack(iks_payload,
++                                              sizeof(iks_payload),
++                                              app_context->counter,
++                                              (uint32_t)curr_time.tv_sec,
++                                              &reading);
++            SID_PAL_LOG_INFO("IKS4A1 action uplink seq=%u gps=%lu stts22h=%d cC sht40_t=%d cC sht40_rh=%u cRH lps22df=%lu cPa",
++                             app_context->counter,
++                             (unsigned long)curr_time.tv_sec,
++                             reading.stts22h_c_x100,
++                             reading.sht40_temp_c_x100,
++                             (unsigned)reading.sht40_rh_x100,
++                             (unsigned long)reading.lps22df_pa_x100);
++        }
++        struct sid_msg msg = {.data = iks_payload, .size = payload_len};
++#elif defined(SID_APP_SIMPLE_BE_SEQ_ENABLED) && (SID_APP_SIMPLE_BE_SEQ_ENABLED == 1)
++        /* Two-byte big-endian sequence counter that pairs with the already-
++         * approved /IOTCONNECT "stsidewalk" decoder + "sidewalk01" template.
++         * Used to confirm /IOTCONNECT ingestion against a fresh ST device,
++         * isolated from IKS4A1 payload concerns. */
++        static uint16_t simple_seq = 0;
++        static uint8_t simple_payload[2];
++        simple_payload[0] = (uint8_t)((simple_seq >> 8) & 0xFFu);  /* BE high */
++        simple_payload[1] = (uint8_t)( simple_seq       & 0xFFu);  /* BE low  */
++        SID_PAL_LOG_INFO("Simple BE-seq uplink: seq=%u (0x%04X)", simple_seq, simple_seq);
++        simple_seq++;
++        struct sid_msg msg = {.data = simple_payload, .size = sizeof(simple_payload)};
++#else
+         SID_PAL_LOG_INFO("Sending counter update: %d", app_context->counter);
+         struct sid_msg msg = {.data = (uint8_t*)&app_context->counter, .size = sizeof(uint8_t)};
++#endif
+         struct sid_msg_desc desc = {
+             .type = SID_MSG_TYPE_NOTIFY,
+             .link_type = SID_LINK_TYPE_ANY,
+@@ -348,6 +449,12 @@ static void send_ping(app_context_t *app_context)
+ #endif /* CFG_LED_SUPPORTED */
+         }
+         app_context->counter++;
++
++#if defined(SID_APP_LOCATION_ENABLED) && (SID_APP_LOCATION_ENABLED == 1)
++        /* Request a Level-1 BLE location resolve alongside whichever uplink
++         * just went out (sensor TLV or counter). Internally rate-limited. */
++        (void)location_wba55_run(app_context->sidewalk_handle);
++#endif
+     } else {
+         SID_PAL_LOG_WARNING("Send_ping: Sidewalk is not ready yet!");
+ #if CFG_LED_SUPPORTED
+@@ -444,6 +551,10 @@ static sid_error_t init_and_start_link(app_context_t * const context, struct sid
+     /* Register sidewalk handle to the application context */
+     context->sidewalk_handle = sid_handle;
+ 
++#if defined(SID_APP_LOCATION_ENABLED) && (SID_APP_LOCATION_ENABLED == 1)
++    (void)location_wba55_init(sid_handle);
++#endif
++
+     ret = sid_get_status(sid_handle, &sid_status);
+     if (ret != SID_ERROR_NONE)
+     {
+@@ -1006,7 +1117,22 @@ static void demo_counter_task_entry(void *context)
+         {
+             SID_PAL_LOG_DEBUG("Demo Counter Thread: sending out counter update");
+             queue_event(g_event_queue, EVENT_TYPE_SEND_HELLO);
++#if (defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)) || \
++    (defined(SID_APP_IKS5A1_ENABLED) && (SID_APP_IKS5A1_ENABLED == 1))
++            /* Stay at the 5 s capability cadence while the handshake is in
++             * progress, then drop back to the configured action-notification
++             * interval (default 120 s for LPM headroom). The handshake ends
++             * either when the cloud sends a 0xE0 response, or after
++             * IKS4A1_CAP_ATTEMPTS_MAX unanswered attempts (decode-only
++             * backends never send 0xE0, so the device must time out and
++             * proceed to action frames). */
++            const bool in_cap_phase = !s_iks_cap_response_received &&
++                                      (s_iks_cap_attempts < IKS4A1_CAP_ATTEMPTS_MAX);
++            const uint32_t interval_ms = in_cap_phase ? 5000u : commands_iks4a1_get_interval_ms();
++            osDelay(interval_ms);
++#else
+             osDelay(DEMO_MESSAGE_DELAY_MS);
++#endif
+         }
+ 
+         SID_PAL_LOG_DEBUG("Demo Counter Thread: Sidewalk connection lost");
+@@ -1077,6 +1203,14 @@ void SID_APP_Init(void)
+     }
+ #endif /* CFG_LED_SUPPORTED */
+ 
++#if (defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)) || \
++    (defined(SID_APP_IKS5A1_ENABLED) && (SID_APP_IKS5A1_ENABLED == 1))
++    if (sensors_iks4a1_init() != 0)
++    {
++        SID_PAL_LOG_ERROR("IKS4A1 sensors init failed - uplink will report zeros");
++    }
++#endif
++
+     g_event_queue = osMessageQueueNew(SID_MSG_QUEUE_LEN, sizeof(enum event_type), NULL);
+     if (g_event_queue == NULL)
+     {
+diff --git a/platform/sid_mcu/st/stm32wba/Projects/Common/WPAN/Startup/stm32wbaxx_ResetHandler_GCC.s b/platform/sid_mcu/st/stm32wba/Projects/Common/WPAN/Startup/stm32wbaxx_ResetHandler_GCC.s
+index 1c898fa..9a9d412 100644
+--- a/platform/sid_mcu/st/stm32wba/Projects/Common/WPAN/Startup/stm32wbaxx_ResetHandler_GCC.s
++++ b/platform/sid_mcu/st/stm32wba/Projects/Common/WPAN/Startup/stm32wbaxx_ResetHandler_GCC.s
+@@ -186,6 +186,8 @@ CPUcontextSave:
+         DSB
+         WFI                            /* all saved, trigger deep sleep */
+ 
++  .type CPUcontextRestore, %function
++  .thumb_func
+ CPUcontextRestore:
+   /* Even if we fall through the WFI instruction, we will immediately
+    * execute a context restore and end up where we left off with no
+@@ -196,6 +198,8 @@ CPUcontextRestore:
+         MOV    SP, R4                  /* restore the SP from R4 */
+         POP    { R4 - R12, PC }        /* load R4 to R12 and PC (10 words) from C stack */
+ 
++  .type backup_system_register, %function
++  .thumb_func
+ backup_system_register:
+ /* R0 -> register_backup_table array current item address */
+ /* R1 -> loop counter (from register_backup_table_size to 0) */
+@@ -222,6 +226,8 @@ backup_loop_iter:
+ backup_loop_end:
+         BX LR                                    /* Return to caller */
+ 
++  .type restore_system_register, %function
++  .thumb_func
+ restore_system_register:
+ /* R0 -> register_backup_table array current item address */
+ /* R1 -> loop counter (from register_backup_table_size to 0) */

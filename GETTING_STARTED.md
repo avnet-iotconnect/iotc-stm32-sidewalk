@@ -15,7 +15,7 @@ _The X-NUCLEO-IKS4A1 / IKS5A1 MEMS sensor shield stacked on the NUCLEO-WBA55CG A
 
 This guide walks through bringing a **NUCLEO-WBA55CG** (or **NUCLEO-WBA65RI**) with an **X-NUCLEO-IKS4A1** (or **X-NUCLEO-IKS5A1**) MEMS sensor expansion board online with the Avnet **/IOTCONNECT** platform over **Amazon Sidewalk** (BLE / Link Type 1). When complete, the board streams live accelerometer, gyroscope, temperature, humidity, pressure, orientation, and Qvar (capacitive touch) readings to an /IOTCONNECT dashboard, and you can send commands back to the device.
 
-The firmware is built from source — licensing on the upstream SDK and crypto library prevents this repository from redistributing compiled images (see [`NOTICE.md`](NOTICE.md)). Step 9 covers the build with a one-command helper script; the detailed [example README](examples/sidewalk-mems-wba55/README.md) covers the full toolchain setup, and this guide references it where useful.
+The firmware is built from source — licensing on the upstream SDK and crypto library prevents this repository from redistributing compiled images (see [`NOTICE.md`](NOTICE.md)). Step 9 covers the build with a one-command helper script; the one-time toolchain setup it needs is in [Build Setup](BUILD_SETUP.md), and the detailed [example README](examples/sidewalk-mems-wba55/README.md) covers the firmware itself.
 
 Because the data travels over Amazon Sidewalk, your device reaches the cloud through any nearby **Sidewalk gateway** (for example, a compatible Amazon Echo) — no local Wi-Fi credentials are programmed onto the board.
 
@@ -48,6 +48,7 @@ Because the data travels over Amazon Sidewalk, your device reaches the cloud thr
 > **Windows: `Python was not found; run without arguments to install from the Microsoft Store`.** Windows ships placeholder `python.exe` / `python3.exe` shortcuts that are not Python and shadow a real install. Turn them off under **Settings > Apps > Advanced app settings > App execution aliases** (switch off `python.exe` and `python3.exe`), then reopen Git Bash. The provisioning script also detects and skips these stubs on its own.
 * A Serial Terminal application such as [Tera Term](https://teratermproject.github.io/index-en.html), [PuTTY](https://www.putty.org/), or `screen` (115200 8N1)
 * **Windows only:** [Git for Windows](https://git-scm.com/download/win), which installs **Git Bash**. The provisioning, build, and flash helpers in this repo are bash scripts — run them from a Git Bash prompt. macOS and Linux already have a suitable shell.
+* **To build the firmware (Step 9):** STM32CubeIDE plus three ST packages, staged by one script — follow [Build Setup](BUILD_SETUP.md) once before you reach Step 9. Everything up to Step 8 works without it.
 
 ### Put STM32_Programmer_CLI on your PATH
 
@@ -338,7 +339,7 @@ The `BOARD` env var selects the host board (default `wba55`); `BOARD=wba65` buil
 >
 > You can also open the CubeIDE project and build from the GUI — the [example README](examples/sidewalk-mems-wba55/README.md) walks through that path and produces the same hex.
 
-Prerequisites — STM32CubeIDE, the STM32-Sidewalk-SDK adjacent to this repo, X-CUBE-MEMS1 BSP drivers, and X-CUBE-CRYPTOLIB (CMOX) downloaded from st.com with click-through accepted. See [examples/sidewalk-mems-wba55/README.md](examples/sidewalk-mems-wba55/README.md) for the full setup. Output lands at:
+This needs the one-time setup in [Build Setup](BUILD_SETUP.md) — install STM32CubeIDE, download the SDK and two ST packages, run `./scripts/prepare-sdk.sh`. A fresh SDK download does **not** build on its own; the prepare step stages the sensor drivers, crypto library, and this demo's sources into it. Output lands at:
 
 ```
 binaries/sid_ble_wba55_iks4a1.hex     # (WBA65: sid_ble_wba65_iks4a1.hex)
