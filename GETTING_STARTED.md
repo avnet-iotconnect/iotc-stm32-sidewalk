@@ -42,7 +42,10 @@ Because the data travels over Amazon Sidewalk, your device reaches the cloud thr
 
 * PC running Windows 11, macOS, or Linux
 * [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (provides the `STM32_Programmer_CLI` used for flashing) — **it does not add itself to your `PATH`;** see below
-* [Python 3.10+](https://www.python.org/downloads/) (used to generate the per-device manufacturing image)
+* [Python 3.10+](https://www.python.org/downloads/) (used to generate the per-device manufacturing image) — tick **Add python.exe to PATH** in the installer
+
+> [!NOTE]
+> **Windows: `Python was not found; run without arguments to install from the Microsoft Store`.** Windows ships placeholder `python.exe` / `python3.exe` shortcuts that are not Python and shadow a real install. Turn them off under **Settings > Apps > Advanced app settings > App execution aliases** (switch off `python.exe` and `python3.exe`), then reopen Git Bash. The provisioning script also detects and skips these stubs on its own.
 * A Serial Terminal application such as [Tera Term](https://teratermproject.github.io/index-en.html), [PuTTY](https://www.putty.org/), or `screen` (115200 8N1)
 * **Windows only:** [Git for Windows](https://git-scm.com/download/win), which installs **Git Bash**. The provisioning, build, and flash helpers in this repo are bash scripts — run them from a Git Bash prompt. macOS and Linux already have a suitable shell.
 

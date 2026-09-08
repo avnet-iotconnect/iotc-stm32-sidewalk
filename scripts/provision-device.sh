@@ -85,12 +85,53 @@ chmod 700 "$REPO_ROOT/binaries/sidewalk-mfg" "$OUT_DIR"
 cp "$CERT_IN" "$OUT_DIR/cert.json"
 chmod 600 "$OUT_DIR/cert.json"
 
-# Some installs (notably Git Bash on Windows) only ship `python`, not `python3`.
-PYTHON="$(command -v python3 || command -v python || true)"
-[[ -n "$PYTHON" ]] || { echo "python3 (or python) not found on PATH" >&2; exit 1; }
+# Find a Python that actually runs. On Windows, PATH usually contains Microsoft
+# Store alias stubs named python.exe / python3.exe which are NOT Python -- they
+# print "Python was not found..." and exit non-zero -- so test each candidate
+# rather than trusting `command -v`.
+find_python() {
+    local py
+    for py in python3 python; do
+        command -v "$py" >/dev/null 2>&1 || continue
+        if "$py" -c 'import sys' >/dev/null 2>&1; then
+            PYTHON=("$py")
+            return 0
+        fi
+    done
+    # The py launcher is the reliable one on Windows when aliases shadow python.
+    if command -v py >/dev/null 2>&1 && py -3 -c 'import sys' >/dev/null 2>&1; then
+        PYTHON=(py -3)
+        return 0
+    fi
+    # Last resort: the usual install locations, newest first.
+    local cand
+    while IFS= read -r cand; do
+        [[ -x "$cand" ]] || continue
+        if "$cand" -c 'import sys' >/dev/null 2>&1; then
+            PYTHON=("$cand")
+            return 0
+        fi
+    done < <(ls -d /c/Python3*/python.exe \
+                   "$LOCALAPPDATA"/Programs/Python/Python3*/python.exe \
+                   "/c/Program Files/Python3"*/python.exe 2>/dev/null | sort -r)
+    {
+        echo "error: no working Python 3 found."
+        echo
+        echo "If you have Python installed, PATH is probably being shadowed by the"
+        echo "Microsoft Store alias stubs. Turn them off under:"
+        echo "    Settings > Apps > Advanced app settings > App execution aliases"
+        echo "and switch off python.exe and python3.exe. Then reopen Git Bash."
+        echo
+        echo "Otherwise install Python 3.10+ from https://www.python.org/downloads/"
+        echo "and tick \"Add python.exe to PATH\" in the installer."
+    } >&2
+    return 1
+}
+
+find_python || exit 1
 
 cd "$OUT_DIR"
-"$PYTHON" "$PROVISION_PY" st aws --chip "$CHIP" \
+"${PYTHON[@]}" "$PROVISION_PY" st aws --chip "$CHIP" \
     --certificate_json cert.json \
     --output_bin mfg.bin \
     --output_hex mfg.hex
