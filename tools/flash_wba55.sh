@@ -36,7 +36,42 @@ for f in "$fw" "$mfg"; do
     fi
 done
 
-PROG=${STM32_PROGRAMMER_CLI:-STM32_Programmer_CLI}
+# Locate STM32_Programmer_CLI. STM32CubeProgrammer does not add itself to PATH
+# on Windows, so fall back to the default install locations before giving up.
+find_programmer() {
+    if [[ -n "${STM32_PROGRAMMER_CLI:-}" ]]; then
+        echo "$STM32_PROGRAMMER_CLI"
+        return 0
+    fi
+    if command -v STM32_Programmer_CLI >/dev/null 2>&1; then
+        echo "STM32_Programmer_CLI"
+        return 0
+    fi
+    local candidates=(
+        "/c/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
+        "/c/Program Files (x86)/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
+        "/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin/STM32_Programmer_CLI"
+        "$HOME/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI"
+        "/opt/stm32cubeprog/bin/STM32_Programmer_CLI"
+    )
+    for c in "${candidates[@]}"; do
+        [[ -x "$c" ]] && { echo "$c"; return 0; }
+    done
+    {
+        echo "ERROR: STM32_Programmer_CLI not found."
+        echo
+        echo "It ships with STM32CubeProgrammer, which does not add itself to PATH."
+        echo "Either add its bin directory to PATH, e.g. in Git Bash:"
+        echo "    export PATH=\"\$PATH:/c/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin\""
+        echo "or point STM32_PROGRAMMER_CLI at the executable:"
+        echo "    STM32_PROGRAMMER_CLI=/path/to/STM32_Programmer_CLI $0 ..."
+        echo
+        echo "Install it from https://www.st.com/en/development-tools/stm32cubeprog.html"
+    } >&2
+    return 1
+}
+
+PROG="$(find_programmer)" || exit 2
 COMMON_ARGS=(-c port=SWD mode=UR)
 
 # Helper: run the programmer with one retry on DEV_CONNECT_ERR / connect failures.

@@ -41,10 +41,32 @@ Because the data travels over Amazon Sidewalk, your device reaches the cloud thr
 **Software**
 
 * PC running Windows 11, macOS, or Linux
-* [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (provides the `STM32_Programmer_CLI` used for flashing)
+* [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (provides the `STM32_Programmer_CLI` used for flashing) — **it does not add itself to your `PATH`;** see below
 * [Python 3.10+](https://www.python.org/downloads/) (used to generate the per-device manufacturing image)
 * A Serial Terminal application such as [Tera Term](https://teratermproject.github.io/index-en.html), [PuTTY](https://www.putty.org/), or `screen` (115200 8N1)
 * **Windows only:** [Git for Windows](https://git-scm.com/download/win), which installs **Git Bash**. The provisioning, build, and flash helpers in this repo are bash scripts — run them from a Git Bash prompt. macOS and Linux already have a suitable shell.
+
+### Put STM32_Programmer_CLI on your PATH
+
+STM32CubeProgrammer installs its command-line tool but **does not add it to `PATH`**, so `STM32_Programmer_CLI` comes back as *not recognized* / *command not found* in PowerShell, cmd, and Git Bash alike. Fix it once, in the Git Bash window you will use for the rest of this guide:
+
+```bash
+export PATH="$PATH:/c/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin"
+STM32_Programmer_CLI --version    # should print the version
+```
+
+That lasts for the current window. To make it permanent, append the same line to `~/.bashrc`:
+
+```bash
+echo 'export PATH="$PATH:/c/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin"' >> ~/.bashrc
+```
+
+On macOS and Linux the equivalent directories are
+`/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin`
+and `~/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin`.
+
+> [!NOTE]
+> [`tools/flash_wba55.sh`](tools/flash_wba55.sh) (Step 9) checks these default install locations on its own, so it works even if you skip this. Setting `PATH` is what lets you run `STM32_Programmer_CLI` directly.
 
 ### Get this repository
 
@@ -337,7 +359,7 @@ STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sidewalk-mfg/wba55-mems-01/
 The `mfg.hex` carries its own flash address. If you flash the raw `mfg.bin` instead, supply the address yourself — `0x080FE000` on WBA55, `0x081FE000` on WBA65.
 
 > [!NOTE]
-> **Windows:** if `STM32_Programmer_CLI` is not recognized, add its folder to your `PATH` — by default `C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin`.
+> `STM32_Programmer_CLI: command not found` means STM32CubeProgrammer is not on your `PATH` — see [Put STM32_Programmer_CLI on your PATH](#put-stm32_programmer_cli-on-your-path) in Step 2. The `flash_wba55.sh` helper above finds it without that; the three manual commands do not.
 
 After flashing, **press the black RESET button** (or power-cycle) to start the firmware.
 
