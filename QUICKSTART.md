@@ -363,8 +363,24 @@ The `mfg.hex` carries its own flash address. If you flash the raw `mfg.bin` inst
 
 After flashing, **press the black RESET button** (or power-cycle) to start the firmware.
 
-> [!NOTE]
-> If `STM32_Programmer_CLI` returns `DEV_CONNECT_ERR` repeatedly, **hold the black RESET button** on the Nucleo while the command starts. Between Sidewalk BLE advertising windows the WBA55 / WBA65 enters a low-power mode that gates the SWD pads; holding RESET keeps the CPU awake long enough for the programmer to attach.
+The two failures worth knowing apart:
+
+**`Error: No debug probe detected`** — the programmer cannot see the board's ST-LINK at all. Confirm with:
+
+```bash
+STM32_Programmer_CLI -l      # look under "===== STLink Interface ====="
+```
+
+If that says `No ST-Link detected!`, work through these in order:
+
+1. **Suspect the USB cable first.** Many USB-C cables are charge-only and carry no data. Swap in a known-good data cable — this is the most common cause, and the board still lights up on a charge-only cable, so power is not proof.
+2. **Check the board is powered** — the ST-LINK LED next to the USB connector should be lit.
+3. **Use the ST-LINK USB connector**, not any other port on the board.
+4. **Install the ST-LINK driver** (Windows). STM32CubeProgrammer bundles it but does not always install it: run `stlink_winusb_install.bat` as Administrator from
+   `C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\Drivers\stsw-link009_v3`, then unplug and replug the board.
+5. **Update the ST-LINK firmware** if it is still not seen — run `STM32CubeProgrammer` (the GUI), open **Firmware upgrade** under the ST-LINK panel, and apply the update.
+
+**`DEV_CONNECT_ERR`** — the probe *is* detected but the target will not attach. **Hold the black RESET button** on the Nucleo while the command starts. Between Sidewalk BLE advertising windows the WBA55 / WBA65 enters a low-power mode that gates the SWD pads; holding RESET keeps the CPU awake long enough for the programmer to connect.
 
 ---
 
