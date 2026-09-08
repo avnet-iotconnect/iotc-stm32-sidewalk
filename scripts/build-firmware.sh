@@ -35,12 +35,53 @@ case "$BOARD" in
 esac
 
 PROJ_DIR="$SDK_ROOT/apps/st/stm32wba/sid_ble/STM32CubeIDE/$PROJ_SUB"
-CUBE_IDE="${CUBE_IDE:-/opt/st/stm32cubeide_1.18.0/headless-build.sh}"
 OUT_DIR="$REPO_ROOT/binaries"
 CPROJECT="$PROJ_DIR/.cproject"
 TARGET="${1:-both}"
 
-[[ -x "$CUBE_IDE" ]] || { echo "STM32CubeIDE headless build not found at $CUBE_IDE" >&2; exit 1; }
+# Locate STM32CubeIDE's headless builder. CUBE_IDE wins; otherwise search the
+# default install locations, newest version first, on Windows/Linux/macOS.
+CUBE_IDE_WIN=0
+find_cube_ide() {
+    local c candidates=()
+    if [[ -n "${CUBE_IDE:-}" ]]; then
+        candidates=("$CUBE_IDE")
+    else
+        while IFS= read -r c; do candidates+=("$c"); done < <(
+            ls -d /c/ST/STM32CubeIDE_*/STM32CubeIDE/headless-build.bat \
+                  "/c/Program Files/STMicroelectronics/STM32CubeIDE"*/STM32CubeIDE/headless-build.bat \
+                  /opt/st/stm32cubeide_*/headless-build.sh \
+                  "$HOME/st/stm32cubeide_"*/headless-build.sh \
+                  /Applications/STM32CubeIDE.app/Contents/MacOs/headless-build.sh \
+                  2>/dev/null | sort -r)
+    fi
+    for c in "${candidates[@]}"; do
+        [[ -f "$c" ]] || continue
+        CUBE_IDE="$c"
+        [[ "$c" == *.bat ]] && CUBE_IDE_WIN=1
+        return 0
+    done
+    {
+        echo "error: STM32CubeIDE headless build not found."
+        echo
+        echo "Building the firmware requires STM32CubeIDE to be installed (you do"
+        echo "not have to open it -- this drives its headless builder)."
+        echo "    https://www.st.com/en/development-tools/stm32cubeide.html"
+        echo
+        echo "If it is installed somewhere unusual, point CUBE_IDE at the launcher:"
+        echo "    CUBE_IDE=/c/ST/STM32CubeIDE_1.18.0/STM32CubeIDE/headless-build.bat $0"
+    } >&2
+    return 1
+}
+
+find_cube_ide || exit 1
+echo "CubeIDE    : $CUBE_IDE"
+
+# The Windows builder is a native binary and cannot read MSYS paths
+# (/c/Users/...), so hand it Windows paths instead.
+ide_path() {
+    if [[ "$CUBE_IDE_WIN" == 1 ]]; then cygpath -w "$1"; else echo "$1"; fi
+}
 [[ -d "$PROJ_DIR" ]] || { echo "SDK project dir not found at $PROJ_DIR" >&2; exit 1; }
 
 LOCATION="${LOCATION:-0}"
@@ -91,8 +132,8 @@ build_one() {
 
     echo "== building $BOARD $suffix =="
     "$CUBE_IDE" \
-        -data "$ws" \
-        -import "$PROJ_DIR" \
+        -data "$(ide_path "$ws")" \
+        -import "$(ide_path "$PROJ_DIR")" \
         -cleanBuild "$PROJ_NAME/$BUILD_CFG" \
         -no-indexer | tail -3
 

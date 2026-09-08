@@ -330,7 +330,13 @@ BOARD=wba65 ./scripts/build-firmware.sh   # build the WBA65 hex(es) instead (BOA
 The `BOARD` env var selects the host board (default `wba55`); `BOARD=wba65` builds the WBA65 variants from the STM32WBA65 CubeIDE project (`STM32CubeIDE/STM32WBA65`, `Debug_Nucleo-WBA65` config) that the SDK already ships.
 
 > [!NOTE]
-> This helper drives STM32CubeIDE's headless builder. You can also open the CubeIDE project and build it from the GUI — the [example README](examples/sidewalk-mems-wba55/README.md) walks through that path and produces the same hex.
+> This helper drives STM32CubeIDE's headless builder, so **STM32CubeIDE must be installed** — but you never open it. The script finds it automatically in the default install locations on Windows, Linux, and macOS; if yours lives somewhere else, point `CUBE_IDE` at the launcher:
+>
+> ```bash
+> CUBE_IDE=/c/ST/STM32CubeIDE_1.18.0/STM32CubeIDE/headless-build.bat ./scripts/build-firmware.sh
+> ```
+>
+> You can also open the CubeIDE project and build from the GUI — the [example README](examples/sidewalk-mems-wba55/README.md) walks through that path and produces the same hex.
 
 Prerequisites — STM32CubeIDE, the STM32-Sidewalk-SDK adjacent to this repo, X-CUBE-MEMS1 BSP drivers, and X-CUBE-CRYPTOLIB (CMOX) downloaded from st.com with click-through accepted. See [examples/sidewalk-mems-wba55/README.md](examples/sidewalk-mems-wba55/README.md) for the full setup. Output lands at:
 
