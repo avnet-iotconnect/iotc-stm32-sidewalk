@@ -25,10 +25,16 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Locate the STM32-Sidewalk-SDK: SDK_ROOT wins, else the conventional spots.
 find_sdk() {
+    # Both the renamed folder and the name the GitHub ZIP extracts to.
+    local parent; parent="$(dirname "$REPO_ROOT")"
     local candidates=(
-        "$(dirname "$REPO_ROOT")/STM32-Sidewalk-SDK"   # sibling of this repo
+        "$parent/STM32-Sidewalk-SDK"
+        "$parent/STM32-Sidewalk-SDK-main"
         "$HOME/dev/sidewalk/STM32-Sidewalk-SDK"
+        "$HOME/Downloads/STM32-Sidewalk-SDK"
+        "$HOME/Downloads/STM32-Sidewalk-SDK-main"
         "$HOME/STM32-Sidewalk-SDK"
+        "$HOME/STM32-Sidewalk-SDK-main"
     )
     [[ -n "${SDK_ROOT:-}" ]] && candidates=("$SDK_ROOT")
     for root in "${candidates[@]}"; do

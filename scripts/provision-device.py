@@ -49,12 +49,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 def sdk_candidates() -> list[Path]:
     """Conventional STM32-Sidewalk-SDK locations, most specific first."""
     home = Path.home()
-    return [
-        REPO_ROOT.parent / "STM32-Sidewalk-SDK",  # sibling of this repo
-        home / "dev" / "sidewalk" / "STM32-Sidewalk-SDK",
-        home / "STM32-Sidewalk-SDK",
-        Path.cwd() / "STM32-Sidewalk-SDK",
-    ]
+    # "-main" is the folder name the GitHub ZIP extracts to, so both work.
+    names = ("STM32-Sidewalk-SDK", "STM32-Sidewalk-SDK-main")
+    bases = (REPO_ROOT.parent, home / "dev" / "sidewalk", home / "Downloads", home, Path.cwd())
+    return [base / name for base in bases for name in names]
 
 
 def find_provision_py(sdk_root: str | None) -> Path:

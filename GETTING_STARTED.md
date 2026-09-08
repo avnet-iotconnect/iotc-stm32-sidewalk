@@ -228,15 +228,22 @@ The certificate JSON must be converted into a **board-format manufacturing image
 
 ### One-time setup: get the STM32-Sidewalk-SDK
 
-The provisioning logic lives in ST's SDK, so you need a copy of it alongside this repository. **[Download the SDK ZIP](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK/archive/refs/heads/main.zip)** (~53 MB, also public — no account needed) and extract it **next to** your `iotc-stm32-sidewalk` folder, renaming it `STM32-Sidewalk-SDK`:
+The provisioning logic lives in ST's SDK, so you need a copy of it alongside this repository. **[Download the SDK ZIP](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK/archive/refs/heads/main.zip)** (~53 MB, also public — no account needed) and extract it **next to** your `iotc-stm32-sidewalk` folder:
 
 ```
 Downloads/
 ├── iotc-stm32-sidewalk-main/     <-- this repo
-└── STM32-Sidewalk-SDK/           <-- the SDK, extracted alongside it
+└── STM32-Sidewalk-SDK-main/      <-- the SDK, extracted alongside it
 ```
 
-The script finds the SDK there automatically. If you keep it elsewhere, set the `SDK_ROOT` environment variable to its path.
+Leave both folders under the names the ZIPs give them — the script accepts those, and `STM32-Sidewalk-SDK` if you prefer to drop the `-main` suffix. If you keep the SDK somewhere else entirely, set the `SDK_ROOT` environment variable to its path:
+
+```bash
+SDK_ROOT=/c/path/to/STM32-Sidewalk-SDK ./scripts/provision-device.sh ...
+```
+
+> [!NOTE]
+> `could not find the STM32-Sidewalk-SDK` means this step was skipped or the folder is somewhere the script does not look — the error lists every path it tried.
 
 The SDK's provisioning tool needs two Python packages:
 
