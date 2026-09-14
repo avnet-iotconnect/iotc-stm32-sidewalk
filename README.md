@@ -67,7 +67,7 @@ For production onboarding, work with the **/IOTCONNECT team** to integrate the *
   /IOTCONNECT device templates aligned to specific STM32 Sidewalk examples.
 
 - `dashboard-templates`  
-  /IOTCONNECT dashboard templates (optional).
+  /IOTCONNECT dashboard exports, one per MEMS shield (`…+IKS4A1_…` and `…+IKS5A1_…`), each showing only the sensors that board reports.
 
 - `decoders`  
   Uplink payload decoders for Sidewalk demo payloads.

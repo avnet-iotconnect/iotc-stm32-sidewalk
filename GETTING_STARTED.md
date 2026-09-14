@@ -464,19 +464,24 @@ Both boards share the same TLV wire format and the single `STswMEMS` template; t
 
 ## 11. Import the Dashboard
 
-/IOTCONNECT dashboards visualize your device's telemetry with charts, gauges, and widgets. This repo includes a ready-made dashboard for the MEMS demo — accelerometer / gyroscope / QVAR charts, a live 3D orientation cube, and Room Temp, Refrigerated, Pressure, and Humidity gauges.
+/IOTCONNECT dashboards visualize your device's telemetry with charts, gauges, and widgets. This repo includes a ready-made dashboard **per sensor board**, each showing only the sensors that board actually reports (see the table in Step 10):
 
-1. Download the dashboard export from this repo: [`dashboard-templates/sidewalk_st_WBA55+MEMS_dashboard_export.json`](dashboard-templates/sidewalk_st_WBA55+MEMS_dashboard_export.json).
+| Your shield | Dashboard export | Widgets |
+|---|---|---|
+| **X-NUCLEO-IKS4A1** | [`sidewalk_st_WBA55+IKS4A1_dashboard_export.json`](dashboard-templates/sidewalk_st_WBA55+IKS4A1_dashboard_export.json) | Accel / gyro / QVAR charts, 6D orientation and MLC activity pictures, SHT40 + STTS22H temperature, pressure, and humidity gauges |
+| **X-NUCLEO-IKS5A1** | [`sidewalk_st_WBA55+IKS5A1_dashboard_export.json`](dashboard-templates/sidewalk_st_WBA55+IKS5A1_dashboard_export.json) | Accel / gyro / QVAR charts, MLC activity picture, temperature and pressure gauges — no SHT40 or orientation widgets, since the IKS5A1 has neither |
+
+1. Download the export for **your** board from the table above.
 2. In /IOTCONNECT, open the **Dashboards** menu at the top of the page and choose **Create Dashboard**.
-3. Choose **Import**, then **Browse** to the downloaded `sidewalk_st_WBA55+MEMS_dashboard_export.json`.
+3. Choose **Import**, then **Browse** to the downloaded export.
 4. When prompted, bind the widgets to your device — select the template `STswMEMS` and your device's **Unique ID** — then give the dashboard a name and **Save**.
 
 ![Sidewalk MEMS example dashboard in /IOTCONNECT](media/sidewalk-dashboard-example.png)
 
-_(Screen: the imported dashboard populated with live MEMS telemetry — motion / shock / tamper charts, a 3D orientation cube, and environmental gauges.)_
+_(Screen: the IKS4A1 dashboard populated with live telemetry — motion / shock / tamper charts, orientation and activity pictures, and environmental gauges. The IKS5A1 dashboard is the same layout minus the SHT40 and orientation widgets.)_
 
 > [!NOTE]
-> The dashboard binds to the `STswMEMS` template attributes, so import the template (Step 4) and confirm telemetry is flowing (Step 10) first. Some widgets (SHT40 temperature/humidity, orientation, MLC activity) only populate on **IKS4A1** boards — see the per-board table in Step 10.
+> Both dashboards bind to the `STswMEMS` template attributes, so import the template (Step 4) and confirm telemetry is flowing (Step 10) first. If you import the IKS4A1 dashboard for an IKS5A1 board it still works — the SHT40 gauges and orientation picture simply stay empty.
 
 ---
 
