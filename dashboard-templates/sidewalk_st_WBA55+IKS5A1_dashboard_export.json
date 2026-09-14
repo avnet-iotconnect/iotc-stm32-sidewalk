@@ -47,10 +47,10 @@
         }
       },
       "properties": {
-        "x": "0",
-        "y": "0",
-        "w": "42",
-        "h": "13",
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 13,
         "i": "Image",
         "minW": "5",
         "minH": "5",
@@ -70,10 +70,10 @@
         "contents": ""
       },
       "properties": {
-        "x": "42",
-        "y": "0",
-        "w": "46",
-        "h": "2",
+        "x": 40,
+        "y": 0,
+        "w": 48,
+        "h": 2,
         "i": "Label",
         "minW": "6",
         "minH": "2",
@@ -323,10 +323,10 @@
         }
       },
       "properties": {
-        "x": "42",
-        "y": "2",
-        "w": "15",
-        "h": "15",
+        "x": 40,
+        "y": 2,
+        "w": 24,
+        "h": 19,
         "i": "LiveLineChart",
         "minW": "15",
         "minH": "15",
@@ -578,10 +578,10 @@
         }
       },
       "properties": {
-        "x": "57",
-        "y": "2",
-        "w": "15",
-        "h": "15",
+        "x": 64,
+        "y": 2,
+        "w": 24,
+        "h": 19,
         "i": "LiveLineChart",
         "minW": "15",
         "minH": "15",
@@ -832,10 +832,10 @@
         }
       },
       "properties": {
-        "x": "72",
-        "y": "2",
-        "w": "16",
-        "h": "15",
+        "x": 72,
+        "y": 21,
+        "w": 16,
+        "h": 14,
         "i": "bar",
         "minW": "16",
         "minH": "12",
@@ -893,10 +893,10 @@
         }
       },
       "properties": {
-        "x": "0",
-        "y": "13",
-        "w": "15",
-        "h": "16",
+        "x": 0,
+        "y": 13,
+        "w": 15,
+        "h": 16,
         "i": "DeviceLatestValue",
         "minW": "15",
         "minH": "16",
@@ -1228,7 +1228,7 @@
       "properties": {
         "x": 15,
         "y": 13,
-        "w": 27,
+        "w": 25,
         "h": 22,
         "i": "Transformation",
         "minW": "7",
@@ -1465,32 +1465,38 @@
                 }
               ]
             },
-            "minValue": "-10",
-            "maxValue": "30",
+            "minValue": "0",
+            "maxValue": "45",
             "version": "2.0",
             "zones": [
               {
-                "zoneName": "1",
-                "zoneColor": "#d03b3b",
-                "upToValue": "2",
-                "showColorPicker": "false"
-              },
-              {
-                "zoneName": "44",
-                "zoneColor": "#0ca30c",
-                "upToValue": "8",
-                "showColorPicker": "false"
-              },
-              {
-                "zoneName": "3",
-                "zoneColor": "#fab219",
+                "zoneName": "5",
+                "zoneColor": "#ec835a",
                 "upToValue": "15",
                 "showColorPicker": "false"
               },
               {
-                "zoneName": "5",
-                "zoneColor": "#d03b3b",
+                "zoneName": "4",
+                "zoneColor": "#fab219",
+                "upToValue": "18",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "55",
+                "zoneColor": "#0ca30c",
+                "upToValue": "25",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "6",
+                "zoneColor": "#fab219",
                 "upToValue": "30",
+                "showColorPicker": "false"
+              },
+              {
+                "zoneName": "7",
+                "zoneColor": "#d03b3b",
+                "upToValue": "45",
                 "showColorPicker": "false"
               }
             ],
@@ -1500,10 +1506,10 @@
         }
       },
       "properties": {
-        "x": 42,
-        "y": 17,
+        "x": 40,
+        "y": 21,
         "w": 16,
-        "h": 12,
+        "h": 14,
         "i": "gauge",
         "minW": "10",
         "minH": "9",
@@ -1776,10 +1782,10 @@
         }
       },
       "properties": {
-        "x": 58,
-        "y": 17,
+        "x": 56,
+        "y": 21,
         "w": 16,
-        "h": 12,
+        "h": 14,
         "i": "gauge",
         "minW": "10",
         "minH": "9",
@@ -1846,10 +1852,10 @@
         }
       },
       "properties": {
-        "x": "0",
-        "y": "29",
-        "w": "15",
-        "h": "6",
+        "x": 0,
+        "y": 29,
+        "w": 15,
+        "h": 6,
         "i": "Notifications",
         "minW": "10",
         "minH": "5",

@@ -478,7 +478,7 @@ Both boards share the same TLV wire format and the single `STswMEMS` template; t
 
 ![Sidewalk MEMS example dashboard in /IOTCONNECT](media/sidewalk-dashboard-example.png)
 
-_(Screen: the IKS4A1 dashboard populated with live telemetry — motion / shock / tamper charts, orientation and activity pictures, and environmental gauges. The IKS5A1 dashboard is the same layout minus the SHT40 and orientation widgets.)_
+_(Screen: the IKS4A1 dashboard populated with live telemetry — motion / shock / tamper charts, orientation and activity pictures, and environmental gauges. The IKS5A1 dashboard is a tighter layout without the SHT40 and orientation widgets.)_
 
 > [!NOTE]
 > Both dashboards bind to the `STswMEMS` template attributes, so import the template (Step 4) and confirm telemetry is flowing (Step 10) first. If you import the IKS4A1 dashboard for an IKS5A1 board it still works — the SHT40 gauges and orientation picture simply stay empty.
