@@ -415,6 +415,9 @@ Open the board's USB serial port at **115200 8N1**. On first boot you should see
 ```
 
 > [!NOTE]
+> `Corrupted dir pair at {0x0, 0x1}` on the first boot after flashing is normal: the erase wiped the LittleFS region, and the SDK formats it and continues. It only signals a problem if it appears on every boot.
+
+> [!NOTE]
 > First-boot registration and Sidewalk BLE re-acquisition mean the first uplink can take a couple of minutes to appear. The send cadence is roughly one uplink every ~2 minutes — that gap is Sidewalk's BLE window, not a firmware delay.
 
 Back in /IOTCONNECT, find your device in the **Wireless Device** list and open its **Live Data** tab to confirm telemetry is flowing.
