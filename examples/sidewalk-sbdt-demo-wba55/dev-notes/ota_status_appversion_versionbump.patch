@@ -7,7 +7,7 @@ index 555750e..8470c34 100644
  # If no LICENSE file comes with this software, it is provided AS-IS.
  
 -STM32WBA_APPS_PACKAGE_VER := 1.1.0
-+STM32WBA_APPS_PACKAGE_VER := 1.1.5
++STM32WBA_APPS_PACKAGE_VER := 1.1.7
 diff --git a/apps/common/sid_app_sbdt_demo/include/sid_app_sbdt_demo.h b/apps/common/sid_app_sbdt_demo/include/sid_app_sbdt_demo.h
 index c38af75..96c2a18 100644
 --- a/apps/common/sid_app_sbdt_demo/include/sid_app_sbdt_demo.h
