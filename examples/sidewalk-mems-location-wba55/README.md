@@ -198,7 +198,8 @@ Then confirm each pipe: sensor values in /IOTCONNECT (MEMS §7/§13), and a
 stored position via `get-resource-position` (§5 above).
 
 Timing to expect (verified 2026-09-25 on `StSidewalkLocation2`): each
-`LOC: result status=SEND_DONE` on the UART is followed by a
+`LOC: result status=SEND_DONE` **that is followed by an `ENC: M:15 [4:2:2]`
+line** (the location frame actually being serialized) is followed by a
 `{"location":[lat,lon]}` record in the /IOTCONNECT device's raw data about
 **one second later**, so a UART capture with UTC timestamps lines up directly
 with the cloud `dt` stamps. A device that logs `SEND_DONE` every 120 s but never

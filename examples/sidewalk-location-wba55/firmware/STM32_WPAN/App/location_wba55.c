@@ -109,6 +109,14 @@ static void location_callback(const struct sid_location_result *const result, vo
             s_l1_ready = false;  /* gate closed: no consenting gateway on this link */
             SID_PAL_LOG_WARNING("LOC: no consenting gateway; resolve not sent");
             break;
+        case SID_LOCATION_SEND_DONE:
+            /* Raised synchronously when the message manager ACCEPTS the location
+             * command - not when the BLE link transmits it. The transmit shows up
+             * as the stack's "ENC: M:15 [4:2:2]" line; if that line is missing
+             * the command was dropped (queued behind an in-flight uplink with a
+             * zero timeout). Keep the request ahead of sid_put_msg(). */
+            SID_PAL_LOG_INFO("LOC: SEND_DONE = accepted by the stack; look for 'ENC: M:15' as the transmit");
+            break;
         default:
             break;
     }

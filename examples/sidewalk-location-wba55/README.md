@@ -188,6 +188,14 @@ location services, so this example's job is to **confirm the contract**:
 `LVL1_UNAVAILABLE` → no opted-in gateway in BLE range (coverage problem, not a
 firmware bug).
 
+> **`SEND_DONE` is not proof of transmission.** It is raised synchronously by the
+> message manager when the location command is *accepted*, before the BLE link
+> serializes it. The line that proves the frame actually went out is the stack's
+> `ENC: M:15 [4:2:2]` (the location command class being serialized), which the
+> stock logs print right after the resolve; expect exactly one per `SEND_DONE`.
+> Zero `ENC: M:15` lines with plenty of `SEND_DONE` means every resolve was
+> dropped on the device — see the troubleshooting table.
+
 **On the cloud** — proves resolution + delivery: a `measurementType:"BLE"`
 GeoJSON point appears at the location destination, and (per the confirmed
 contract) a coordinate shows in /IOTCONNECT as a `{"location":[lat,lon]}` record
@@ -223,7 +231,7 @@ about **1 s after each device `SEND_DONE`**.
 | `LVL1_UNAVAILABLE` every cycle | No Community-Finding gateway in BLE range, or the gateway hasn't opted in. |
 | Device logs `LVL1_READY`/`SEND_DONE` but nothing in /IOTCONNECT | Positioning not enabled on the device, or the location destination isn't forwarded to /IOTCONNECT — **backend contract (§5)**. On the /IOTCONNECT instance used here the coordinate only appears for a device whose template has **Geo Location enabled** (template `STswLOC`); it arrives as a separate `{"location":[lat,lon]}` record about 1 s after each `SEND_DONE`. |
 | Boot banner repeats (`Application name: …`) with no fault report; uplink counter restarts | The demo task idled long enough for the BLE link to drop and the device to enter Standby; on WBA55 the Standby wake‑up came back as a full reboot. **Fixed** by the 15 s demo tick under `SID_APP_LOCATION_ENABLED` (as the July 2026 build had), which keeps the link up so Standby is never entered. (A HardFault would look the same: the handler's report markers live in initialised RAM and are rewritten at boot, so crashes are unreportable in this build. STM32CubeProgrammer hot‑plug sessions while the target sleeps also coincided with restarts — don't poll a running board over SWD.) `LPM_STANDBY=0 ./scripts/build-firmware.sh location` remains available as a Stop‑only fallback. |
-| Device logs `SEND_DONE` every 120 s but the cloud never produces a position (verified with an identity swap: the same identity resolved from another board) | `SEND_DONE` is the location library's *local* completion callback, not a gateway acknowledgement. Root cause found 2026-09-26 by A/B against the July 2026 build: the resolve must be requested **before** the tick's `sid_put_msg()` (first statement of `send_ping()`), only after the gateway signalled `LVL1_READY`, and the wrapper must stamp its throttle only on success. With the request placed *after* the uplink, two WBA55 boards logged `SEND_DONE` for hours and never resolved; with the July order they resolved within a second. Both are now in the shipped wrapper / hook ([firmware/README.md](firmware/README.md) step 3). |
+| Device logs `SEND_DONE` every 120 s but the cloud never produces a position (verified with an identity swap: the same identity resolved from another board) | `SEND_DONE` is the location library's *local* completion callback, not a gateway acknowledgement. Root cause found 2026-09-26 by A/B against the July 2026 build, then confirmed in the SDK library (disassembly of `sidewalk_sdk_full_stm32wba_ble_with_logs.a`): when the resolve is requested *after* the tick's `sid_put_msg()`, the BLE TX path is busy with that application frame, so the explicit location command is appended to the link's output list with the location command class's default **zero timeout**; the message manager still reports success synchronously (that is the `SEND_DONE`), and when the link drains the list the entry is already expired and is discarded (`-2 TIMEOUT`) without ever being serialized — the log then has `SEND_DONE` but **no `ENC: M:15 [4:2:2]`** (0 of 17 across three captures). Requested *before* the uplink, the TX path is idle, the command is serialized at once (`ENC: M:15` 1:1 with `SEND_DONE`, 29 of 29) and the counter queues behind it. So the request must be the first statement of `send_ping()`, issued only after `LVL1_READY`, with the throttle stamped only on success — all now in the shipped wrapper / hook ([firmware/README.md](firmware/README.md) step 3). |
 
 ## 8) Next step: merge with the MEMS example
 
