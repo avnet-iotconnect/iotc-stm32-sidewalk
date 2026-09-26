@@ -81,14 +81,29 @@ valid and before/after `sid_start()`):
 #endif
 ```
 
-**3. In `send_ping()`** — alongside (or instead of) the counter uplink, request
-a Level-1 BLE location resolve. It is internally throttled, so calling it on
-every demo tick is fine:
+**3. At the top of `send_ping()`, BEFORE the uplink is built and queued**
+(first statement inside the `state == READY || SECURE_CONNECTION` block) —
+request the Level-1 BLE location resolve. It is internally gated on
+`LVL1_READY` and throttled, so calling it on every demo tick is fine:
 ```c
 #if defined(SID_APP_LOCATION_ENABLED) && (SID_APP_LOCATION_ENABLED == 1)
     (void)location_wba55_run(app_context->sidewalk_handle);
 #endif
 ```
+> **Placement matters (bench, 2026-09-26).** Requesting *after*
+> `sid_put_msg()` — so the location notify is queued behind the tick's
+> application frame — produced `SEND_DONE` on the device but **never a cloud
+> position**, on two WBA55 boards, with the same identity that resolves fine
+> when the request precedes the uplink. `SEND_DONE` is the library's local
+> completion callback, not a gateway acknowledgement, so it cannot be used as
+> proof that a resolve reached the network.
+
+**3b. Demo tick.** With location enabled the demo task must tick faster than
+the stock 120 s, otherwise the BLE link idles, drops, and the device enters
+Standby between resolves (which on WBA55 came back as a full reboot). The
+overlay's `app_sidewalk.c` uses a 15 s tick under `SID_APP_LOCATION_ENABLED`
+(`#elif` branch of the demo delay); the wrapper's 120 s throttle still limits
+how often a resolve is actually requested.
 > For the **pure location proof** you can leave the counter `sid_put_msg()` in
 > place (harmless) or `#if`-out everything below `SID_PAL_LOG_INFO("Sending
 > counter ...")`. Keeping it is useful: it confirms the link is alive even

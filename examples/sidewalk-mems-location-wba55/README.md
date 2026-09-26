@@ -160,16 +160,24 @@ aws iotwireless get-resource-position --resource-type WirelessDevice \
   --resource-identifier <WirelessDeviceId> /dev/stdout
 ```
 
-### ⚠ Open risk to verify on your account (from location §8)
+### ✅ Verified: positioning does not block application uplinks
 
 AWS docs state that enabling positioning can stop the *raw uplink payload*
-from reaching the uplink destination. Whether that affects **application
-(sensor) frames** or only the dedicated location frames must be confirmed:
-after enabling positioning on the merged device, **check the sensor TLV still
-lands in /IOTCONNECT**. If it does — one board carries both (the expected
-outcome, since the location frames travel outside the application path). If it
-doesn't, split sensors and location across two devices or move to an SDK with
-the `resolve_location` piggyback.
+from reaching the uplink destination. This was checked on 2026-09-25 against a
+positioning-enabled device (`StSidewalkLocation2`, location-only build): its
+application uplinks (`seq_no` / `rawdata_default`, one every 15 s) and its
+resolved `location` records (one per 120 s resolve) arrived in /IOTCONNECT
+side by side. So one board can carry both sensors and location — the location
+frames travel outside the application path, as expected.
+
+What *does* decide whether a `location` record appears is the **/IOTCONNECT
+template**: on that instance the resolved coordinate shows up as a separate
+`{"location":[lat,lon]}` record only for a device whose template has
+**Geo Location enabled** and a `location` attribute (template `STswLOC`,
+`enableGeoLocation: true`). A device on the plain MEMS template (`STswMEMS`,
+no geolocation flag, no `location` attribute) uplinks sensors fine but never
+receives a coordinate, even though its firmware sends the resolves. For the
+merged device, use a template with geolocation enabled.
 
 ## 6) Verify
 
@@ -188,6 +196,18 @@ Expected UART interleaving per demo cycle (real bench capture):
 
 Then confirm each pipe: sensor values in /IOTCONNECT (MEMS §7/§13), and a
 stored position via `get-resource-position` (§5 above).
+
+Timing to expect (verified 2026-09-25 on `StSidewalkLocation2`): each
+`LOC: result status=SEND_DONE` on the UART is followed by a
+`{"location":[lat,lon]}` record in the /IOTCONNECT device's raw data about
+**one second later**, so a UART capture with UTC timestamps lines up directly
+with the cloud `dt` stamps. A device that logs `SEND_DONE` every 120 s but never
+shows a `location` record is **not** proof of a cloud-side gap: `SEND_DONE` is
+the library's local completion callback, and the 2026-09-26 A/B showed the
+request must precede the tick's uplink and follow `LVL1_READY` (see the
+location example's troubleshooting table). Also check the /IOTCONNECT view's
+timestamp skew: location rows render 5 h earlier than the telemetry they
+belong to.
 
 ## 7) Troubleshooting
 

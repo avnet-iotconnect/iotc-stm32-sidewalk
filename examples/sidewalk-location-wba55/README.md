@@ -93,6 +93,17 @@ exactly as listed in [`firmware/README.md`](firmware/README.md):
 - define `SID_SDK_CONFIG_ENABLE_LOCATION=1` and `SID_APP_LOCATION_ENABLED=1`,
 - `location_wba55_init()` after `sid_init()`, `location_wba55_run()` in `send_ping()`.
 
+### Headless build
+
+Once the overlay is in the SDK tree, `scripts/build-firmware.sh` builds this
+location-only variant (both MEMS flags off, location overlay on) without
+opening CubeIDE:
+
+```bash
+./scripts/build-firmware.sh location              # WBA55 -> binaries/sid_ble_wba55_location.hex
+BOARD=wba65 ./scripts/build-firmware.sh location  # WBA65 -> binaries/sid_ble_wba65_location.hex
+```
+
 ## 4) Generate manufacturing data + flash
 
 Identical to the other examples — create the device in /IOTCONNECT, generate the
@@ -179,7 +190,29 @@ firmware bug).
 
 **On the cloud** — proves resolution + delivery: a `measurementType:"BLE"`
 GeoJSON point appears at the location destination, and (per the confirmed
-contract) a coordinate shows in /IOTCONNECT.
+contract) a coordinate shows in /IOTCONNECT as a `{"location":[lat,lon]}` record
+about **1 s after each device `SEND_DONE`**.
+
+> **Why two boards on the "same program" report different fields.** The
+> firmware uplinks exactly one byte every tick (the stock demo counter). The
+> platform-side decoder that was attached to the `STswLOC` template parses that
+> byte's **hex string as a decimal number** when it happens to be all digits:
+> bytes 0x10–0x19 arrive as `seq_no: 10..19` (wrong value: 0x12 is 18, not 12),
+> 0x1a–0x1f arrive as `rawdata_default: "1a".."1f"`, and so on, so one device's
+> stream alternates between two attributes in blocks of ten and six. Any
+> difference between two devices is therefore a template/decoder assignment
+> difference on the platform, not a firmware one. To get one correct attribute
+> on every board, attach [`decoders/sidewalk-aws-location.py`](../../decoders/sidewalk-aws-location.py)
+> (it now decodes a one‑byte uplink to `sequence_number` 0–255 and leaves the
+> GeoJSON path unchanged) and make sure both devices use the same template.
+>
+> **Reading the /IOTCONNECT views (verified 2026-09-26).** Location records
+> carry a `Z`-suffixed UTC stamp; telemetry records don't. Both the Raw view and
+> the per-attribute reporting view render the two differently, so location rows
+> appear **5 h earlier** than the telemetry they belong to (e.g. a resolve at
+> 14:29:18Z shows as `9:29:19 AM` while the same minute's telemetry shows as
+> `2:29 PM`) and sink to the bottom of the list. Search for `"location"` and
+> convert its stamp to UTC before concluding a resolve is missing.
 
 ## 7) Troubleshooting
 
@@ -188,7 +221,9 @@ contract) a coordinate shows in /IOTCONNECT.
 | Linker `undefined reference to sid_location_init` | Still linking the **basic** archive — swap to `sidewalk_sdk_full_stm32wba_ble.a` ([firmware/README.md](firmware/README.md) step 1). |
 | Compiles, but `sid_location_run` returns error | `SID_SDK_CONFIG_ENABLE_LOCATION=1` missing, or called before the link is READY/time-synced. |
 | `LVL1_UNAVAILABLE` every cycle | No Community-Finding gateway in BLE range, or the gateway hasn't opted in. |
-| Device logs `LVL1_READY`/`SEND_DONE` but nothing in /IOTCONNECT | Positioning not enabled on the device, or the location destination isn't forwarded to /IOTCONNECT — **backend contract (§5)**. |
+| Device logs `LVL1_READY`/`SEND_DONE` but nothing in /IOTCONNECT | Positioning not enabled on the device, or the location destination isn't forwarded to /IOTCONNECT — **backend contract (§5)**. On the /IOTCONNECT instance used here the coordinate only appears for a device whose template has **Geo Location enabled** (template `STswLOC`); it arrives as a separate `{"location":[lat,lon]}` record about 1 s after each `SEND_DONE`. |
+| Boot banner repeats (`Application name: …`) with no fault report; uplink counter restarts | The demo task idled long enough for the BLE link to drop and the device to enter Standby; on WBA55 the Standby wake‑up came back as a full reboot. **Fixed** by the 15 s demo tick under `SID_APP_LOCATION_ENABLED` (as the July 2026 build had), which keeps the link up so Standby is never entered. (A HardFault would look the same: the handler's report markers live in initialised RAM and are rewritten at boot, so crashes are unreportable in this build. STM32CubeProgrammer hot‑plug sessions while the target sleeps also coincided with restarts — don't poll a running board over SWD.) `LPM_STANDBY=0 ./scripts/build-firmware.sh location` remains available as a Stop‑only fallback. |
+| Device logs `SEND_DONE` every 120 s but the cloud never produces a position (verified with an identity swap: the same identity resolved from another board) | `SEND_DONE` is the location library's *local* completion callback, not a gateway acknowledgement. Root cause found 2026-09-26 by A/B against the July 2026 build: the resolve must be requested **before** the tick's `sid_put_msg()` (first statement of `send_ping()`), only after the gateway signalled `LVL1_READY`, and the wrapper must stamp its throttle only on success. With the request placed *after* the uplink, two WBA55 boards logged `SEND_DONE` for hours and never resolved; with the July order they resolved within a second. Both are now in the shipped wrapper / hook ([firmware/README.md](firmware/README.md) step 3). |
 
 ## 8) Next step: merge with the MEMS example
 

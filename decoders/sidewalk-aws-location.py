@@ -123,6 +123,17 @@ def dict_from_payload(base64_input: str, fport: int = None):
     if not base64_input:
         raise ValueError("empty payload")
 
+    # The location-only firmware's application uplink is the stock sid_ble
+    # demo counter: exactly ONE byte, incremented every tick (0x00..0xFF, wraps).
+    # Decode it as a number so both boards report one attribute,
+    # `sequence_number`, with the right value. (A platform-default decoder that
+    # parses the byte's *hex string* as decimal splits the same stream into
+    # `seq_no` for "10".."19", "20".."29", ... and `rawdata_default` for
+    # "1a".."1f", ..., with the numeric value wrong - see the example README.)
+    raw = base64.b64decode(base64_input)
+    if len(raw) == 1:
+        return {"payload": {"sequence_number": raw[0]}}
+
     text = _decode_text(base64_input)
     try:
         obj = json.loads(text)

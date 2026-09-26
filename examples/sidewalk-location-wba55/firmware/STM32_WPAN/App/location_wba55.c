@@ -41,6 +41,16 @@
 static bool     s_inited = false;
 static uint32_t s_last_run_gps_s = 0u;   /* 0 = never run */
 
+/* LVL1_READY gate. The library only accepts a Level-1 request once the
+ * connected gateway has answered the gateway-info exchange and signalled
+ * that it offers L1 (SID_LOCATION_LVL1_READY). Requesting before that
+ * returns SID_ERROR_NOSUPPORT (-6, "No valid consent GW") and, worse, the
+ * build that requested blindly right after every uplink never produced a
+ * cloud position even when later calls "succeeded". The July 2026 build that
+ * does produce positions latches this gate in the callback and only calls
+ * sid_location_run() once it is open (bench-verified 2026-09-26). */
+static volatile bool s_l1_ready = false;
+
 static const char *status_str(enum sid_location_status st)
 {
     switch (st) {
@@ -89,6 +99,19 @@ static void location_callback(const struct sid_location_result *const result, vo
     }
     SID_PAL_LOG_INFO("LOC: result status=%s mode=%d link=%d",
                      status_str(result->status), (int)result->mode, (int)result->link);
+
+    switch (result->status) {
+        case SID_LOCATION_LVL1_READY:
+            s_l1_ready = true;   /* gate open: the next tick may request a resolve */
+            SID_PAL_LOG_INFO("LOC: L1 gateway ready; resolve fires on the next tick");
+            break;
+        case SID_LOCATION_LVL1_UNAVAILABLE:
+            s_l1_ready = false;  /* gate closed: no consenting gateway on this link */
+            SID_PAL_LOG_WARNING("LOC: no consenting gateway; resolve not sent");
+            break;
+        default:
+            break;
+    }
 
     /* Raw uplink payload inspection. NOTE: this is the gateway-proximity data the
      * device sends UP for cloud-side resolution — it is NOT a resolved lat/lon
@@ -145,15 +168,26 @@ sid_error_t location_wba55_run(struct sid_handle *handle)
         return SID_ERROR_INVALID_STATE;
     }
 
-    /* Rate-limit using GPS time (same clock the demo app already reads). */
+    /* GATE: never request before the gateway has signalled LVL1_READY for
+     * the current link (see s_l1_ready). Returning BUSY here is silent by
+     * design: the demo task calls us on every tick. */
+    if (!s_l1_ready) {
+        SID_PAL_LOG_DEBUG("LOC: resolve deferred - waiting for LVL1_READY");
+        return SID_ERROR_BUSY;
+    }
+
+    /* Rate-limit using GPS time (same clock the demo app already reads).
+     * The stamp is taken only after a request is accepted (below), so a
+     * failed call does not block retries for a whole period. */
     struct sid_timespec now = { 0 };
-    if (sid_get_time(handle, SID_GET_GPS_TIME, &now) == SID_ERROR_NONE) {
-        const uint32_t now_s = (uint32_t)now.tv_sec;
+    uint32_t now_s = 0u;
+    const bool have_time = (sid_get_time(handle, SID_GET_GPS_TIME, &now) == SID_ERROR_NONE);
+    if (have_time) {
+        now_s = (uint32_t)now.tv_sec;
         if ((s_last_run_gps_s != 0u) &&
             ((now_s - s_last_run_gps_s) < LOCATION_WBA55_MIN_PERIOD_S)) {
             return SID_ERROR_BUSY; /* suppressed by throttle — caller ignores */
         }
-        s_last_run_gps_s = now_s;
     }
 
     /* BLE Level-1: no scan buffer; cloud resolves from gateway proximity.
@@ -171,6 +205,9 @@ sid_error_t location_wba55_run(struct sid_handle *handle)
     if (ret != SID_ERROR_NONE) {
         SID_PAL_LOG_ERROR("LOC: sid_location_run failed: %d", (int)ret);
     } else {
+        if (have_time) {
+            s_last_run_gps_s = now_s;
+        }
         SID_PAL_LOG_INFO("LOC: Level-1 BLE location resolve requested");
     }
     return ret;
@@ -183,6 +220,7 @@ sid_error_t location_wba55_deinit(struct sid_handle *handle)
     }
     sid_error_t ret = sid_location_deinit(handle);
     s_inited = false;
+    s_l1_ready = false;
     s_last_run_gps_s = 0u;
     return ret;
 }

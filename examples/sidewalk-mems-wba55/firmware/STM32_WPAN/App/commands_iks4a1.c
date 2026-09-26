@@ -30,6 +30,15 @@ uint32_t commands_iks4a1_get_interval_ms(void)
 static void cmd_led_set(bool on)
 {
 #if defined(NUCLEO_WBA55_BOARD) || defined(NUCLEO_WBA65_BOARD)
+    /* Configure the LED GPIO right before driving it. The stock sid_ble
+     * Led_Init() (Core/Src/app_entry.c) calls BSP_LED_Init(LED_BLUE) only on
+     * NUCLEO-WBA65: on NUCLEO-WBA55 the blue user LED LD1 sits on PB4, which
+     * doubles as JTAG NJTRST, so ST leaves that pin at its reset (JTAG) state
+     * and a bare BSP_LED_On() never lights it. BSP_LED_Init() is idempotent
+     * and cheap (GPIO clock + mode register), and doing it per command also
+     * survives a Standby cycle: Standby tri-states the GPIOs and the exit
+     * path (led_indication_exit_standby) re-inits only LED_GREEN/LED_RED. */
+    (void)BSP_LED_Init(LED_BLUE);
     if (on) {
         BSP_LED_On(LED_BLUE);
     } else {

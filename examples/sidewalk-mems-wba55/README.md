@@ -420,7 +420,7 @@ Sidewalk passes downlink payloads through `on_sidewalk_msg_received()` as a raw 
 
 | Opcode | Name           | Params              | Effect                                        |
 |-------:|----------------|---------------------|-----------------------------------------------|
-| `0x01` | `LED_ON`       | none                | Turn user LED (LED_BLUE) on                   |
+| `0x01` | `LED_ON`       | none                | Turn user LED on (`LED_BLUE` = **LD1**, the blue LED beside the user buttons) |
 | `0x02` | `LED_OFF`      | none                | Turn user LED off                             |
 | `0x10` | `SET_INTERVAL` | `uint32` BE seconds | Update uplink period; clamped to [60, 3600] s |
 
@@ -621,6 +621,9 @@ The downlink reached the device but the first byte didn't match a supported opco
 - The /IOTCONNECT bytes command was registered with the wrong `command` hex (e.g. `0x10` typed as decimal `10`).
 - An attribute‑style command was sent instead of `isBytesCommand: true` — check the `POST /WirelessDevice/{deviceGuid}/send` body.
 - The `dtName` chosen for `set_interval` does not match what your /IOTCONNECT instance expects (`LONG` vs `INTEGER` vs `INT`). Re‑run `tools/register_iks4a1_commands.py` without `--apply` to print the supported list and adjust the JSON.
+
+### `CMD led_on` / `CMD led_off` logged but no LED changes
+The dispatcher ran, so the downlink path is fine — the GPIO simply wasn't driven. The command targets **LD1, the blue LED** (not the green one, which the Sidewalk state indicator owns). On NUCLEO‑WBA55 LD1 sits on PB4 (JTAG NJTRST) and the stock `Led_Init()` in `Core/Src/app_entry.c` only initializes `LED_BLUE` on WBA65, so on WBA55 the pin is never configured as an output. `cmd_led_set()` in `commands_iks4a1.c` now calls `BSP_LED_Init(LED_BLUE)` before driving the pin; if you see this symptom you are running a firmware built before that change — rebuild and re‑flash.
 
 ### `CMD set_interval -> 60 s` regardless of the value sent
 /IOTCONNECT serialized the parameter in **little‑endian** rather than the big‑endian the firmware expects, so the upper 16 bits decode to a huge number and get clamped down to the floor. Either change the `dtName` (some types are LE on this platform) or swap the byte order in `cmd_set_interval()` in `commands_iks4a1.c`.

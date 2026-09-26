@@ -13,6 +13,9 @@
   * Supported opcodes:
   *     0x01  CMD_LED_ON       (no params)            -> turn user LED on
   *     0x02  CMD_LED_OFF      (no params)            -> turn user LED off
+  *           (user LED = LED_BLUE = LD1, the blue LED next to the three user
+  *            buttons; the green/red LEDs belong to the Sidewalk state
+  *            indicator and are never touched by these commands)
   *     0x10  CMD_SET_INTERVAL (4 bytes uint32 BE s)  -> change uplink period,
   *                                                     clamped to [60, 3600]
   *

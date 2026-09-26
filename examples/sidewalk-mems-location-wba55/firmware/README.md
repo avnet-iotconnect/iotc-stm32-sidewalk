@@ -39,15 +39,19 @@ verbatim, no merge-specific changes:
 #endif
 ```
 
-**3. In `send_ping()`, after `app_context->counter++`** — deliberately
-**outside** the payload `#if/#elif/#else`, so it runs identically whether the
-uplink that just went out was the IKS sensor TLV, the simple-seq frame, or the
-stock counter:
+**3. At the top of `send_ping()`, BEFORE the payload `#if/#elif/#else`** —
+first statement inside the `state == READY || SECURE_CONNECTION` block, so the
+resolve is requested before this tick's uplink (sensor TLV, simple-seq frame or
+stock counter) is queued:
 ```c
 #if defined(SID_APP_LOCATION_ENABLED) && (SID_APP_LOCATION_ENABLED == 1)
     (void)location_wba55_run(app_context->sidewalk_handle);
 #endif
 ```
+> Earlier revisions placed this call *after* `app_context->counter++`, i.e.
+> after `sid_put_msg()`. That order logs `SEND_DONE` but never yields a cloud
+> position (bench, 2026-09-26, two WBA55 boards, identity-swap controlled).
+> Keep the request ahead of the uplink.
 
 `location_wba55_run()` is internally throttled
 (`LOCATION_WBA55_MIN_PERIOD_S`, default 120 s), so calling it on every demo

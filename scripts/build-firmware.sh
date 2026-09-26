@@ -10,6 +10,22 @@
 #   ./scripts/build-firmware.sh                 # WBA55, build both shields
 #   ./scripts/build-firmware.sh iks4a1          # WBA55, IKS4A1 only
 #   BOARD=wba65 ./scripts/build-firmware.sh     # WBA65, build both shields
+#   ./scripts/build-firmware.sh location        # WBA55, location-only (no MEMS shield;
+#                                               #   stock counter uplink + BLE L1 resolves,
+#                                               #   examples/sidewalk-location-wba55) ->
+#                                               #   binaries/sid_ble_<board>_location.hex
+#
+# LPM_STANDBY=0 builds with Stop-mode-only low power (CFG_LPM_STDBY_SUPPORTED=0
+# in Config/app_conf.h, restored after the build). Use it when a board shows
+# unexplained restarts while idle: Standby wake-up goes through the reset
+# vector and, if the resume is rejected, looks exactly like a cold reboot.
+#   LPM_STANDBY=0 ./scripts/build-firmware.sh location
+#
+# DEMO_PERIOD_S=<n> sets the stock counter demo's uplink period (default 120 s,
+# DEMO_MESSAGE_DELAY_MS in app_sidewalk.c; restored after the build). At 60 s
+# or less the BLE link never idles, so the device stays connected and never
+# enters Standby. Output suffix _p<n>.
+#   DEMO_PERIOD_S=15 ./scripts/build-firmware.sh location
 #
 # LOCATION=1 composes the BLE L1 location overlay onto any variant
 # (examples/sidewalk-mems-location-wba55): swaps the Sidewalk archive
@@ -85,6 +101,8 @@ ide_path() {
 [[ -d "$PROJ_DIR" ]] || { echo "SDK project dir not found at $PROJ_DIR" >&2; exit 1; }
 
 LOCATION="${LOCATION:-0}"
+# The location-only target always needs the location overlay.
+[[ "$TARGET" == "location" ]] && LOCATION=1
 if [[ "$LOCATION" == "1" ]]; then
     APP_DIR="$SDK_ROOT/apps/st/stm32wba/sid_ble/STM32_WPAN/App"
     [[ -f "$APP_DIR/location_wba55.c" ]] || {
@@ -103,14 +121,40 @@ mkdir -p "$OUT_DIR"
 
 backup="$(mktemp)"
 cp "$CPROJECT" "$backup"
-restore() { cp "$backup" "$CPROJECT"; rm -f "$backup"; }
+APP_CONF="$SDK_ROOT/apps/st/stm32wba/sid_ble/Config/app_conf.h"
+conf_backup="$(mktemp)"
+cp "$APP_CONF" "$conf_backup"
+restore() { cp "$backup" "$CPROJECT"; rm -f "$backup"; cp "$conf_backup" "$APP_CONF"; rm -f "$conf_backup"; }
 trap restore EXIT
 
+APP_SIDEWALK="$SDK_ROOT/apps/st/stm32wba/sid_ble/STM32_WPAN/App/app_sidewalk.c"
+sidewalk_backup="$(mktemp)"
+cp "$APP_SIDEWALK" "$sidewalk_backup"
+restore_all() { restore; cp "$sidewalk_backup" "$APP_SIDEWALK"; rm -f "$sidewalk_backup"; }
+trap restore_all EXIT
+
+DEMO_PERIOD_S="${DEMO_PERIOD_S:-}"
+if [[ -n "$DEMO_PERIOD_S" ]]; then
+    sed -i -e "s|^#define DEMO_MESSAGE_DELAY_MS        (2u \* 60000u)|#define DEMO_MESSAGE_DELAY_MS        (${DEMO_PERIOD_S}u * 1000u)|" "$APP_SIDEWALK"
+    grep -q "DEMO_MESSAGE_DELAY_MS        (${DEMO_PERIOD_S}u \* 1000u)" "$APP_SIDEWALK" || { echo "failed to set DEMO_MESSAGE_DELAY_MS in $APP_SIDEWALK" >&2; exit 1; }
+    echo "Demo period: ${DEMO_PERIOD_S} s (DEMO_MESSAGE_DELAY_MS)"
+fi
+
+LPM_STANDBY="${LPM_STANDBY:-1}"
+if [[ "$LPM_STANDBY" == "0" ]]; then
+    # Stop-mode-only low power: no Standby entry, so no reset-vector wake-ups.
+    sed -i -e 's|^#define CFG_LPM_STDBY_SUPPORTED  (1)|#define CFG_LPM_STDBY_SUPPORTED  (0)|' "$APP_CONF"
+    grep -q "CFG_LPM_STDBY_SUPPORTED  (0)" "$APP_CONF" || { echo "failed to set CFG_LPM_STDBY_SUPPORTED=0 in $APP_CONF" >&2; exit 1; }
+    echo "LPM        : Stop-only (CFG_LPM_STDBY_SUPPORTED=0)"
+fi
+
 build_one() {
-    local variant="$1"    # iks4a1 | iks5a1
+    local variant="$1"    # iks4a1 | iks5a1 | location
     local ws hex suffix
     suffix="$variant"
-    [[ "$LOCATION" == "1" ]] && suffix="${variant}_loc"
+    [[ "$variant" != "location" && "$LOCATION" == "1" ]] && suffix="${variant}_loc"
+    [[ "$LPM_STANDBY" == "0" ]] && suffix="${suffix}_stop"
+    [[ -n "$DEMO_PERIOD_S" ]] && suffix="${suffix}_p${DEMO_PERIOD_S}"
     ws="/tmp/${BOARD}_ws_${suffix}"
     hex="$PROJ_DIR/$BUILD_CFG/$PROJ_NAME.hex"
 
@@ -119,6 +163,12 @@ build_one() {
         sed -i \
             -e 's|SID_APP_IKS4A1_ENABLED=1|SID_APP_IKS4A1_ENABLED=0|g' \
             -e 's|SID_APP_IKS5A1_ENABLED=0|SID_APP_IKS5A1_ENABLED=1|g' \
+            "$CPROJECT"
+    elif [[ "$variant" == "location" ]]; then
+        # No MEMS shield: both sensor flags off -> app_sidewalk.c falls back to
+        # the stock counter payload; the guarded location hooks still compile.
+        sed -i \
+            -e 's|SID_APP_IKS4A1_ENABLED=1|SID_APP_IKS4A1_ENABLED=0|g' \
             "$CPROJECT"
     fi
     if [[ "$LOCATION" == "1" ]]; then
@@ -156,8 +206,9 @@ build_one() {
 case "$TARGET" in
     iks4a1) build_one iks4a1 ;;
     iks5a1) build_one iks5a1 ;;
+    location) build_one location ;;
     both)   build_one iks4a1; build_one iks5a1 ;;
-    *)      echo "unknown target: $TARGET (expected: iks4a1 | iks5a1 | both)" >&2; exit 1 ;;
+    *)      echo "unknown target: $TARGET (expected: iks4a1 | iks5a1 | location | both)" >&2; exit 1 ;;
 esac
 
 ls -la "$OUT_DIR"/*.hex
