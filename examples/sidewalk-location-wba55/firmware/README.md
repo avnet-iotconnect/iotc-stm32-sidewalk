@@ -109,7 +109,28 @@ how often a resolve is actually requested.
 > counter ...")`. Keeping it is useful: it confirms the link is alive even
 > before any gateway resolves location.
 
-**4. (Optional) Before `sid_deinit()`** on shutdown/factory-reset paths:
+**3c. Gateway watchdog (same place, right after the run call).** The stack
+asks the gateway for its type once per connection; if that reply never comes
+the library never reports `LVL1_READY`, and because the 15 s tick keeps the
+link up the device would sit on that gateway forever without a position
+(observed 2026-09-28: 10 min stuck until a reset). The wrapper counts ticks
+refused by the gate and, after `LOCATION_WBA55_GATE_STALL_TICKS` (12 ≈ 3 min),
+`location_wba55_gate_stalled()` returns true once; the app then restarts the
+link through the existing STOP/START events so it re-advertises, reconnects
+(possibly to another gateway) and re-queries:
+```c
+        if (location_wba55_gate_stalled()) {
+            SID_PAL_LOG_WARNING("LOC: restarting the Sidewalk link to find a gateway that answers");
+            queue_event(g_event_queue, EVENT_TYPE_STOP_LINK);
+            queue_event(g_event_queue, EVENT_TYPE_START_LINK);
+            return;
+        }
+```
+
+**4. In `destroy_link()`, before `sid_stop()` — required** (the watchdog and
+the B1 link toggle both tear the stack down and bring it back; without this
+the wrapper thinks it is still initialised and skips re-initialising the
+library on the new handle):
 ```c
 #if defined(SID_APP_LOCATION_ENABLED) && (SID_APP_LOCATION_ENABLED == 1)
     (void)location_wba55_deinit(app_context->sidewalk_handle);

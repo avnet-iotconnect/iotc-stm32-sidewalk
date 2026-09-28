@@ -52,6 +52,16 @@ sid_error_t location_wba55_run(struct sid_handle *handle);
  */
 sid_error_t location_wba55_deinit(struct sid_handle *handle);
 
+/* Gateway watchdog. Returns true (once) when the demo has ticked
+ * LOCATION_WBA55_GATE_STALL_TICKS times on a live link without the gateway
+ * ever signalling LVL1_READY - i.e. the gateway-type query went unanswered
+ * and, with a link that never idles, the device would otherwise stay stuck
+ * on that gateway forever (observed 2026-09-28: 10 min with no resolve until
+ * a reset). The app should then restart the Sidewalk link (STOP + START
+ * events) so the stack re-advertises, reconnects - possibly to another
+ * gateway - and re-queries. */
+bool location_wba55_gate_stalled(void);
+
 #ifdef __cplusplus
 }
 #endif

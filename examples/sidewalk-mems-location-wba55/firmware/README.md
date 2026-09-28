@@ -53,6 +53,12 @@ stock counter) is queued:
 > position (bench, 2026-09-26, two WBA55 boards, identity-swap controlled).
 > Keep the request ahead of the uplink.
 
+The same block also carries the gateway watchdog (`location_wba55_gate_stalled()`
+→ STOP/START link events) and `destroy_link()` must call
+`location_wba55_deinit()` — both exactly as in the
+[location example's firmware README](../../sidewalk-location-wba55/firmware/README.md)
+(steps 3c and 4).
+
 `location_wba55_run()` is internally throttled
 (`LOCATION_WBA55_MIN_PERIOD_S`, default 120 s), so calling it on every demo
 tick is safe regardless of the sensor uplink interval set via the

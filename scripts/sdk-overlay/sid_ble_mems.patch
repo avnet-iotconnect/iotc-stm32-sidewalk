@@ -351,7 +351,7 @@ index e562d9c..9621f4b 100644
  			<name>Drivers/CMSIS/system_stm32wbaxx.c</name>
  			<type>1</type>
 diff --git a/apps/st/stm32wba/sid_ble/STM32_WPAN/App/app_sidewalk.c b/apps/st/stm32wba/sid_ble/STM32_WPAN/App/app_sidewalk.c
-index b05149a..5537f81 100644
+index b05149a..408d4a8 100644
 --- a/apps/st/stm32wba/sid_ble/STM32_WPAN/App/app_sidewalk.c
 +++ b/apps/st/stm32wba/sid_ble/STM32_WPAN/App/app_sidewalk.c
 @@ -54,6 +54,16 @@
@@ -433,7 +433,7 @@ index b05149a..5537f81 100644
              break;
  
          case SID_STATE_ERROR:
-@@ -322,8 +373,66 @@ static void send_ping(app_context_t *app_context)
+@@ -322,8 +373,77 @@ static void send_ping(app_context_t *app_context)
  {
      if (app_context->state == STATE_SIDEWALK_READY ||
          app_context->state == STATE_SIDEWALK_SECURE_CONNECTION) {
@@ -444,6 +444,17 @@ index b05149a..5537f81 100644
 +         * positions; requesting after sid_put_msg() never did (bench 2026-09-26).
 +         * The wrapper gates on LVL1_READY and throttles internally. */
 +        (void)location_wba55_run(app_context->sidewalk_handle);
++        if (location_wba55_gate_stalled()) {
++            /* The gateway never answered the type query on this link and the
++             * link never idles, so the device would stay stuck without a
++             * position. Restart the Sidewalk link: re-advertise, reconnect
++             * (possibly to another gateway) and re-query. Same path as the
++             * B1 toggle (destroy_link -> init_and_start_link). */
++            SID_PAL_LOG_WARNING("LOC: restarting the Sidewalk link to find a gateway that answers");
++            queue_event(g_event_queue, EVENT_TYPE_STOP_LINK);
++            queue_event(g_event_queue, EVENT_TYPE_START_LINK);
++            return;
++        }
 +#endif
 +#if (defined(SID_APP_IKS4A1_ENABLED) && (SID_APP_IKS4A1_ENABLED == 1)) || \
 +    (defined(SID_APP_IKS5A1_ENABLED) && (SID_APP_IKS5A1_ENABLED == 1))
@@ -500,7 +511,7 @@ index b05149a..5537f81 100644
          struct sid_msg_desc desc = {
              .type = SID_MSG_TYPE_NOTIFY,
              .link_type = SID_LINK_TYPE_ANY,
-@@ -444,6 +553,10 @@ static sid_error_t init_and_start_link(app_context_t * const context, struct sid
+@@ -444,6 +564,10 @@ static sid_error_t init_and_start_link(app_context_t * const context, struct sid
      /* Register sidewalk handle to the application context */
      context->sidewalk_handle = sid_handle;
  
@@ -511,7 +522,19 @@ index b05149a..5537f81 100644
      ret = sid_get_status(sid_handle, &sid_status);
      if (ret != SID_ERROR_NONE)
      {
-@@ -1006,7 +1119,28 @@ static void demo_counter_task_entry(void *context)
+@@ -499,6 +623,11 @@ static sid_error_t destroy_link(app_context_t *app_context, struct sid_config *c
+             break;
+         }
+ 
++#if defined(SID_APP_LOCATION_ENABLED) && (SID_APP_LOCATION_ENABLED == 1)
++        /* Release the location library before the stack goes away, so a later
++         * init_and_start_link() re-initialises it on the new handle. */
++        (void)location_wba55_deinit(app_context->sidewalk_handle);
++#endif
+         ret = sid_stop(app_context->sidewalk_handle, config->link_mask);
+         if(ret != SID_ERROR_NONE)
+         {
+@@ -1006,7 +1135,28 @@ static void demo_counter_task_entry(void *context)
          {
              SID_PAL_LOG_DEBUG("Demo Counter Thread: sending out counter update");
              queue_event(g_event_queue, EVENT_TYPE_SEND_HELLO);
@@ -540,7 +563,7 @@ index b05149a..5537f81 100644
          }
  
          SID_PAL_LOG_DEBUG("Demo Counter Thread: Sidewalk connection lost");
-@@ -1077,6 +1211,14 @@ void SID_APP_Init(void)
+@@ -1077,6 +1227,14 @@ void SID_APP_Init(void)
      }
  #endif /* CFG_LED_SUPPORTED */
  

@@ -38,6 +38,12 @@
 #define LOCATION_WBA55_MIN_PERIOD_S (120u)
 #endif
 
+/* Demo ticks to tolerate on a live link without LVL1_READY before asking the
+ * app to restart the link (12 ticks x 15 s = 3 min). */
+#ifndef LOCATION_WBA55_GATE_STALL_TICKS
+#define LOCATION_WBA55_GATE_STALL_TICKS (12u)
+#endif
+
 static bool     s_inited = false;
 static uint32_t s_last_run_gps_s = 0u;   /* 0 = never run */
 
@@ -50,6 +56,7 @@ static uint32_t s_last_run_gps_s = 0u;   /* 0 = never run */
  * does produce positions latches this gate in the callback and only calls
  * sid_location_run() once it is open (bench-verified 2026-09-26). */
 static volatile bool s_l1_ready = false;
+static uint32_t      s_gate_wait_ticks = 0u;   /* run() calls refused by the gate on this link */
 
 static const char *status_str(enum sid_location_status st)
 {
@@ -103,6 +110,7 @@ static void location_callback(const struct sid_location_result *const result, vo
     switch (result->status) {
         case SID_LOCATION_LVL1_READY:
             s_l1_ready = true;   /* gate open: the next tick may request a resolve */
+            s_gate_wait_ticks = 0u;
             SID_PAL_LOG_INFO("LOC: L1 gateway ready; resolve fires on the next tick");
             break;
         case SID_LOCATION_LVL1_UNAVAILABLE:
@@ -180,6 +188,7 @@ sid_error_t location_wba55_run(struct sid_handle *handle)
      * the current link (see s_l1_ready). Returning BUSY here is silent by
      * design: the demo task calls us on every tick. */
     if (!s_l1_ready) {
+        s_gate_wait_ticks++;
         SID_PAL_LOG_DEBUG("LOC: resolve deferred - waiting for LVL1_READY");
         return SID_ERROR_BUSY;
     }
@@ -221,6 +230,17 @@ sid_error_t location_wba55_run(struct sid_handle *handle)
     return ret;
 }
 
+bool location_wba55_gate_stalled(void)
+{
+    if (s_inited && !s_l1_ready && (s_gate_wait_ticks >= LOCATION_WBA55_GATE_STALL_TICKS)) {
+        SID_PAL_LOG_WARNING("LOC: no LVL1_READY after %lu ticks on this link - gateway never answered the type query",
+                            (unsigned long)s_gate_wait_ticks);
+        s_gate_wait_ticks = 0u;   /* report once; the app restarts the link */
+        return true;
+    }
+    return false;
+}
+
 sid_error_t location_wba55_deinit(struct sid_handle *handle)
 {
     if (!s_inited) {
@@ -229,6 +249,7 @@ sid_error_t location_wba55_deinit(struct sid_handle *handle)
     sid_error_t ret = sid_location_deinit(handle);
     s_inited = false;
     s_l1_ready = false;
+    s_gate_wait_ticks = 0u;
     s_last_run_gps_s = 0u;
     return ret;
 }
