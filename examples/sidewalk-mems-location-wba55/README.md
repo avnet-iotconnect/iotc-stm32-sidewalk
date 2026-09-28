@@ -130,6 +130,8 @@ STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sid_ble_wba55_iks5a1_loc.he
 STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sidewalk-mfg/<device>/mfg.bin 0x080FE000 -v -rst
 ```
 
+> **Always `-e all` before changing a board's identity** — a manufacturing-region-only rewrite leaves the stack's NVM state from the previous identity and the cloud keeps seeing the old device (see the location example, §4).
+>
 > Flashing tips learned the hard way: close any serial monitor (GtkTerm etc.)
 > before flashing — it holds the ST‑LINK and causes `DEV_USB_COMM_ERR` — and
 > when several probes are attached, target by serial (`-c port=SWD sn=<SN>`)

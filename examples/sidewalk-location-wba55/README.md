@@ -106,6 +106,16 @@ BOARD=wba65 ./scripts/build-firmware.sh location  # WBA65 -> binaries/sid_ble_wb
 
 ## 4) Generate manufacturing data + flash
 
+> **Changing a board's identity requires a mass erase (`-e all`) first.** The
+> Sidewalk stack keeps its runtime state (registration/session context, in a
+> LittleFS region between the application and the manufacturing area). If only
+> the manufacturing region is rewritten, that store still belongs to the
+> previous identity and the cloud keeps seeing the *old* device (observed
+> 2026-09-28: mfg-only rewrite mclST5A1 → mclST5X1, /IOTCONNECT still showed
+> mclST5A1 online; after `-e all` + app + mfg the new device appeared). A
+> `LittleFS: Corrupted dir pair` line on the first boot after an erase is
+> normal — it is the store being re-created.
+
 Identical to the other examples — create the device in /IOTCONNECT, generate the
 manufacturing image from its certificate JSON, then erase → flash firmware
 → flash MFG. Pass the `--chip` that matches your board:
