@@ -170,6 +170,14 @@ resolved `location` records (one per 120 s resolve) arrived in /IOTCONNECT
 side by side. So one board can carry both sensors and location — the location
 frames travel outside the application path, as expected.
 
+A ready-made template for the merged device is in the repo:
+[`device-templates/sidewalk_st_WBA55+MEMS+Location_template.JSON`](../../device-templates/sidewalk_st_WBA55+MEMS+Location_template.JSON)
+(code `STswMEMSL`): the MEMS template's `payload`/`decoder_name` attributes and
+LED/interval commands, plus the `location` (LATLONG) attribute and
+**Geo Location enabled**. Import it, create (or move) the device on it, and keep
+the `sidewalk-mems-tlv` decoder for the sensor uplink — the position arrives
+through the positioning capability, not the decoder.
+
 What *does* decide whether a `location` record appears is the **/IOTCONNECT
 template**: on that instance the resolved coordinate shows up as a separate
 `{"location":[lat,lon]}` record only for a device whose template has
