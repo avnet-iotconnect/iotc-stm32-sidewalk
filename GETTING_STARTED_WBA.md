@@ -280,7 +280,7 @@ You build the firmware yourself; pre-built images are not distributed in this re
 
 ### One-time build setup
 
-Complete steps 1 to 3 of [Build Setup](BUILD_SETUP.md) before your first build: install STM32CubeIDE, download the two ST packages, and run the prepare script. A fresh SDK download does **not** build on its own.
+Complete steps 1 to 3 of [Build Setup](BUILD_SETUP.md) before your first build: install STM32CubeIDE, download the two ST packages, and run the prepare script.
 
 ### Build the firmware
 
@@ -407,6 +407,7 @@ Both boards share the same TLV wire format and the single `STswMEMS` template; t
 | `sensor_data` / `Temperature` | whole-°C temperature (for the standard widget) | ✅ | ✅ |
 | `Sequence`, `gps_time`, `link_type`, `version` | firmware / Sidewalk metadata | ✅ | ✅ |
 
+> [!NOTE]
 > The IKS5A1 omits SHT40 temperature/humidity and 6D orientation (reported as `unknown` — its 6D path is not yet wired in firmware). It **does** run the ISM6HG256X **MLC asset-tracking** classifier, emitting the same `mlc1_label` classes and model id as the IKS4A1, so the shared decoder handles both boards unchanged.
 
 ---
