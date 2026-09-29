@@ -145,6 +145,19 @@ static bool try_parse_text_command(const uint8_t *data, size_t size)
         if (k != SIZE_MAX) {
             secs = s_parse_uint_after(data, size, k + strlen("interval_seconds"));
         }
+        /* /IOTCONNECT appends the command's parameterValue after the JSON text,
+         * separated by a space:  {..."interval_seconds": 60} 300
+         * The literal inside the JSON is the template default; the trailing
+         * number is what the user actually asked for, so it wins when present. */
+        for (size_t j = size; j > 0u; j--) {
+            if (data[j - 1u] == '}') {
+                uint32_t tail = s_parse_uint_after(data, size, j);
+                if (tail != 0u) {
+                    secs = tail;
+                }
+                break;
+            }
+        }
         /* Reuse cmd_set_interval(); it already clamps to MIN/MAX and writes
          * s_interval_ms. Synthesise the 4-byte big-endian param. */
         uint8_t params[4];

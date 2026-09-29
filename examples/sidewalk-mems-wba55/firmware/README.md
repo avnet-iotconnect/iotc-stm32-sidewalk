@@ -169,3 +169,33 @@ In `STM32CubeIDE/STM32WBA55/` (and, for WBA65, `STM32CubeIDE/STM32WBA65/`):
 See the parent [example README](../README.md), Sections 2–4, for the full
 step-by-step (including the per-board project/build-config/hex names and the
 WBA65 I²C pin-verification caveat).
+
+## Building with STM32CubeIDE 2.x (GCC 14) on Windows — notes from 2026-09-08
+
+The SDK targets CubeIDE 1.18 (GCC 13). Three things were needed to build headlessly with CubeIDE 2.1.1 on Windows:
+
+1. **Complete SDK checkout.** A file-copied SDK tree lost 216 git-tracked files (FreeRTOS ports, the BLE stack
+   headers `ble/stack/include/auto/ble_types.h`, `ll_cmd_lib/config/ble_peripheral_only/ll_fw_config.h`, …).
+   `git ls-files --deleted -z | xargs -0 git checkout --` restores them.
+2. **GCC 14 linker: "dangerous relocation: unsupported relocation" in `PWR_EnterOffMode`.** The calls into
+   `backup_system_register`, `restore_system_register` and `CPUcontextRestore` in
+   `platform/sid_mcu/st/stm32wba/Projects/Common/WPAN/Startup/stm32wbaxx_ResetHandler_GCC.s` need the labels typed
+   as Thumb functions — add `.type <sym>, %function` and `.thumb_func` in front of each of the three labels
+   (`CPUcontextSave` already has it).
+3. **`python3` on PATH** for the pre-build step (a copy of `python.exe` named `python3.exe` in a PATH directory
+   is enough; the step falls back to `python` if that is found).
+
+Headless build (same flags the `scripts/build-firmware.sh` helper flips in `.cproject`):
+
+```
+"C:\ST\STM32CubeIDE_2.1.1\STM32CubeIDE\headless-build.bat" -data <fresh workspace dir> ^
+  -import <SDK>\apps\st\stm32wba\sid_ble\STM32CubeIDE\STM32WBA55 -cleanBuild "sid_ble_wba55/Debug_Nucleo-WBA55" -no-indexer
+```
+
+### Gyro fix (2026-09-08)
+
+The MLC `.ucf` tail writes `CTRL2 = 0x00`, switching the gyro off, so tag 0x23 carried one frozen reading. The
+drivers now call `IKSxA1_MOTION_SENSOR_SetOutputDataRate(inst, MOTION_GYRO, 120.0f)` right after the UCF load and log
+the CTRL2 read-back (`CTRL2 after MLC load = 0x06`). `Disable()`+`Enable()` does **not** work here: the BSP's
+`Disable()` snapshots the current (already OFF) rate and `Enable()` re-applies it. `commands_iks4a1.c` also prefers
+the number /IOTCONNECT appends after the JSON for `SET_INTERVAL`, so the requested interval is honoured.

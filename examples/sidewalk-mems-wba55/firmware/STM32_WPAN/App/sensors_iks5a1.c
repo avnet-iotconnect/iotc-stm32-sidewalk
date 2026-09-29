@@ -135,8 +135,8 @@ int sensors_iks4a1_init(void)
      * the LSM6DSV16X one on IKS4A1). Flat (register, value) write sequence:
      * SW procedure, EMB_FUNC bank, ODR/full-scale (30 Hz LP, +-16 g), filter
      * chain, features, decision tree, and finally back to the main bank.
-     * Note the UCF's tail leaves the gyro ODR off (CTRL2=0x00) — same accepted
-     * behavior as the IKS4A1 variant; gyro TLVs read zero while MLC is active.
+     * The UCF's tail leaves the gyro ODR off (CTRL2=0x00); the gyro is
+     * re-enabled right after the load (see below) so gyro TLVs stay live.
      * MLC needs ~0.5 s before its first stable inference; sensors_iks4a1_read()
      * polls MLC1_SRC each cycle, so we just let it ride. */
     {
@@ -163,6 +163,22 @@ int sensors_iks4a1_init(void)
         (void)IKS5A1_MOTION_SENSOR_Write_Register(IKS5A1_ISM6HG256X_0,
                                                   ISM6HG256X_REG_FUNC_CFG_ACCESS,
                                                   ISM6HG256X_FUNC_CFG_MAIN_BANK);
+
+        /* The UCF tail leaves the gyro ODR off (CTRL2 = 0x00), so tag 0x23
+         * used to carry one frozen reading forever. The asset-tracking tree
+         * only consumes the accelerometer, so the gyro can simply be brought
+         * back. Note: Disable()+Enable() does NOT work here - the BSP's
+         * Disable() snapshots the *current* (already OFF) rate and Enable()
+         * re-applies it. SetOutputDataRate() writes CTRL2 directly because
+         * the gyro is still flagged as enabled from the Enable() above. */
+        if (IKS5A1_MOTION_SENSOR_SetOutputDataRate(IKS5A1_ISM6HG256X_0, MOTION_GYRO, 120.0f) != BSP_ERROR_NONE) {
+            SID_PAL_LOG_WARNING("IKS5A1: ISM6HG256X gyro ODR restore after MLC load failed");
+        }
+        {
+            uint8_t ctrl2 = 0xFFu;
+            (void)IKS5A1_MOTION_SENSOR_Read_Register(IKS5A1_ISM6HG256X_0, 0x11u, &ctrl2);
+            SID_PAL_LOG_INFO("IKS5A1: ISM6HG256X CTRL2 after MLC load = 0x%02X (gyro ODR nibble must be non-zero)", (unsigned)ctrl2);
+        }
     }
 
     SID_PAL_LOG_INFO("IKS5A1: sensors initialized (ISM6HG256X + IIS2DULPX + ILPS22QS)");
@@ -196,6 +212,8 @@ int sensors_iks4a1_read(sensors_iks4a1_reading_t *out)
         out->gyr_dps_x10[0] = s_clamp_i16(axes.x / 100);
         out->gyr_dps_x10[1] = s_clamp_i16(axes.y / 100);
         out->gyr_dps_x10[2] = s_clamp_i16(axes.z / 100);
+        /* Raw mdps on the console: a live gyro jitters by a few mdps between reads even at rest. */
+        SID_PAL_LOG_INFO("IKS5A1: gyro mdps=%ld,%ld,%ld", (long)axes.x, (long)axes.y, (long)axes.z);
     } else {
         SID_PAL_LOG_WARNING("IKS5A1: ISM6HG256X gyro read failed (%ld)", (long)rc);
     }

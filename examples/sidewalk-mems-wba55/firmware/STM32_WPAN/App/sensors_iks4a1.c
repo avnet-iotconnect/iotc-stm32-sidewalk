@@ -202,6 +202,21 @@ int sensors_iks4a1_init(void)
         (void)IKS4A1_MOTION_SENSOR_Write_Register(SID_IKS4A1_LSM6DSV16X_INSTANCE,
                                                   LSM6DSV16X_REG_FUNC_CFG_ACCESS,
                                                   LSM6DSV16X_FUNC_CFG_MAIN_BANK);
+
+        /* The UCF tail leaves the gyro ODR off (CTRL2 = 0x00), so tag 0x23
+         * used to carry one frozen reading forever. The asset-tracking tree
+         * only consumes the accelerometer, so bring the gyro back. Disable()
+         * + Enable() does NOT work: the BSP's Disable() snapshots the current
+         * (already OFF) rate and Enable() re-applies it. SetOutputDataRate()
+         * writes CTRL2 directly while the gyro is still flagged enabled. */
+        if (IKS4A1_MOTION_SENSOR_SetOutputDataRate(SID_IKS4A1_LSM6DSV16X_INSTANCE, MOTION_GYRO, 120.0f) != BSP_ERROR_NONE) {
+            SID_PAL_LOG_WARNING("IKS4A1: LSM6DSV16X gyro ODR restore after MLC load failed");
+        }
+        {
+            uint8_t ctrl2 = 0xFFu;
+            (void)IKS4A1_MOTION_SENSOR_Read_Register(SID_IKS4A1_LSM6DSV16X_INSTANCE, 0x11u, &ctrl2);
+            SID_PAL_LOG_INFO("IKS4A1: LSM6DSV16X CTRL2 after MLC load = 0x%02X", (unsigned)ctrl2);
+        }
     }
 
     SID_PAL_LOG_INFO("IKS4A1: sensors initialized");
