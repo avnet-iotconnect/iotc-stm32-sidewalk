@@ -48,7 +48,7 @@ def dict_from_payload(base64_input: str, fport: int = None):
     return {"payload": {...}}
 ```
 
-Custom decoders are reviewed by /IOTCONNECT before they can run in the cloud. Submitting one is covered in [Getting Started, Step 4](GETTING_STARTED_WBA.md#submit-the-decoder-for-approval).
+Custom decoders are reviewed by /IOTCONNECT before they can run in the cloud. Submitting one is covered in [Getting Started, Step 4](GETTING_STARTED_WBA.md#decoder).
 
 ### Test the decoder locally
 

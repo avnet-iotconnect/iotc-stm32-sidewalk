@@ -35,7 +35,7 @@ _Device connectivity: the board reaches /IOTCONNECT through a nearby Sidewalk ga
 1. [Introduction](#1-introduction)
 2. [Prerequisites](#2-prerequisites)
 3. [Create /IOTCONNECT Account](#3-create-iotconnect-account)
-4. [Import the Device Template](#4-import-the-device-template)
+4. [Device Template and Decoder](#4-device-template-and-decoder)
 5. [Create a Sidewalk Device](#5-create-a-sidewalk-device)
 6. [Obtain the Device Certificate](#6-obtain-the-device-certificate)
 7. [Generate the Manufacturing Image](#7-generate-the-manufacturing-image)
@@ -59,15 +59,23 @@ _Device connectivity: the board reaches /IOTCONNECT through a nearby Sidewalk ga
 
 **Software**
 
-* PC running Windows 11 (recommended)
-* [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (provides the `STM32_Programmer_CLI` used for flashing)
-* [Python 3.10+](https://www.python.org/downloads/) (used to generate the per-device manufacturing image) — tick **Add python.exe to PATH** in the installer
+| Software | Used for |
+|---|---|
+| PC running Windows 11 (recommended) | Host for the tools below |
+| [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) | Flashing the board (`STM32_Programmer_CLI`) |
+| [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) | Compiling the firmware; the build script drives it, you never open it |
+| [STM32-Sidewalk-SDK](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK) (ST's GitHub repository) | Sidewalk stack and the provisioning tool |
+| [X-CUBE-MEMS1](https://www.st.com/en/embedded-software/x-cube-mems1.html) (free ST account) | Drivers for the sensors on the MEMS shield |
+| [X-CUBE-CRYPTOLIB](https://www.st.com/en/embedded-software/x-cube-cryptolib.html) (free ST account) | Crypto library the Sidewalk SDK links against |
+| [Python 3.10+](https://www.python.org/downloads/) with the `pyyaml` and `intelhex` packages | Generating the manufacturing image, and the SDK's build steps. Tick **Add python.exe to PATH** in the installer |
+| Serial terminal such as [Tera Term](https://teratermproject.github.io/index-en.html) or [PuTTY](https://www.putty.org/) | Reading the board's log (115200 8N1) |
+
+The SDK is downloaded in Step 7. STM32CubeIDE and the two X-CUBE packages are set up in [Build Setup](BUILD_SETUP.md), which Step 9 sends you to.
+
+Every command in this guide is run from **PowerShell** in the repository folder. In File Explorer, right-click the extracted folder and choose **Open in Terminal**. The same commands work in Command Prompt, and on macOS and Linux.
 
 > [!NOTE]
-> **Windows: `Python was not found; run without arguments to install from the Microsoft Store`.** Windows ships placeholder `python.exe` / `python3.exe` shortcuts that are not Python and shadow a real install. Turn them off under **Settings > Apps > Advanced app settings > App execution aliases** (switch off `python.exe` and `python3.exe`), then reopen Git Bash. The provisioning script also detects and skips these stubs on its own.
-* A Serial Terminal application such as [Tera Term](https://teratermproject.github.io/index-en.html), [PuTTY](https://www.putty.org/), or `screen` (115200 8N1)
-* **Windows only:** [Git for Windows](https://git-scm.com/download/win), which installs **Git Bash**. The provisioning, build, and flash helpers in this repo are bash scripts — run them from a Git Bash prompt. macOS and Linux already have a suitable shell.
-* **To build the firmware (Step 9):** STM32CubeIDE plus three ST packages, staged by one script — follow [Build Setup](BUILD_SETUP.md) once before you reach Step 9. Everything up to Step 8 works without it.
+> **Windows: `Python was not found; run without arguments to install from the Microsoft Store`.** Windows ships placeholder `python.exe` / `python3.exe` shortcuts that are not Python and shadow a real install. Turn them off under **Settings > Apps > Advanced app settings > App execution aliases** (switch off `python.exe` and `python3.exe`), then reopen PowerShell.
 
 ### Get this repository
 
@@ -86,8 +94,6 @@ Your board does **not** join your Wi-Fi. It reaches the cloud through a nearby *
 * **Availability:** check Amazon's [Sidewalk coverage map](https://coverage.sidewalk.amazon/) for where Sidewalk is currently available.
 * **Placement:** keep the gateway powered and within BLE range of your board; the same room is ideal.
 
-Your board does not need to be on the same Amazon account as the gateway.
-
 ---
 
 ## 3. Create /IOTCONNECT Account
@@ -105,28 +111,30 @@ An /IOTCONNECT account with an **AWS backend** is required (Amazon Sidewalk runs
 
 ---
 
-## 4. Import the Device Template
+## 4. Device Template and Decoder
 
 The **device template** defines the telemetry attributes and downlink commands for the MEMS demo, and the **decoder** turns the raw Sidewalk uplink into named values.
 
-1. Download the pre-made device template from this repo: [`device-templates/sidewalk_st_WBA+MEMS_template.JSON`](device-templates/sidewalk_st_WBA+MEMS_template.JSON) (template code `STswMEMS`, *“Sidewalk ST WBA + MEMS”*). The same template covers both the IKS4A1 and IKS5A1 boards.
+1. Download the pre-made device template from this repo: [`device-templates/st_sidewalk_st_mems_template.json`](device-templates/st_sidewalk_st_mems_template.json) (template code `STswMEMS`, *“Sidewalk ST MEMS”*). The same template covers both the IKS4A1 and IKS5A1 boards.
 2. Login to the platform at [console.iotconnect.io](https://console.iotconnect.io).
 3. From the navigation panel on the left, select the **Devices** icon and choose **Wireless Device** from the sub-menu.<br>![Devices menu with Wireless Device selected](media/menu-wireless-device.png)
 4. At the bottom of the page, select the **Templates** icon from the toolbar.<br>![Templates toolbar icon](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/menu-templates.png?raw=true)
 5. At the top-right of the page, select the **Create Template** button.<br>![Create Template button](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/button-create-template.png?raw=true)
 6. At the top-right of the page, select the **Import** button.<br>![Import button](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/button-import.png?raw=true)
-7. Click **Browse**, navigate to and select the downloaded `sidewalk_st_WBA+MEMS_template.JSON`.
+7. Click **Browse**, navigate to and select the downloaded `st_sidewalk_st_mems_template.json`.
 8. Click **Save**.
 
-### Submit the decoder for approval
+### Decoder
 
-The decoder for this demo is [`decoders/sidewalk-mems-tlv.py`](decoders/sidewalk-mems-tlv.py), and one decoder serves both sensor boards. A new account has no approved decoder, so submit this one now. How the decoder works, and how to test it locally, is covered in the [Developer Guide](DEVELOPER_GUIDE.md#the-uplink-decoder).
+Sidewalk is a low-bandwidth network, so the firmware does not send JSON. It packs each reading into a compact binary frame, and a **decoder** is the small piece of Python in the cloud that turns those bytes back into the named values the template declares. The decoder for this demo is [`decoders/sidewalk-mems-tlv.py`](decoders/sidewalk-mems-tlv.py). The [Developer Guide](DEVELOPER_GUIDE.md#the-uplink-decoder) covers how it works and how to test it.
+
+A new account has no approved decoder, so submit this one for approval:
 
 1. From the navigation panel on the left, select the **Settings** icon and choose **Key Vault**.<br>![Settings menu with Key Vault selected](media/menu-key-vault.png)
 2. Select the **Wireless** tab, then **Custom Decoder**, and click **Create Decoder**.<br>![Key Vault Wireless tab with the Custom Decoder list and the Create Decoder button](media/key-vault-custom-decoder.png)
 3. Fill in the fields:
    * **Transmission type:** select **Sidewalk**
-   * **Template:** select the imported template *Sidewalk ST WBA + MEMS*
+   * **Template:** select the imported template *Sidewalk ST MEMS*
    * **Device:** leave empty
    * **Runtime:** select **Python**
    * **Upload File:** click **Browse** and select `decoders/sidewalk-mems-tlv.py`
@@ -149,7 +157,7 @@ In this step you create a **Wireless Device** of transmission type **Sidewalk**,
    * **Unique Id:** a unique identifier for this unit, e.g. `wba-mems-01`. **Pick this carefully — it cannot be changed later**, and you will pass it to the provisioning script in Step 7.
    * **Device Name:** a friendly name, e.g. `WBA MEMS Demo`
    * **Entity:** select the entity to own the device (new accounts have a single option)
-   * **Template:** select the imported template *Sidewalk ST WBA + MEMS*
+   * **Template:** select the imported template *Sidewalk ST MEMS*
    * **Custom Decoder:** select `sidewalk-mems-tlv` once it has been approved
 4. Click **Save & View**. Saving whitelists the device with AWS IoT Wireless for authorization.
 
@@ -196,11 +204,7 @@ Downloads/
 └── STM32-Sidewalk-SDK-main/      <-- the SDK, extracted alongside it
 ```
 
-If you keep the SDK somewhere else, set the `SDK_ROOT` environment variable to its path:
-
-```bash
-SDK_ROOT=/c/path/to/STM32-Sidewalk-SDK ./scripts/provision-device.sh ...
-```
+If you keep the SDK somewhere else, add `--sdk-root` and its path to the provisioning command below.
 
 > [!NOTE]
 > `could not find the STM32-Sidewalk-SDK` means this step was skipped or the folder is somewhere the script does not look — the error lists every path it tried.
@@ -213,10 +217,10 @@ python -m pip install pyyaml intelhex
 
 ### Run the provisioning script
 
-From the root of the extracted repo folder (a **Git Bash** prompt on Windows):
+From the repository folder:
 
-```bash
-./scripts/provision-device.sh <device-name> <path-to-cert.json> [chip]
+```
+python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
 ```
 
 * `<device-name>` — the device's **Unique ID** from Step 5 (e.g. `wba-mems-01`). It names the output folder, so using the Unique ID is what lets you match a generated image back to the device it belongs to. It is *not* read from the certificate, so a typo here silently produces a confusingly-named folder rather than an error.
@@ -225,14 +229,14 @@ From the root of the extracted repo folder (a **Git Bash** prompt on Windows):
 
 For the NUCLEO-WBA55CG:
 
-```bash
-./scripts/provision-device.sh wba-mems-01 certificate.json
+```
+python scripts/provision-device.py wba-mems-01 certificate.json
 ```
 
 For the NUCLEO-WBA65RI:
 
-```bash
-./scripts/provision-device.sh wba-mems-01 certificate.json WBA65xI
+```
+python scripts/provision-device.py wba-mems-01 certificate.json WBA65xI
 ```
 
 This produces (WBA55 shown; on WBA65 the `mfg.bin` flashes @ `0x081FE000`):
@@ -243,9 +247,6 @@ binaries/sidewalk-mfg/wba-mems-01/
 ├── mfg.bin      <-- flash this @ 0x080FE000  (WBA65: 0x081FE000)
 └── mfg.hex
 ```
-
-> [!NOTE]
-> If you would rather not use a shell at all, `scripts/provision-device.py` takes the same arguments and runs under plain `python` on any platform.
 
 > [!NOTE]
 > Do **not** flash the raw certificate JSON, and do not reuse a `mfg.bin` from anywhere else — each image is bound to one device. Always generate it with the provisioning script (which runs `provision.py st aws --chip WBA55xG`, or `--chip WBA65xI` for the WBA65) first.
@@ -281,22 +282,16 @@ Complete steps 1 to 3 of [Build Setup](BUILD_SETUP.md) before your first build: 
 
 ### Build the firmware
 
-Select your host board. For the NUCLEO-WBA55CG:
+One run produces the firmware for both sensor shields. For the NUCLEO-WBA55CG:
 
-```bash
-export BOARD=wba55
+```
+python scripts/build-firmware.py
 ```
 
 For the NUCLEO-WBA65RI:
 
-```bash
-export BOARD=wba65
 ```
-
-Then build. One run produces the firmware for both sensor shields:
-
-```bash
-./scripts/build-firmware.sh
+python scripts/build-firmware.py --board wba65
 ```
 
 If the build fails, see [If it fails](BUILD_SETUP.md#if-it-fails) in Build Setup.
@@ -319,26 +314,11 @@ Pick the one that matches your host board + sensor board:
 
 ### Flash the two images
 
-[`tools/flash_wba.sh`](tools/flash_wba.sh) erases the chip, writes the firmware, then writes the manufacturing image — each step under connect-under-reset with an automatic one-shot retry. It is board-agnostic: pass whichever firmware hex and `mfg.hex` you built.
+[`tools/flash_wba.py`](tools/flash_wba.py) erases the chip, writes the firmware, then writes the manufacturing image. Each step connects under reset and is retried once. It is board-agnostic and finds STM32CubeProgrammer on its own. Pass the firmware hex for your board and shield, and the `mfg.hex` from Step 7:
 
-```bash
-tools/flash_wba.sh \
-  binaries/sid_ble_wba55_iks4a1.hex \
-  binaries/sidewalk-mfg/wba-mems-01/mfg.hex
 ```
-
-The equivalent three commands, if you would rather run them yourself:
-
-```bash
-STM32_Programmer_CLI -c port=SWD mode=UR -e all
-STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sid_ble_wba55_iks4a1.hex -v
-STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sidewalk-mfg/wba-mems-01/mfg.hex -v
+python tools/flash_wba.py binaries/sid_ble_wba55_iks4a1.hex binaries/sidewalk-mfg/wba-mems-01/mfg.hex
 ```
-
-The `mfg.hex` carries its own flash address. If you flash the raw `mfg.bin` instead, supply the address yourself — `0x080FE000` on WBA55, `0x081FE000` on WBA65.
-
-> [!NOTE]
-> STM32CubeProgrammer does not add itself to your `PATH`. The `flash_wba.sh` helper finds the CLI on its own; to run the commands by hand, call it by its full path, e.g. `"/c/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"`.
 
 After flashing, **press the black RESET button** (or power-cycle) to start the firmware.
 
@@ -346,9 +326,11 @@ The two failures worth knowing apart:
 
 **`Error: No debug probe detected`** — the programmer cannot see the board's ST-LINK at all. Confirm with:
 
-```bash
-STM32_Programmer_CLI -l      # look under "===== STLink Interface ====="
 ```
+python tools/flash_wba.py --list-probes
+```
+
+Look under `===== STLink Interface =====` in the output.
 
 If that says `No ST-Link detected!`, work through these in order:
 

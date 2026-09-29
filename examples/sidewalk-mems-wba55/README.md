@@ -540,7 +540,7 @@ Expected output: a JSON dump of the synthetic sample payload (~23 °C, ~42 %RH, 
 
 ## 11) /IOTCONNECT device template
 
-Use [`device-templates/sidewalk_st_WBA+MEMS_template.JSON`](../../device-templates/sidewalk_st_WBA+MEMS_template.JSON) when creating the device template. It declares:
+Use [`device-templates/st_sidewalk_st_mems_template.json`](../../device-templates/st_sidewalk_st_mems_template.json) when creating the device template. It declares:
 
 - The uplink attributes (decoder output fields with units and aggregation types).
 - The three downlink commands (`LED_ON`, `LED_OFF`, `SET_INTERVAL`) as JSON descriptors, matching the standard /IOTCONNECT Sidewalk pattern (cf. ST's `WLS0723`).
@@ -567,7 +567,7 @@ Setup:
 
    Other template attributes (`gps_time`, `link_type`, `ota_*`, `button_*`, `led_*`, etc.) stay empty — the firmware doesn't emit those tags. That's expected and harmless.
 
-5. **When the new decoder is approved**, attach `sidewalk-mems-tlv.py` to a primary device on the [`sidewalk_st_WBA+MEMS_template.JSON`](../../device-templates/sidewalk_st_WBA+MEMS_template.JSON) template and decommission the temporary device. The same firmware image carries over without re‑flashing.
+5. **When the new decoder is approved**, attach `sidewalk-mems-tlv.py` to a primary device on the [`st_sidewalk_st_mems_template.json`](../../device-templates/st_sidewalk_st_mems_template.json) template and decommission the temporary device. The same firmware image carries over without re‑flashing.
 
 > Why this works: our TLV stream emits tag `0x06` (whole °C) **and** tag `0x24` (°C × 100). `STsidewalk2` knows tag `0x06` and silently skips the IKS4A1‑specific tags 0x20–0x27 (sid_demo's `_read_tlv` advances over unknown tags rather than erroring). Once the new decoder is in place, it ignores tag `0x06` and reads tag `0x24` for higher precision plus all the other sensor tags.
 
@@ -583,7 +583,7 @@ Setup:
 6. Generate `mfg_wba55.hex` (WBA65: `mfg_wba65.hex` with `--chip WBA65xI`) from the /IOTCONNECT JSON.
 7. Erase → flash firmware → flash MFG.
 8. Confirm `IKS4A1: sensors initialized` and `IKS4A1 uplink seq=...` in the UART log.
-9. Apply `sidewalk-mems-tlv.py` decoder + `sidewalk_st_WBA+MEMS_template.JSON` template in /IOTCONNECT.
+9. Apply `sidewalk-mems-tlv.py` decoder + `st_sidewalk_st_mems_template.json` template in /IOTCONNECT.
 10. Wire `decoders/iks4a1_downlink_translator.py` into your /IOTCONNECT downlink hook (or as a Lambda) so dashboard commands hit the firmware as opcode bytes. (Or use the `bytesCommand` REST path with `tools/register_iks4a1_commands.py --apply`.)
 11. (Optional) Fire `aws iotwireless send-data-to-wireless-device --payload-data AQ==` to confirm `CMD led_on` lands.
 

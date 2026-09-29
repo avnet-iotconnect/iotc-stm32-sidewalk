@@ -28,13 +28,15 @@ Downloads/
 
 ## 3. Prepare the SDK (once)
 
-The public SDK ships without the sensor drivers, the crypto library, or this demo's sources. One script stages all of it — from Git Bash on Windows, or any shell on macOS/Linux:
+The public SDK ships without the sensor drivers, the crypto library, or this demo's sources. One script stages all of it. Run it from PowerShell in the repository folder:
 
-```bash
-./scripts/prepare-sdk.sh
+```
+python scripts/prepare-sdk.py
 ```
 
-It finds the three packages automatically and prints what it used. If you keep one somewhere unusual, point at it: `SDK_ROOT=… MEMS1_ROOT=… CMOX_ROOT=… ./scripts/prepare-sdk.sh`. Safe to re-run.
+It finds the three packages automatically and prints what it used. If you keep one somewhere unusual, point at it with `--sdk-root`, `--mems1-root`, or `--cmox-root`. Safe to re-run.
+
+The script needs only Python. It does not need Git or Git Bash.
 
 ## 4. Build
 
@@ -46,14 +48,14 @@ The build script also accepts a single shield as an argument, `iks4a1` or `iks5a
 
 | Message | Cause | Fix |
 |---|---|---|
-| `could not find …` from `prepare-sdk.sh` | A package is missing or somewhere the script does not look | The error lists every path it tried; extract the package there, or set the matching `…_ROOT` variable |
-| `STM32CubeIDE headless build not found` | CubeIDE not installed, or in a non-default location | Install it, or `CUBE_IDE=/path/to/headless-build.bat ./scripts/build-firmware.sh` |
-| `iks4a1_motion_sensors.h: No such file` / `cmox_init.h: No such file` | Step 3 was skipped, or the SDK was re-extracted afterwards | Run `./scripts/prepare-sdk.sh` again |
-| `Unknown destination type (ARM/Thumb)` at link | SDK missing the GCC 14 reset-handler fix | Run `./scripts/prepare-sdk.sh` again — it applies the fix even to an SDK that was prepared earlier |
+| `could not find …` from `prepare-sdk.py` | A package is missing or somewhere the script does not look | The error lists every path it tried; extract the package there, or pass the matching `--…-root` option |
+| `STM32CubeIDE headless build not found` | CubeIDE not installed, or in a non-default location | Install it, or `python scripts/build-firmware.py --cube-ide <path to headless-build.bat>` |
+| `iks4a1_motion_sensors.h: No such file` / `cmox_init.h: No such file` | Step 3 was skipped, or the SDK was re-extracted afterwards | Run `python scripts/prepare-sdk.py` again |
+| `Unknown destination type (ARM/Thumb)` at link | SDK missing the GCC 14 reset-handler fix | Run `python scripts/prepare-sdk.py` again — it applies the fix even to an SDK that was prepared earlier |
 
 Every build writes a full log to `binaries/build_<project>_<variant>.log`; on failure the script prints the compiler errors from it.
 
-## What `prepare-sdk.sh` actually does
+## What `prepare-sdk.py` actually does
 
 For anyone who wants to reproduce it by hand, or build from the CubeIDE GUI instead:
 
