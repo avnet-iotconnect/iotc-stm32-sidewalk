@@ -212,8 +212,6 @@ int sensors_iks4a1_read(sensors_iks4a1_reading_t *out)
         out->gyr_dps_x10[0] = s_clamp_i16(axes.x / 100);
         out->gyr_dps_x10[1] = s_clamp_i16(axes.y / 100);
         out->gyr_dps_x10[2] = s_clamp_i16(axes.z / 100);
-        /* Raw mdps on the console: a live gyro jitters by a few mdps between reads even at rest. */
-        SID_PAL_LOG_INFO("IKS5A1: gyro mdps=%ld,%ld,%ld", (long)axes.x, (long)axes.y, (long)axes.z);
     } else {
         SID_PAL_LOG_WARNING("IKS5A1: ISM6HG256X gyro read failed (%ld)", (long)rc);
     }

@@ -170,29 +170,52 @@ See the parent [example README](../README.md), Sections 2–4, for the full
 step-by-step (including the per-board project/build-config/hex names and the
 WBA65 I²C pin-verification caveat).
 
-## Building with STM32CubeIDE 2.x (GCC 14) on Windows — notes from 2026-09-08
+## Building with STM32CubeIDE 2.x (GCC 14)
 
-The SDK targets CubeIDE 1.18 (GCC 13). Three things were needed to build headlessly with CubeIDE 2.1.1 on Windows:
+The SDK targets STM32CubeIDE 1.18 (GCC 13). Building with STM32CubeIDE 2.x needs two adjustments, and the
+helper scripts in this repo make both for you:
 
-1. **Complete SDK checkout.** A file-copied SDK tree lost 216 git-tracked files (FreeRTOS ports, the BLE stack
-   headers `ble/stack/include/auto/ble_types.h`, `ll_cmd_lib/config/ble_peripheral_only/ll_fw_config.h`, …).
-   `git ls-files --deleted -z | xargs -0 git checkout --` restores them.
-2. **GCC 14 linker: "dangerous relocation: unsupported relocation" in `PWR_EnterOffMode`.** The calls into
-   `backup_system_register`, `restore_system_register` and `CPUcontextRestore` in
-   `platform/sid_mcu/st/stm32wba/Projects/Common/WPAN/Startup/stm32wbaxx_ResetHandler_GCC.s` need the labels typed
-   as Thumb functions — add `.type <sym>, %function` and `.thumb_func` in front of each of the three labels
-   (`CPUcontextSave` already has it).
-3. **`python3` on PATH** for the pre-build step (a copy of `python.exe` named `python3.exe` in a PATH directory
-   is enough; the step falls back to `python` if that is found).
+| Issue | Symptom | Handled by |
+|---|---|---|
+| GCC 14 needs three labels in the reset-handler assembly typed as Thumb functions | Link fails with `Unknown destination type (ARM/Thumb)` or `dangerous relocation: unsupported relocation` in `PWR_EnterOffMode` | [`scripts/prepare-sdk.py`](../../../scripts/prepare-sdk.py) applies the fix as part of the SDK patch |
+| The SDK's pre-build step calls `python3`, then falls back to `python` | Pre-build step fails on Windows, where `python3` is a Microsoft Store placeholder | [`scripts/build-firmware.py`](../../../scripts/build-firmware.py) puts the Python running it first on `PATH` for the build |
 
-Headless build (same flags the `scripts/build-firmware.sh` helper flips in `.cproject`):
+So the normal path needs nothing by hand. Follow [Build Setup](../../../BUILD_SETUP.md), then:
+
+```
+python scripts/build-firmware.py
+```
+
+### Building without the helper scripts
+
+If you drive STM32CubeIDE yourself, from the GUI or its headless builder, apply the two adjustments manually:
+
+1. **Reset-handler fix.** In
+   `platform/sid_mcu/st/stm32wba/Projects/Common/WPAN/Startup/stm32wbaxx_ResetHandler_GCC.s`, add
+   `.type <sym>, %function` and `.thumb_func` in front of the labels `backup_system_register`,
+   `restore_system_register` and `CPUcontextRestore`. `CPUcontextSave` already has them.
+2. **Python on PATH.** Make sure `python` resolves to a real Python 3 install in the environment that starts
+   STM32CubeIDE.
+
+The headless command the build script runs is:
 
 ```
 "C:\ST\STM32CubeIDE_2.1.1\STM32CubeIDE\headless-build.bat" -data <fresh workspace dir> ^
   -import <SDK>\apps\st\stm32wba\sid_ble\STM32CubeIDE\STM32WBA55 -cleanBuild "sid_ble_wba55/Debug_Nucleo-WBA55" -no-indexer
 ```
 
-### Gyro fix (2026-09-08)
+Before each build the script sets `SID_APP_IKS4A1_ENABLED` and `SID_APP_IKS5A1_ENABLED` in `.cproject` for the
+shield being built, and restores the file afterwards.
+
+### Incomplete SDK copy
+
+An SDK tree that was copied between machines by file copy, instead of downloaded or cloned, can be missing
+files. One such copy had lost 216 of them, including FreeRTOS ports and BLE stack headers such as
+`ble/stack/include/auto/ble_types.h`. The symptom is `No such file or directory` on SDK headers that this
+example never touches. Download a fresh SDK ZIP, or in a Git clone restore the files with
+`git ls-files --deleted -z | xargs -0 git checkout --`.
+
+## Gyro stays live after the MLC load
 
 The MLC `.ucf` tail writes `CTRL2 = 0x00`, switching the gyro off, so tag 0x23 carried one frozen reading. The
 drivers now call `IKSxA1_MOTION_SENSOR_SetOutputDataRate(inst, MOTION_GYRO, 120.0f)` right after the UCF load and log
