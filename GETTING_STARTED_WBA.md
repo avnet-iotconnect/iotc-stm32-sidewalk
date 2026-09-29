@@ -3,7 +3,7 @@
 [Purchase the NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) &nbsp;•&nbsp; [Purchase the NUCLEO-WBA65RI](https://www.newark.com/stmicroelectronics/nucleo-wba65ri/dev-brd-nucleo-64-arm-cortex-m33f/dp/25AM5396) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
 
 > [!NOTE]
-> This guide covers both the NUCLEO-WBA55CG and the NUCLEO-WBA65RI; where a value differs between them, the WBA65 value is shown alongside.
+> This guide covers both the NUCLEO-WBA55CG and the NUCLEO-WBA65RI and any differences be noted in the relevant sections.
 
 | NUCLEO-WBA55CG | NUCLEO-WBA65RI |
 |:---:|:---:|
@@ -11,9 +11,9 @@
 
 ## 1. Introduction
 
-This guide walks through bringing a **NUCLEO-WBA55CG** (or **NUCLEO-WBA65RI**) with an **X-NUCLEO-IKS4A1** (or **X-NUCLEO-IKS5A1**) MEMS sensor expansion board online with the Avnet **/IOTCONNECT** platform over **Amazon Sidewalk** (BLE / Link Type 1). When complete, the board streams live accelerometer, gyroscope, temperature, humidity, pressure, orientation, and Qvar (capacitive touch) readings to an /IOTCONNECT dashboard, and you can send commands back to the device.
+This guide walks through bringing a **NUCLEO-WBA55CG** (or **NUCLEO-WBA65RI**) with an **X-NUCLEO-IKS4A1** (or **X-NUCLEO-IKS5A1**) MEMS sensor expansion board online with the Avnet **/IOTCONNECT** platform over **Amazon Sidewalk** using BLE. When complete, the board streams live accelerometer, gyroscope, temperature, humidity, pressure, orientation, and capacitive touch (IKS4A1 only) readings to an /IOTCONNECT dashboard, and you can send commands back to the device.
 
-The demo also uses the **Machine Learning Core (MLC)** built into the shield's motion sensor, the LSM6DSV16X on the IKS4A1 and the ISM6HG256X on the IKS5A1. The MLC runs a small decision-tree classifier inside the sensor itself, so motion is classified without any processing on the microcontroller. It is loaded with an asset-tracking model that reports one of four states: stationary upright, stationary not upright, in motion, or shaken. The result arrives in /IOTCONNECT as the `mlc1_label` attribute.
+The demo also uses the **Machine Learning Core (MLC)** built into the motion sensor, the LSM6DSV16X on the IKS4A1 and the ISM6HG256X on the IKS5A1. The MLC runs a small decision-tree classifier inside the sensor itself, so motion is classified without any processing on the microcontroller. It is loaded with an asset-tracking model that reports one of four states: stationary upright, stationary not upright, in motion, or shaken. The result arrives in /IOTCONNECT as the `mlc1_label` attribute.
 
 The firmware is built from source — licensing on the upstream SDK and crypto library prevents this repository from redistributing compiled images (see [`NOTICE.md`](NOTICE.md)). Step 9 covers the build with a one-command helper script; the one-time toolchain setup it needs is in [Build Setup](BUILD_SETUP.md), and the detailed [example README](examples/sidewalk-mems-wba55/README.md) covers the firmware itself.
 
@@ -74,14 +74,14 @@ _Device connectivity: the board reaches /IOTCONNECT through a nearby Sidewalk ga
 
 The SDK is downloaded in Step 7. STM32CubeIDE and the two X-CUBE packages are set up in [Build Setup](BUILD_SETUP.md), which Step 9 sends you to.
 
-Every command in this guide is run from **PowerShell** in the repository folder. In File Explorer, right-click the extracted folder and choose **Open in Terminal**. The same commands work in Command Prompt, and on macOS and Linux.
+Every command in this guide is run from **PowerShell** in the repository folder. In File Explorer, right-click the extracted folder and choose **Open in Terminal**.
 
 > [!NOTE]
 > **Windows: `Python was not found; run without arguments to install from the Microsoft Store`.** Windows ships placeholder `python.exe` / `python3.exe` shortcuts that are not Python and shadow a real install. Turn them off under **Settings > Apps > Advanced app settings > App execution aliases** (switch off `python.exe` and `python3.exe`), then reopen PowerShell.
 
 ### Get this repository
 
-**[Download the repository ZIP](https://github.com/avnet-iotconnect/iotc-stm32-sidewalk/archive/refs/heads/main.zip)**, then extract it anywhere convenient (e.g. `Downloads\iotc-stm32-sidewalk-main`). That is all you need — this is a public repository, so the download works for anyone, with **no GitHub account, no sign-in, and no `git` installation**.
+**[Download and Extract the repository ZIP](https://github.com/avnet-iotconnect/iotc-stm32-sidewalk/archive/refs/heads/main.zip)** to your Downloads folder.
 
 Everything this guide references (templates, decoders, dashboards, and the provisioning script) is inside that ZIP. If you would rather use Git, `git clone https://github.com/avnet-iotconnect/iotc-stm32-sidewalk.git` gets you the same content.
 
@@ -165,13 +165,9 @@ In this step you create a **Wireless Device** of transmission type **Sidewalk**,
 
 ![Create Device screen](media/create-device.png)
 
-_(Screen: Create Device)_
-
 After saving, the device appears in the Sidewalk device list, ready to be provisioned and flashed.
 
 ![Sidewalk Device List screen](media/device-list.png)
-
-_(Screen: Sidewalk Device List)_
 
 ---
 
