@@ -224,19 +224,21 @@ python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
 ```
 
 * `<device-name>` — the device's **Unique ID** from Step 5 (e.g. `wba-mems-01`). It names the output folder, so using the Unique ID is what lets you match a generated image back to the device it belongs to. It is *not* read from the certificate, so a typo here silently produces a confusingly-named folder rather than an error.
-* `<path-to-cert.json>` — the file you downloaded in Step 6. It is normally called **`certificate.json`**.
+* `<path-to-cert.json>` — the file you downloaded in Step 6. The browser saves it to your **Downloads** folder as **`certificate.json`**.
 * `[chip]` — optional; defaults to **`WBA55xG`** (NUCLEO-WBA55CG). Pass **`WBA65xI`** for the NUCLEO-WBA65RI. The script picks the matching mfg flash address automatically.
+
+The commands below assume the certificate is still in your Downloads folder. If you moved or renamed it, use that path instead.
 
 For the NUCLEO-WBA55CG:
 
 ```
-python scripts/provision-device.py wba-mems-01 certificate.json
+python scripts/provision-device.py wba-mems-01 ~/Downloads/certificate.json
 ```
 
 For the NUCLEO-WBA65RI:
 
 ```
-python scripts/provision-device.py wba-mems-01 certificate.json WBA65xI
+python scripts/provision-device.py wba-mems-01 ~/Downloads/certificate.json WBA65xI
 ```
 
 This produces (WBA55 shown; on WBA65 the `mfg.bin` flashes @ `0x081FE000`):
