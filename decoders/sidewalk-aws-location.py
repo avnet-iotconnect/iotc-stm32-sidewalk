@@ -1,6 +1,6 @@
 """
 /IOTCONNECT decoder for the WBA55 Sidewalk **AWS IoT Core Device Location** demo
-(template: sidewalk_aws-location_wba55_template.JSON, code "STswLOC").
+(template: sidewalk_aws-location_wba_template.JSON, code "STswLOC").
 
 WHAT THIS DECODES
 -----------------

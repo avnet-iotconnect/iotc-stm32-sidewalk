@@ -3,13 +3,11 @@
 [Purchase the NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) &nbsp;•&nbsp; [Purchase the NUCLEO-WBA65RI](https://www.newark.com/stmicroelectronics/nucleo-wba65ri/dev-brd-nucleo-64-arm-cortex-m33f/dp/25AM5396) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) &nbsp;•&nbsp; [Purchase the X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356)
 
 > [!NOTE]
-> **Two host boards are supported.** This guide is written around the **NUCLEO-WBA55CG**, but the **NUCLEO-WBA65RI** (STM32WBA65RI, 2 MB flash) works too and follows the exact same steps. Wherever a WBA55-specific value appears — the firmware hex names, the `provision-device.sh` chip argument, the `BOARD=` build flag, and the raw `mfg.bin` flash address — the WBA65 equivalent is noted alongside it. Pick one board and follow the matching values throughout.
+> This guide covers both the NUCLEO-WBA55CG and the NUCLEO-WBA65RI; where a value differs between them, the WBA65 value is shown alongside.
 
-![NUCLEO-WBA55CG with the X-NUCLEO-IKS MEMS sensor shield stacked on its Arduino headers](media/wba55-iks-stack.png)
-
-_The X-NUCLEO-IKS4A1 / IKS5A1 MEMS sensor shield stacked on the NUCLEO-WBA55CG Arduino headers (Step 8; a NUCLEO-WBA65RI hosts the same shield identically). The board reaches /IOTCONNECT over Amazon Sidewalk (BLE / Link Type 1) via a nearby gateway (e.g. Amazon Echo) and the AWS backend._
-
-![Amazon Sidewalk end-to-end workflow](https://docs.iotconnect.io/wp-content/uploads/2023/12/image7.png)
+| NUCLEO-WBA55CG | NUCLEO-WBA65RI |
+|:---:|:---:|
+| ![NUCLEO-WBA55CG](media/nucleo-wba55cg.jpg) | ![NUCLEO-WBA65RI](media/nucleo-wba65ri.jpg) |
 
 ## 1. Introduction
 
@@ -19,13 +17,34 @@ The firmware is built from source — licensing on the upstream SDK and crypto l
 
 Because the data travels over Amazon Sidewalk, your device reaches the cloud through any nearby **Sidewalk gateway** (for example, a compatible Amazon Echo) — no local Wi-Fi credentials are programmed onto the board.
 
-| | |
-|---|---|
-| ![Amazon Sidewalk device onboarding](https://docs.iotconnect.io/wp-content/uploads/2023/12/image6-1.png) | ![Amazon Echo (4th Gen) Sidewalk gateway](https://docs.iotconnect.io/wp-content/uploads/2023/12/image8.jpg) |
-| _Sidewalk onboarding: a per-device certificate is provisioned, then the manufacturing data is flashed onto the board._ | _A compatible Amazon Echo (4th Gen) can act as the Sidewalk gateway that relays your uplinks to the cloud._ |
+![Amazon Sidewalk device onboarding](https://docs.iotconnect.io/wp-content/uploads/2023/12/image6-1.png)
+
+_Device onboarding: a per-device certificate is provisioned, then the manufacturing data is flashed onto the board._
+
+![Amazon Sidewalk device connectivity](https://docs.iotconnect.io/wp-content/uploads/2023/12/image7.png)
+
+_Device connectivity: the board reaches /IOTCONNECT through a nearby Sidewalk gateway and the AWS backend._
 
 > [!NOTE]
-> Amazon Sidewalk coverage is required for the device to connect. Make sure a compatible Sidewalk gateway is powered on, within range, and has Amazon Sidewalk enabled. See [Amazon Sidewalk gateway](#amazon-sidewalk-gateway) in Step 2 for compatible devices and setup.
+> Amazon Sidewalk coverage is required for the device to connect. Make sure a compatible Sidewalk gateway is powered on, within range, and has Amazon Sidewalk enabled. See [Amazon Sidewalk gateway](#amazon-sidewalk-gateway) in Step 2.
+
+---
+
+## Table of Contents
+
+1. [Introduction](#1-introduction)
+2. [Prerequisites](#2-prerequisites)
+3. [Create /IOTCONNECT Account](#3-create-iotconnect-account)
+4. [Import the Device Template](#4-import-the-device-template)
+5. [Create a Sidewalk Device](#5-create-a-sidewalk-device)
+6. [Obtain the Device Certificate](#6-obtain-the-device-certificate)
+7. [Generate the Manufacturing Image](#7-generate-the-manufacturing-image)
+8. [Setup Hardware](#8-setup-hardware)
+9. [Build and Flash the Firmware](#9-build-and-flash-the-firmware)
+10. [Check Connectivity](#10-check-connectivity)
+11. [Import the Dashboard](#11-import-the-dashboard)
+12. [Send a Command (Downlink)](#12-send-a-command-downlink)
+13. [Resources](#13-resources)
 
 ---
 
@@ -33,15 +52,15 @@ Because the data travels over Amazon Sidewalk, your device reaches the cloud thr
 
 **Hardware**
 
-* [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) — Sidewalk host MCU (STM32WBA55CG, 1 MB flash; programmed over the on-board ST-LINK). **Or** a [NUCLEO-WBA65RI](https://www.newark.com/stmicroelectronics/nucleo-wba65ri/dev-brd-nucleo-64-arm-cortex-m33f/dp/25AM5396) (STM32WBA65RI, 2 MB flash) — same steps, using the WBA65 values noted throughout this guide.
-* **One of:** [X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) *or* [X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356) MEMS sensor expansion board
-* USB Type-C cable (ST-LINK programming + UART log)
-* A compatible **Amazon Sidewalk gateway** in range — see the next subsection
+* [NUCLEO-WBA55CG](https://www.newark.com/stmicroelectronics/nucleo-wba55cg/dev-brd-nucleo-64-32bit-arm-cortex/dp/94AK4277) or [NUCLEO-WBA65RI](https://www.newark.com/stmicroelectronics/nucleo-wba65ri/dev-brd-nucleo-64-arm-cortex-m33f/dp/25AM5396)
+* [X-NUCLEO-IKS4A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks4a1/expansion-brd-mems-environmental/dp/04AM0395) or [X-NUCLEO-IKS5A1](https://www.newark.com/stmicroelectronics/x-nucleo-iks5a1/expansion-brd-mems-environmental/dp/51AM2356) MEMS sensor expansion board
+* USB Type-C cable
+* [Amazon Sidewalk compatible gateway](https://docs.sidewalk.amazon/introduction/sidewalk-gateways.html)
 
 **Software**
 
-* PC running Windows 11, macOS, or Linux
-* [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (provides the `STM32_Programmer_CLI` used for flashing) — **it does not add itself to your `PATH`;** see below
+* PC running Windows 11 (recommended)
+* [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (provides the `STM32_Programmer_CLI` used for flashing)
 * [Python 3.10+](https://www.python.org/downloads/) (used to generate the per-device manufacturing image) — tick **Add python.exe to PATH** in the installer
 
 > [!NOTE]
@@ -49,28 +68,6 @@ Because the data travels over Amazon Sidewalk, your device reaches the cloud thr
 * A Serial Terminal application such as [Tera Term](https://teratermproject.github.io/index-en.html), [PuTTY](https://www.putty.org/), or `screen` (115200 8N1)
 * **Windows only:** [Git for Windows](https://git-scm.com/download/win), which installs **Git Bash**. The provisioning, build, and flash helpers in this repo are bash scripts — run them from a Git Bash prompt. macOS and Linux already have a suitable shell.
 * **To build the firmware (Step 9):** STM32CubeIDE plus three ST packages, staged by one script — follow [Build Setup](BUILD_SETUP.md) once before you reach Step 9. Everything up to Step 8 works without it.
-
-### Put STM32_Programmer_CLI on your PATH
-
-STM32CubeProgrammer installs its command-line tool but **does not add it to `PATH`**, so `STM32_Programmer_CLI` comes back as *not recognized* / *command not found* in PowerShell, cmd, and Git Bash alike. Fix it once, in the Git Bash window you will use for the rest of this guide:
-
-```bash
-export PATH="$PATH:/c/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin"
-STM32_Programmer_CLI --version    # should print the version
-```
-
-That lasts for the current window. To make it permanent, append the same line to `~/.bashrc`:
-
-```bash
-echo 'export PATH="$PATH:/c/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin"' >> ~/.bashrc
-```
-
-On macOS and Linux the equivalent directories are
-`/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin`
-and `~/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin`.
-
-> [!NOTE]
-> [`tools/flash_wba55.sh`](tools/flash_wba55.sh) (Step 9) checks these default install locations on its own, so it works even if you skip this. Setting `PATH` is what lets you run `STM32_Programmer_CLI` directly.
 
 ### Get this repository
 
@@ -80,30 +77,16 @@ Everything this guide references (templates, decoders, dashboards, and the provi
 
 ### Amazon Sidewalk gateway
 
-Your board does **not** join your Wi-Fi. It reaches the cloud through a nearby **Amazon Sidewalk gateway** (Amazon calls these *bridges*) — a consumer Amazon device that is already on someone's Wi-Fi and donates a sliver of its bandwidth to relay Sidewalk traffic. You do not need to buy a dedicated gateway if one is already in range.
+Your board does **not** join your Wi-Fi. It reaches the cloud through a nearby **Amazon Sidewalk gateway**, such as a compatible Amazon Echo or Ring device. This demo uses **Sidewalk over BLE (Link Type 1)**, so the gateway must support BLE.
 
-This demo uses **Sidewalk over BLE (Link Type 1)**, so any Sidewalk gateway with BLE support works. Common ones:
+![Amazon Echo (4th Gen) Sidewalk gateway](https://docs.iotconnect.io/wp-content/uploads/2023/12/image8.jpg)
 
-| Amazon device | Sidewalk radios | Works for this demo (BLE) |
-|---|---|:--:|
-| Echo (4th Gen), Echo Show 15 (2nd Gen), Echo Show 21 | BLE + Sub-GHz (CSS + FSK) | ✅ |
-| Echo Hub | BLE + Sub-GHz (CSS) | ✅ |
-| Echo Dot (5th Gen), Echo Dot Max (Gen 6), Echo Pop, Echo Spot (2024), Echo Studio (Gen 5), Echo Show 8 (Gen 4), Echo Show 11 (Gen 2) | BLE only | ✅ |
-| Ring Bridge (2nd Gen), Ring Wired Doorbell Pro (2021), Ring Floodlight Cam Wired 4K | BLE + Sub-GHz (CSS + FSK) | ✅ |
-| Ring Floodlight Cam Wired Plus, Ring Wired Doorbell Pro 4K, Ring Outdoor Cam Pro | Sub-GHz only (no BLE) | ❌ |
-| Ring Alarm Pro Base Station | Sub-GHz FSK only | ❌ |
+* **Compatible gateways:** see Amazon's [Sidewalk gateways](https://docs.sidewalk.amazon/introduction/sidewalk-gateways.html) page for the current list.
+* **Setup:** make sure **Amazon Sidewalk** and **location services** are enabled for the gateway in the Alexa or Ring app.
+* **Availability:** check Amazon's [Sidewalk coverage map](https://coverage.sidewalk.amazon/) for where Sidewalk is currently available.
+* **Placement:** keep the gateway powered and within BLE range of your board; the same room is ideal.
 
-The full, current list is in the [Amazon Sidewalk gateway documentation](https://docs.sidewalk.amazon/introduction/sidewalk-gateways.html).
-
-**General gateway setup** — a one-time job, and if you already use an Echo at home it is probably done:
-
-1. **Plug the gateway in** and keep it powered — it must stay online for your device to reach the cloud.
-2. **Connect it to a local Wi-Fi network.** In the Alexa app: **More → Add a Device → Amazon Echo**, then follow the prompts to join your Wi-Fi. Sidewalk rides on this internet connection.
-3. **Enable Amazon Sidewalk.** New devices offer this during setup — choose **Enable**. For a gateway you already own: **Alexa app → More → Settings → Account Settings → Amazon Sidewalk → Enable**. (Ring devices: **Ring app → Control Center → Amazon Sidewalk**.)
-4. **Place the gateway within BLE range** of your Nucleo board — same room is ideal; expect a couple of walls at most.
-
-> [!NOTE]
-> Amazon Sidewalk is currently **available in the United States only**, and the gateway must be registered to an Amazon account. Your development board does not need to be on the same account as the gateway — Sidewalk gateways relay for any authorized Sidewalk endpoint in range.
+Your board does not need to be on the same Amazon account as the gateway.
 
 ---
 
@@ -124,54 +107,34 @@ An /IOTCONNECT account with an **AWS backend** is required (Amazon Sidewalk runs
 
 ## 4. Import the Device Template
 
-The **device template** defines the telemetry attributes and downlink commands for the MEMS demo, and the **decoder** turns the raw Sidewalk TLV uplink into named values.
+The **device template** defines the telemetry attributes and downlink commands for the MEMS demo, and the **decoder** turns the raw Sidewalk uplink into named values.
 
-1. Download the pre-made device template from this repo: [`device-templates/sidewalk_st_WBA55+MEMS_template.JSON`](device-templates/sidewalk_st_WBA55+MEMS_template.JSON) (template code `STswMEMS`, *“Sidewalk ST WBA55 + MEMS”*). The same template covers both the IKS4A1 and IKS5A1 boards.
+1. Download the pre-made device template from this repo: [`device-templates/sidewalk_st_WBA+MEMS_template.JSON`](device-templates/sidewalk_st_WBA+MEMS_template.JSON) (template code `STswMEMS`, *“Sidewalk ST WBA + MEMS”*). The same template covers both the IKS4A1 and IKS5A1 boards.
 2. Login to the platform at [console.iotconnect.io](https://console.iotconnect.io).
 3. From the navigation panel on the left, select the **Devices** icon and choose **Wireless Device** from the sub-menu.<br>![Devices menu with Wireless Device selected](media/menu-wireless-device.png)
 4. At the bottom of the page, select the **Templates** icon from the toolbar.<br>![Templates toolbar icon](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/menu-templates.png?raw=true)
 5. At the top-right of the page, select the **Create Template** button.<br>![Create Template button](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/button-create-template.png?raw=true)
 6. At the top-right of the page, select the **Import** button.<br>![Import button](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/media/button-import.png?raw=true)
-7. Click **Browse**, navigate to and select the downloaded `sidewalk_st_WBA55+MEMS_template.JSON`.
+7. Click **Browse**, navigate to and select the downloaded `sidewalk_st_WBA+MEMS_template.JSON`.
 8. Click **Save**.
 
-### About the decoder
+### Submit the decoder for approval
 
-Sidewalk is a low-bandwidth network, so the firmware does not send JSON. It packs each reading into a compact binary **TLV** (tag-length-value) frame — a few dozen bytes carrying accelerometer, gyro, temperature, pressure, and Qvar values — and that frame arrives in the cloud as base64. A **decoder** is the small piece of Python that turns those bytes back into named values.
+The decoder for this demo is [`decoders/sidewalk-mems-tlv.py`](decoders/sidewalk-mems-tlv.py), and one decoder serves both sensor boards. A new account has no approved decoder, so submit this one now. How the decoder works, and how to test it locally, is covered in the [Developer Guide](DEVELOPER_GUIDE.md#the-uplink-decoder).
 
-Here is where it sits in the path from board to dashboard:
+1. From the navigation panel on the left, select the **Settings** icon and choose **Key Vault**.<br>![Settings menu with Key Vault selected](media/menu-key-vault.png)
+2. Select the **Wireless** tab, then **Custom Decoder**, and click **Create Decoder**.<br>![Key Vault Wireless tab with the Custom Decoder list and the Create Decoder button](media/key-vault-custom-decoder.png)
+3. Fill in the fields:
+   * **Transmission type:** select **Sidewalk**
+   * **Template:** select the imported template *Sidewalk ST WBA + MEMS*
+   * **Device:** leave empty
+   * **Runtime:** select **Python**
+   * **Upload File:** click **Browse** and select `decoders/sidewalk-mems-tlv.py`
+4. Click **Save**.
 
-```
-Board  ──BLE──▶  Sidewalk gateway  ──▶  AWS IoT Wireless  ──▶  /IOTCONNECT Lambda
-(packs TLV)         (Echo / Ring)         (deduplicates)         (runs the DECODER)
-                                                                        │
-                                              dashboards & rules  ◀── template attributes
-                                                                   (JSON mapped by name)
-```
+![Create Decoder form in Key Vault](media/key-vault-create-decoder.png)
 
-The decoder runs inside the /IOTCONNECT Lambda, before the platform stores anything. Its output keys are matched **by name, case-sensitively**, against the attributes declared in your device template — an attribute the decoder never emits stays empty, and a key with no matching attribute is discarded. That name mismatch is the single most common reason a device shows as connected but never populates Live Data.
-
-/IOTCONNECT offers two kinds of decoder:
-
-| Decoder | Use |
-|---|---|
-| **Raw Data Default** | Passes the raw payload straight through — useful only to confirm bytes are arriving |
-| **Custom Decoder** | Your own Python, mapping the payload to template attributes — what this demo uses |
-
-This repo ships the matching custom decoder: [`decoders/sidewalk-mems-tlv.py`](decoders/sidewalk-mems-tlv.py). It walks the TLV stream, skips unknown tags rather than failing, and returns scaled SI values (g, dps, °C, %RH, hPa) under exactly the names the `STswMEMS` template declares. One decoder serves both sensor boards — the IKS5A1 simply leaves the fields it has no sensor for empty. /IOTCONNECT decoders use a fixed entry point:
-
-```python
-def dict_from_payload(base64_input: str, fport: int = None):
-    return {"payload": {...}}
-```
-
-You can run it locally before uploading anything — it builds a synthetic payload, decodes it, and prints the result (expect ~23 °C, ~42 %RH, ~1013 hPa):
-
-```
-python decoders/sidewalk-mems-tlv.py
-```
-
-**Submit it for approval, then attach it to the template.** Custom decoders are reviewed by /IOTCONNECT before they can run in the cloud — allow roughly **24 hours**. While yours is in review you can still prove the end-to-end path today using the already-approved `STsidewalk2` decoder, which reads the whole-degree temperature tag our firmware also emits — see [section 12 of the example README](examples/sidewalk-mems-wba55/README.md#12-temporary-device--validate-today-using-the-alreadyapproved-decoder).
+Custom decoders are reviewed by /IOTCONNECT before they can run in the cloud, which typically takes about 24 hours. You will receive an email through the ticket system when your decoder is approved.
 
 ---
 
@@ -183,14 +146,14 @@ In this step you create a **Wireless Device** of transmission type **Sidewalk**,
 2. At the top-right, click **Create Device**.
 3. Fill in the fields:
    * **Transmission Type:** select **Sidewalk**
-   * **Unique ID (DUID):** a unique identifier for this unit, e.g. `wba55-mems-01`. **Pick this carefully — it cannot be changed later**, and you will pass it to the provisioning script in Step 7.
-   * **Device Type / Hardware:** select the option matching your STM32WBA55 (or STM32WBA65) hardware
-   * **Display Name:** a friendly name, e.g. `WBA55 MEMS Demo`
+   * **Unique Id:** a unique identifier for this unit, e.g. `wba-mems-01`. **Pick this carefully — it cannot be changed later**, and you will pass it to the provisioning script in Step 7.
+   * **Device Name:** a friendly name, e.g. `WBA MEMS Demo`
    * **Entity:** select the entity to own the device (new accounts have a single option)
-   * **Template:** select the imported template `STswMEMS`
+   * **Template:** select the imported template *Sidewalk ST WBA + MEMS*
+   * **Custom Decoder:** select `sidewalk-mems-tlv` once it has been approved
 4. Click **Save & View**. Saving whitelists the device with AWS IoT Wireless for authorization.
 
-![Create Device screen](https://docs.iotconnect.io/wp-content/uploads/2023/12/image3.png)
+![Create Device screen](media/create-device.png)
 
 _(Screen: Create Device)_
 
@@ -214,13 +177,6 @@ The download is available in two places — either works, and both give you the 
 
 ![Downloading the device certificate from the Actions column of the Wireless Device list](media/device-list-certificate-download.png)
 
-> [!NOTE]
-> The /IOTCONNECT console is updated regularly, so **the icon may not look exactly like the screenshot above** (it was a green *HEX* icon when this guide was written). Hover over the icons in the **Actions** column — the certificate download is the one that is not the history icon (clock) or delete (red trash can).
-
-**The downloaded file is normally named `certificate.json`**, not `<device name>.json` — the browser does not name it after your device. If you are provisioning more than one board, rename each download as soon as it lands (e.g. `wba55-mems-01.json`) or keep them in separate folders, because a second download will otherwise overwrite the first or land as `certificate (1).json`.
-
-Save the file somewhere you can reach from a terminal, e.g. your `Downloads` folder.
-
 > [!IMPORTANT]
 > The certificate JSON contains **device private keys**. Treat it like an SSH key: never commit it, never paste it into chat/email/tickets, and delete it from shared machines after flashing. This repository already `.gitignore`s the `binaries/sidewalk-mfg/` directory where the generated artifacts land.
 
@@ -232,7 +188,7 @@ The certificate JSON must be converted into a **board-format manufacturing image
 
 ### One-time setup: get the STM32-Sidewalk-SDK
 
-The provisioning logic lives in ST's SDK, so you need a copy of it alongside this repository. **[Download the SDK ZIP](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK/archive/refs/heads/main.zip)** (~53 MB, also public — no account needed) and extract it **next to** your `iotc-stm32-sidewalk` folder:
+The provisioning logic lives in ST's SDK, so you need a copy of it alongside this repository. **[Download the STM32-Sidewalk-SDK ZIP from ST's GitHub repository](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK/archive/refs/heads/main.zip)** (~53 MB, public, no account needed) and extract it **next to** your `iotc-stm32-sidewalk` folder:
 
 ```
 Downloads/
@@ -240,7 +196,7 @@ Downloads/
 └── STM32-Sidewalk-SDK-main/      <-- the SDK, extracted alongside it
 ```
 
-Leave both folders under the names the ZIPs give them — the script accepts those, and `STM32-Sidewalk-SDK` if you prefer to drop the `-main` suffix. If you keep the SDK somewhere else entirely, set the `SDK_ROOT` environment variable to its path:
+If you keep the SDK somewhere else, set the `SDK_ROOT` environment variable to its path:
 
 ```bash
 SDK_ROOT=/c/path/to/STM32-Sidewalk-SDK ./scripts/provision-device.sh ...
@@ -263,21 +219,26 @@ From the root of the extracted repo folder (a **Git Bash** prompt on Windows):
 ./scripts/provision-device.sh <device-name> <path-to-cert.json> [chip]
 ```
 
-* `<device-name>` — the device's **Unique ID** from Step 5 (e.g. `wba55-mems-01`). It names the output folder, so using the Unique ID is what lets you match a generated image back to the device it belongs to. It is *not* read from the certificate, so a typo here silently produces a confusingly-named folder rather than an error.
+* `<device-name>` — the device's **Unique ID** from Step 5 (e.g. `wba-mems-01`). It names the output folder, so using the Unique ID is what lets you match a generated image back to the device it belongs to. It is *not* read from the certificate, so a typo here silently produces a confusingly-named folder rather than an error.
 * `<path-to-cert.json>` — the file you downloaded in Step 6. It is normally called **`certificate.json`**.
 * `[chip]` — optional; defaults to **`WBA55xG`** (NUCLEO-WBA55CG). Pass **`WBA65xI`** for the NUCLEO-WBA65RI. The script picks the matching mfg flash address automatically.
 
-Examples:
+For the NUCLEO-WBA55CG:
 
 ```bash
-./scripts/provision-device.sh wba55-mems-01 certificate.json            # WBA55 (default)
-./scripts/provision-device.sh wba65-mems-01 certificate.json WBA65xI    # WBA65
+./scripts/provision-device.sh wba-mems-01 certificate.json
+```
+
+For the NUCLEO-WBA65RI:
+
+```bash
+./scripts/provision-device.sh wba-mems-01 certificate.json WBA65xI
 ```
 
 This produces (WBA55 shown; on WBA65 the `mfg.bin` flashes @ `0x081FE000`):
 
 ```
-binaries/sidewalk-mfg/wba55-mems-01/
+binaries/sidewalk-mfg/wba-mems-01/
 ├── cert.json
 ├── mfg.bin      <-- flash this @ 0x080FE000  (WBA65: 0x081FE000)
 └── mfg.hex
@@ -300,14 +261,13 @@ binaries/sidewalk-mfg/wba55-mems-01/
    Support the panel flat with the add-on just past the edge of a table, hold it close to the tabs, and **flex it straight down until the tabs snap** — do not twist, and keep your fingers off the components and pin headers. The tabs are scored to break cleanly by hand; no cutting tool is needed. Keep the add-on board: its pin headers plug into the **DIL24 socket** on the shield when you want to use the sensor it carries.
 
 2. **Stack** the MEMS expansion board onto the NUCLEO-WBA55CG (or NUCLEO-WBA65RI): align the **X-NUCLEO-IKS4A1** (or **IKS5A1**) onto the Arduino headers and press firmly until fully seated. No jumpers or extra wiring are needed — the sensors talk over the Arduino I²C connector.
+
+   ![NUCLEO-WBA55CG with the X-NUCLEO-IKS MEMS sensor shield stacked on its Arduino headers](media/wba55-iks-stack.png)
+
+   _The MEMS sensor shield stacked on the NUCLEO-WBA55CG; the NUCLEO-WBA65RI hosts the same shield identically._
+
 3. **Connect** the USB Type-C cable from your PC to the board's ST-LINK port.
 4. Confirm the board powers up (the ST-LINK LED illuminates).
-
-> [!NOTE]
-> **WBA65 users:** the firmware's sensor-shield Arduino-I²C pin mapping currently defaults to the known-good WBA55 pinout and has **not yet been confirmed against the NUCLEO-WBA65RI schematic**. Confirm the Arduino-I²C pins against the board schematic before trusting sensor data on the WBA65.
-
-> [!NOTE]
-> Use the firmware variant that matches your physical board (IKS4A1 firmware on the IKS4A1 board, IKS5A1 firmware on the IKS5A1 board). A mismatch shows up as an IMU `init failed` message in the serial log.
 
 ---
 
@@ -315,31 +275,33 @@ binaries/sidewalk-mfg/wba55-mems-01/
 
 You build the firmware yourself; pre-built images are not distributed in this repository (see `NOTICE.md` for the licensing rationale). You then flash **two** images: the firmware and the per-device manufacturing data from Step 7.
 
-> [!NOTE]
-> If your board arrived already flashed with this demo firmware, skip ahead to **Step 10**, plug it in, and confirm the boot banner on the UART. You still need your own manufacturing image from Step 7 unless the board was provisioned with a device you own.
+### One-time build setup
 
-### Build the firmware locally
+Complete steps 1 to 3 of [Build Setup](BUILD_SETUP.md) before your first build: install STM32CubeIDE, download the two ST packages, and run the prepare script. A fresh SDK download does **not** build on its own.
+
+### Build the firmware
+
+Select your host board. For the NUCLEO-WBA55CG:
 
 ```bash
-./scripts/build-firmware.sh           # both IKS4A1 and IKS5A1 variants (WBA55)
-./scripts/build-firmware.sh iks4a1    # IKS4A1 only
-./scripts/build-firmware.sh iks5a1    # IKS5A1 only
-
-BOARD=wba65 ./scripts/build-firmware.sh   # build the WBA65 hex(es) instead (BOARD defaults to wba55)
+export BOARD=wba55
 ```
 
-The `BOARD` env var selects the host board (default `wba55`); `BOARD=wba65` builds the WBA65 variants from the STM32WBA65 CubeIDE project (`STM32CubeIDE/STM32WBA65`, `Debug_Nucleo-WBA65` config) that the SDK already ships.
+For the NUCLEO-WBA65RI:
 
-> [!NOTE]
-> This helper drives STM32CubeIDE's headless builder, so **STM32CubeIDE must be installed** — but you never open it. The script finds it automatically in the default install locations on Windows, Linux, and macOS; if yours lives somewhere else, point `CUBE_IDE` at the launcher:
->
-> ```bash
-> CUBE_IDE=/c/ST/STM32CubeIDE_1.18.0/STM32CubeIDE/headless-build.bat ./scripts/build-firmware.sh
-> ```
->
-> You can also open the CubeIDE project and build from the GUI — the [example README](examples/sidewalk-mems-wba55/README.md) walks through that path and produces the same hex.
+```bash
+export BOARD=wba65
+```
 
-This needs the one-time setup in [Build Setup](BUILD_SETUP.md) — install STM32CubeIDE, download the SDK and two ST packages, run `./scripts/prepare-sdk.sh`. A fresh SDK download does **not** build on its own; the prepare step stages the sensor drivers, crypto library, and this demo's sources into it. Output lands at:
+Then build. One run produces the firmware for both sensor shields:
+
+```bash
+./scripts/build-firmware.sh
+```
+
+If the build fails, see [If it fails](BUILD_SETUP.md#if-it-fails) in Build Setup.
+
+Output lands at:
 
 ```
 binaries/sid_ble_wba55_iks4a1.hex     # (WBA65: sid_ble_wba65_iks4a1.hex)
@@ -357,12 +319,12 @@ Pick the one that matches your host board + sensor board:
 
 ### Flash the two images
 
-[`tools/flash_wba55.sh`](tools/flash_wba55.sh) erases the chip, writes the firmware, then writes the manufacturing image — each step under connect-under-reset with an automatic one-shot retry. It is board-agnostic: pass whichever firmware hex and `mfg.hex` you built.
+[`tools/flash_wba.sh`](tools/flash_wba.sh) erases the chip, writes the firmware, then writes the manufacturing image — each step under connect-under-reset with an automatic one-shot retry. It is board-agnostic: pass whichever firmware hex and `mfg.hex` you built.
 
 ```bash
-tools/flash_wba55.sh \
+tools/flash_wba.sh \
   binaries/sid_ble_wba55_iks4a1.hex \
-  binaries/sidewalk-mfg/wba55-mems-01/mfg.hex
+  binaries/sidewalk-mfg/wba-mems-01/mfg.hex
 ```
 
 The equivalent three commands, if you would rather run them yourself:
@@ -370,13 +332,13 @@ The equivalent three commands, if you would rather run them yourself:
 ```bash
 STM32_Programmer_CLI -c port=SWD mode=UR -e all
 STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sid_ble_wba55_iks4a1.hex -v
-STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sidewalk-mfg/wba55-mems-01/mfg.hex -v
+STM32_Programmer_CLI -c port=SWD mode=UR -d binaries/sidewalk-mfg/wba-mems-01/mfg.hex -v
 ```
 
 The `mfg.hex` carries its own flash address. If you flash the raw `mfg.bin` instead, supply the address yourself — `0x080FE000` on WBA55, `0x081FE000` on WBA65.
 
 > [!NOTE]
-> `STM32_Programmer_CLI: command not found` means STM32CubeProgrammer is not on your `PATH` — see [Put STM32_Programmer_CLI on your PATH](#put-stm32_programmer_cli-on-your-path) in Step 2. The `flash_wba55.sh` helper above finds it without that; the three manual commands do not.
+> STM32CubeProgrammer does not add itself to your `PATH`. The `flash_wba.sh` helper finds the CLI on its own; to run the commands by hand, call it by its full path, e.g. `"/c/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"`.
 
 After flashing, **press the black RESET button** (or power-cycle) to start the firmware.
 
@@ -413,6 +375,9 @@ Open the board's USB serial port at **115200 8N1**. On first boot you should see
 [INFO]: Established BLE connection ...
 [INFO]: IKS4A1 action uplink seq=0 ...
 ```
+
+> [!NOTE]
+> Use the firmware variant that matches your physical board (IKS4A1 firmware on the IKS4A1 board, IKS5A1 firmware on the IKS5A1 board). A mismatch shows up as an IMU `init failed` message in the serial log.
 
 > [!NOTE]
 > `Corrupted dir pair at {0x0, 0x1}` on the first boot after flashing is normal: the erase wiped the LittleFS region, and the SDK formats it and continues. It only signals a problem if it appears on every boot.
@@ -468,8 +433,8 @@ Both boards share the same TLV wire format and the single `STswMEMS` template; t
 
 | Your shield | Dashboard export | Widgets |
 |---|---|---|
-| **X-NUCLEO-IKS4A1** | [`sidewalk_st_WBA55+IKS4A1_dashboard_export.json`](dashboard-templates/sidewalk_st_WBA55+IKS4A1_dashboard_export.json) | Accel / gyro / QVAR charts, 6D orientation and MLC activity pictures, SHT40 + STTS22H temperature, pressure, and humidity gauges |
-| **X-NUCLEO-IKS5A1** | [`sidewalk_st_WBA55+IKS5A1_dashboard_export.json`](dashboard-templates/sidewalk_st_WBA55+IKS5A1_dashboard_export.json) | Accel / gyro / QVAR charts, MLC activity picture, temperature and pressure gauges — no SHT40 or orientation widgets, since the IKS5A1 has neither |
+| **X-NUCLEO-IKS4A1** | [`sidewalk_st_WBA+IKS4A1_dashboard_export.json`](dashboard-templates/sidewalk_st_WBA+IKS4A1_dashboard_export.json) | Accel / gyro / QVAR charts, 6D orientation and MLC activity pictures, SHT40 + STTS22H temperature, pressure, and humidity gauges |
+| **X-NUCLEO-IKS5A1** | [`sidewalk_st_WBA+IKS5A1_dashboard_export.json`](dashboard-templates/sidewalk_st_WBA+IKS5A1_dashboard_export.json) | Accel / gyro / QVAR charts, MLC activity picture, temperature and pressure gauges — no SHT40 or orientation widgets, since the IKS5A1 has neither |
 
 1. Download the export for **your** board from the table above.
 2. In /IOTCONNECT, open the **Dashboards** menu at the top of the page and choose **Create Dashboard**.
@@ -508,6 +473,7 @@ _(Screen: Command)_
 
 ## 13. Resources
 
+* [Developer Guide](DEVELOPER_GUIDE.md) (how the uplink decoder works and how to test it)
 * [MEMS Sensor Demo — full example README](examples/sidewalk-mems-wba55/README.md) (build-from-source, payload wire format, troubleshooting)
 * [Binaries & provisioning details](binaries/README.md)
 * [Repository overview](README.md)

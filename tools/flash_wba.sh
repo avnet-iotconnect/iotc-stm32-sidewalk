@@ -9,15 +9,15 @@
 # WBA65 that is the sid_ble_wba65 build and a WBA65xI-provisioned mfg.hex.
 #
 # Usage:
-#   flash_wba55.sh <firmware.hex> <mfg.hex>
+#   flash_wba.sh <firmware.hex> <mfg.hex>
 #
 # Examples:
 #   # WBA55
-#   flash_wba55.sh \
+#   flash_wba.sh \
 #     STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA55/Debug_Nucleo-WBA55/sid_ble_wba55.hex \
 #     /tmp/sidewalk-mfg/STtempIKS4A1/mfg_STtempIKS4A1.hex
 #   # WBA65
-#   flash_wba55.sh \
+#   flash_wba.sh \
 #     STM32-Sidewalk-SDK/apps/st/stm32wba/sid_ble/STM32CubeIDE/STM32WBA65/Debug_Nucleo-WBA65/sid_ble_wba65.hex \
 #     /tmp/sidewalk-mfg/STtempIKS4A1/mfg_STtempIKS4A1.hex
 #

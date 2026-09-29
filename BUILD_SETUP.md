@@ -1,6 +1,6 @@
 # Build Setup: compiling the firmware yourself
 
-Pre-built firmware is not distributed in this repository (see [`NOTICE.md`](NOTICE.md)), so the hex files in Step 9 of [Getting Started](GETTING_STARTED.md) come from a local build. This page is the one-time setup for that build. Once done, the build itself is a single command.
+Pre-built firmware is not distributed in this repository (see [`NOTICE.md`](NOTICE.md)), so the hex files in Step 9 of [Getting Started](GETTING_STARTED_WBA.md) come from a local build. This page is the one-time setup for that build. The build itself is run from Getting Started, Step 9.
 
 ## 1. Install STM32CubeIDE
 
@@ -12,7 +12,7 @@ Extract all three **next to** the `iotc-stm32-sidewalk` folder (or leave them in
 
 | Package | Get it from | Provides |
 |---|---|---|
-| **STM32-Sidewalk-SDK** | [GitHub ZIP](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK/archive/refs/heads/main.zip) (public, ~53 MB) | The Sidewalk stack and the `sid_ble` app this demo builds on |
+| **STM32-Sidewalk-SDK** | [ST's GitHub repository ZIP](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK/archive/refs/heads/main.zip) (public, ~53 MB). Already in place if you completed Getting Started, Step 7. | The Sidewalk stack and the `sid_ble` app this demo builds on |
 | **X-CUBE-MEMS1** | [st.com](https://www.st.com/en/embedded-software/x-cube-mems1.html) (free ST account) | Drivers for the sensors on the IKS4A1 / IKS5A1 shields |
 | **X-CUBE-CRYPTOLIB** | [st.com](https://www.st.com/en/embedded-software/x-cube-cryptolib.html) (free ST account; accept the click-through licence) | The CMOX crypto library the Sidewalk SDK links against |
 
@@ -38,13 +38,9 @@ It finds the three packages automatically and prints what it used. If you keep o
 
 ## 4. Build
 
-```bash
-./scripts/build-firmware.sh           # both sensor shields (WBA55)
-./scripts/build-firmware.sh iks4a1    # one shield only
-BOARD=wba65 ./scripts/build-firmware.sh   # NUCLEO-WBA65RI instead
-```
+Setup is complete. Return to [Getting Started, Step 9](GETTING_STARTED_WBA.md#9-build-and-flash-the-firmware) to build and flash the firmware.
 
-Output lands in `binaries/`, e.g. `binaries/sid_ble_wba55_iks4a1.hex`. Return to [Getting Started, Step 9](GETTING_STARTED.md#9-build-and-flash-the-firmware) to flash it.
+The build script also accepts a single shield as an argument, `iks4a1` or `iks5a1`, if you want to build only one. Output lands in `binaries/`, e.g. `binaries/sid_ble_wba55_iks4a1.hex`.
 
 ## If it fails
 
