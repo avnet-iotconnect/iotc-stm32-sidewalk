@@ -1,3 +1,89 @@
+diff --git a/apps/st/stm32wba/common/hal_handlers/exception_handlers.c b/apps/st/stm32wba/common/hal_handlers/exception_handlers.c
+index 57600a2..be2a626 100644
+--- a/apps/st/stm32wba/common/hal_handlers/exception_handlers.c
++++ b/apps/st/stm32wba/common/hal_handlers/exception_handlers.c
+@@ -459,6 +459,13 @@ __NO_RETURN SID_STM32_STACKLESS_FUNCTION void HardFault_Handler(void)
+ #  warning "It's not safe to let the UART logs to be printed out in HardFault handler. DO NOT USE THIS FUNCTIONALITY IN RELEASE BUILDS. Feel free to ignore this warning if log buffer flush is used intentionally"
+     if ((hard_fault_status_regs[REG_CFSR] & SCB_CFSR_STKOF_Msk) == 0u)
+     {
++        /* Print the report NOW, before the reset. The deferred boot-time
++         * report never fires in this project: hard_fault_info_validity_markers
++         * live in initialised RAM and are rewritten by the startup code, so a
++         * HardFault otherwise looks like a clean restart (bench, 2026-09-29). */
++        SID_PAL_LOG_ERROR("HardFault - immediate report (device will reset)");
++        _print_stack_frame(hard_fault_stack_frame);
++        _print_hardfault_report(hard_fault_status_regs);
+         /* Ensure all the logs are printed out */
+         _flush_log_buffer();
+     }
+diff --git a/apps/st/stm32wba/common/memory_allocation/STM32WBA5xxG_Sidewalk.ld b/apps/st/stm32wba/common/memory_allocation/STM32WBA5xxG_Sidewalk.ld
+index a0a4dc3..19af8c8 100644
+--- a/apps/st/stm32wba/common/memory_allocation/STM32WBA5xxG_Sidewalk.ld
++++ b/apps/st/stm32wba/common/memory_allocation/STM32WBA5xxG_Sidewalk.ld
+@@ -174,6 +174,12 @@ SECTIONS
+   .no_init (NOLOAD) :
+   {
+     . = ALIGN(4);
++    /* Variables tagged UTIL_MEM_PLACE_IN_SECTION(".no_init") - e.g. the
++     * HardFault report captured by exception_handlers.c - must land here, not
++     * be orphaned into .data (where the startup re-initialises them and the
++     * boot-time fault report can never fire). */
++    KEEP(*(.no_init*))
++    . = ALIGN(4);
+   } >RAM
+ 
+   /* Used by the startup to initialize data */
+diff --git a/apps/st/stm32wba/common/memory_allocation/STM32WBA5xxG_Sidewalk_OTA.ld b/apps/st/stm32wba/common/memory_allocation/STM32WBA5xxG_Sidewalk_OTA.ld
+index 8211ca1..00ed0de 100644
+--- a/apps/st/stm32wba/common/memory_allocation/STM32WBA5xxG_Sidewalk_OTA.ld
++++ b/apps/st/stm32wba/common/memory_allocation/STM32WBA5xxG_Sidewalk_OTA.ld
+@@ -185,6 +185,12 @@ SECTIONS
+   .no_init (NOLOAD) :
+   {
+     . = ALIGN(4);
++    /* Variables tagged UTIL_MEM_PLACE_IN_SECTION(".no_init") - e.g. the
++     * HardFault report captured by exception_handlers.c - must land here, not
++     * be orphaned into .data (where the startup re-initialises them and the
++     * boot-time fault report can never fire). */
++    KEEP(*(.no_init*))
++    . = ALIGN(4);
+   } >RAM
+ 
+   /* Used by the startup to initialize data */
+diff --git a/apps/st/stm32wba/common/memory_allocation/STM32WBA6xxI_Sidewalk.ld b/apps/st/stm32wba/common/memory_allocation/STM32WBA6xxI_Sidewalk.ld
+index 3bb6535..b64b483 100644
+--- a/apps/st/stm32wba/common/memory_allocation/STM32WBA6xxI_Sidewalk.ld
++++ b/apps/st/stm32wba/common/memory_allocation/STM32WBA6xxI_Sidewalk.ld
+@@ -174,6 +174,12 @@ SECTIONS
+   .no_init (NOLOAD) :
+   {
+     . = ALIGN(4);
++    /* Variables tagged UTIL_MEM_PLACE_IN_SECTION(".no_init") - e.g. the
++     * HardFault report captured by exception_handlers.c - must land here, not
++     * be orphaned into .data (where the startup re-initialises them and the
++     * boot-time fault report can never fire). */
++    KEEP(*(.no_init*))
++    . = ALIGN(4);
+   } >RAM
+ 
+   /* Used by the startup to initialize data */
+diff --git a/apps/st/stm32wba/common/memory_allocation/STM32WBA6xxI_Sidewalk_OTA.ld b/apps/st/stm32wba/common/memory_allocation/STM32WBA6xxI_Sidewalk_OTA.ld
+index b3c8319..b247f29 100644
+--- a/apps/st/stm32wba/common/memory_allocation/STM32WBA6xxI_Sidewalk_OTA.ld
++++ b/apps/st/stm32wba/common/memory_allocation/STM32WBA6xxI_Sidewalk_OTA.ld
+@@ -185,6 +185,12 @@ SECTIONS
+   .no_init (NOLOAD) :
+   {
+     . = ALIGN(4);
++    /* Variables tagged UTIL_MEM_PLACE_IN_SECTION(".no_init") - e.g. the
++     * HardFault report captured by exception_handlers.c - must land here, not
++     * be orphaned into .data (where the startup re-initialises them and the
++     * boot-time fault report can never fire). */
++    KEEP(*(.no_init*))
++    . = ALIGN(4);
+   } >RAM
+ 
+   /* Used by the startup to initialize data */
 diff --git a/apps/st/stm32wba/sid_ble/Config/app_conf.h b/apps/st/stm32wba/sid_ble/Config/app_conf.h
 index d4d6538..e034d62 100644
 --- a/apps/st/stm32wba/sid_ble/Config/app_conf.h
