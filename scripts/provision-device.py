@@ -2,8 +2,7 @@
 """Generate an STM32WBA Sidewalk manufacturing image from a device certificate.
 
 Cross-platform wrapper around the STM32-Sidewalk-SDK's ``tools/provision/provision.py``.
-Runs the same on Windows (PowerShell / cmd), macOS, and Linux -- unlike the
-``provision-device.sh`` companion, which needs a POSIX shell.
+Runs the same on Windows (PowerShell / Command Prompt), macOS, and Linux.
 
 Takes the certificate JSON downloaded from /IOTCONNECT for one wireless device
 and writes the flashable manufacturing image (``mfg.bin`` / ``mfg.hex``) to
@@ -17,8 +16,8 @@ Usage:
     python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
 
 Examples:
-    python scripts/provision-device.py wba55-mems-01 certificate.json
-    python scripts/provision-device.py wba65-mems-01 certificate.json WBA65xI
+    python scripts/provision-device.py wba-mems-01 certificate.json
+    python scripts/provision-device.py wba-mems-01 certificate.json WBA65xI
 
 <device-name> is just the output folder name -- use the device's /IOTCONNECT
 **Unique ID** so the generated image is easy to match back to the device.
@@ -109,8 +108,8 @@ def main() -> int:
         "from an /IOTCONNECT device certificate JSON.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="example:\n"
-        "  python scripts/provision-device.py wba55-mems-01 certificate.json\n"
-        "  python scripts/provision-device.py wba65-mems-01 certificate.json WBA65xI",
+        "  python scripts/provision-device.py wba-mems-01 certificate.json\n"
+        "  python scripts/provision-device.py wba-mems-01 certificate.json WBA65xI",
     )
     parser.add_argument(
         "device_name",

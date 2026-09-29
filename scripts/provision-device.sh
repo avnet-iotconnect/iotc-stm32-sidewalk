@@ -1,146 +1,21 @@
 #!/usr/bin/env bash
-# Generate a STM32WBA-compatible Sidewalk manufacturing image from a device
-# cert.json (downloaded from AWS IoT Wireless during provisioning) and place it
-# under iotc-stm32-sidewalk/binaries/sidewalk-mfg/<device>/.
+# Generate an STM32WBA Sidewalk manufacturing image from a device certificate.
 #
-# Works for both Nucleo boards — pass the chip as the optional 3rd argument
-# (or CHIP env var). It selects the provisioning flash address automatically:
-#   WBA55xG (default) -> 0x080FE000   (NUCLEO-WBA55CG, 1 MB)
-#   WBA65xI           -> 0x081FE000   (NUCLEO-WBA65RI, 2 MB)
+# Thin wrapper kept so existing commands and documentation keep working.
+# The implementation is scripts/provision-device.py, which needs only Python and
+# runs the same from PowerShell, Command Prompt, macOS, and Linux:
 #
-# This is the POSIX-shell variant and needs bash (Linux, macOS, WSL, or Git Bash
-# on Windows). For a version that runs anywhere Python does -- including Windows
-# PowerShell and cmd -- use the equivalent provision-device.py instead:
-#   python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
+#     python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
 #
-# Usage:
-#   ./scripts/provision-device.sh <device-name> <path-to-cert.json> [chip]
-# Examples:
-#   ./scripts/provision-device.sh mclST5A2 ~/Downloads/mclST5A2.json            # WBA55xG
-#   ./scripts/provision-device.sh mclST5A2 ~/Downloads/mclST5A2.json WBA65xI    # WBA65
-
+# Arguments and environment variables are passed through unchanged.
 set -euo pipefail
-
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
-# Locate the STM32-Sidewalk-SDK: SDK_ROOT wins, else the conventional spots.
-find_sdk() {
-    # Both the renamed folder and the name the GitHub ZIP extracts to.
-    local parent; parent="$(dirname "$REPO_ROOT")"
-    local candidates=(
-        "$parent/STM32-Sidewalk-SDK"
-        "$parent/STM32-Sidewalk-SDK-main"
-        "$HOME/dev/sidewalk/STM32-Sidewalk-SDK"
-        "$HOME/Downloads/STM32-Sidewalk-SDK"
-        "$HOME/Downloads/STM32-Sidewalk-SDK-main"
-        "$HOME/STM32-Sidewalk-SDK"
-        "$HOME/STM32-Sidewalk-SDK-main"
-    )
-    [[ -n "${SDK_ROOT:-}" ]] && candidates=("$SDK_ROOT")
-    for root in "${candidates[@]}"; do
-        if [[ -f "$root/tools/provision/provision.py" ]]; then
-            echo "$root"
-            return 0
-        fi
-    done
-    {
-        echo "error: could not find the STM32-Sidewalk-SDK."
-        echo
-        echo "This script uses the SDK's bundled tools/provision/provision.py."
-        echo "Download or clone it from"
-        echo "    https://github.com/stm32-hotspot/STM32-Sidewalk-SDK"
-        echo "and extract it next to this repo, or set SDK_ROOT to its path."
-        echo
-        echo "Looked in:"
-        printf '    %s\n' "${candidates[@]}"
-    } >&2
-    return 1
-}
-
-SDK_ROOT="$(find_sdk)"
-PROVISION_PY="$SDK_ROOT/tools/provision/provision.py"
-
-if [[ $# -lt 2 || $# -gt 3 ]]; then
-    echo "usage: $0 <device-name> <path-to-cert.json> [chip]" >&2
-    echo "       chip defaults to WBA55xG; use WBA65xI for the NUCLEO-WBA65RI" >&2
-    exit 2
-fi
-DEVICE="$1"
-CERT_IN="$2"
-CHIP="${3:-${CHIP:-WBA55xG}}"
-
-# Provisioning flash address per chip (matches provision.py's chip table).
-case "$CHIP" in
-    WBA65xI|WBA64xI|WBA63xI|WBA62xI) MFG_ADDR="0x081FE000" ;;  # 2 MB parts
-    *)                               MFG_ADDR="0x080FE000" ;;  # 1 MB parts (WBA55xG, ...)
-esac
-
-[[ -f "$CERT_IN" ]] || { echo "cert.json not found: $CERT_IN" >&2; exit 1; }
-[[ -f "$PROVISION_PY" ]] || { echo "provision.py not found: $PROVISION_PY" >&2; exit 1; }
-
-OUT_DIR="$REPO_ROOT/binaries/sidewalk-mfg/$DEVICE"
-mkdir -p "$OUT_DIR"
-chmod 700 "$REPO_ROOT/binaries/sidewalk-mfg" "$OUT_DIR"
-
-cp "$CERT_IN" "$OUT_DIR/cert.json"
-chmod 600 "$OUT_DIR/cert.json"
-
-# Find a Python that actually runs. On Windows, PATH usually contains Microsoft
-# Store alias stubs named python.exe / python3.exe which are NOT Python -- they
-# print "Python was not found..." and exit non-zero -- so test each candidate
-# rather than trusting `command -v`.
-find_python() {
-    local py
-    for py in python3 python; do
-        command -v "$py" >/dev/null 2>&1 || continue
-        if "$py" -c 'import sys' >/dev/null 2>&1; then
-            PYTHON=("$py")
-            return 0
-        fi
-    done
-    # The py launcher is the reliable one on Windows when aliases shadow python.
-    if command -v py >/dev/null 2>&1 && py -3 -c 'import sys' >/dev/null 2>&1; then
-        PYTHON=(py -3)
-        return 0
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+for py in python3 python py; do
+    if command -v "$py" >/dev/null 2>&1 && "$py" -c "import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)" >/dev/null 2>&1; then
+        exec "$py" "$here/provision-device.py" "$@"
     fi
-    # Last resort: the usual install locations, newest first.
-    local cand
-    while IFS= read -r cand; do
-        [[ -x "$cand" ]] || continue
-        if "$cand" -c 'import sys' >/dev/null 2>&1; then
-            PYTHON=("$cand")
-            return 0
-        fi
-    done < <(ls -d /c/Python3*/python.exe \
-                   "$LOCALAPPDATA"/Programs/Python/Python3*/python.exe \
-                   "/c/Program Files/Python3"*/python.exe 2>/dev/null | sort -r)
-    {
-        echo "error: no working Python 3 found."
-        echo
-        echo "If you have Python installed, PATH is probably being shadowed by the"
-        echo "Microsoft Store alias stubs. Turn them off under:"
-        echo "    Settings > Apps > Advanced app settings > App execution aliases"
-        echo "and switch off python.exe and python3.exe. Then reopen Git Bash."
-        echo
-        echo "Otherwise install Python 3.10+ from https://www.python.org/downloads/"
-        echo "and tick \"Add python.exe to PATH\" in the installer."
-    } >&2
-    return 1
-}
-
-find_python || exit 1
-
-cd "$OUT_DIR"
-"${PYTHON[@]}" "$PROVISION_PY" st aws --chip "$CHIP" \
-    --certificate_json cert.json \
-    --output_bin mfg.bin \
-    --output_hex mfg.hex
-
-chmod 600 mfg.bin mfg.hex
-
-echo "wrote:"
-ls -la "$OUT_DIR"
-echo ""
-echo "Chip : $CHIP   (mfg flash address $MFG_ADDR)"
-echo "Flash with:"
-echo "  STM32_Programmer_CLI -c port=SWD mode=UR -d $OUT_DIR/mfg.bin $MFG_ADDR -v"
+done
+echo "error: Python 3.8 or newer was not found on PATH." >&2
+echo "Install it from https://www.python.org/downloads/ and run:" >&2
+echo "    python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]" >&2
+exit 1
