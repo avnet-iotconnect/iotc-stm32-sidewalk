@@ -13,6 +13,8 @@
 
 This guide walks through bringing a **NUCLEO-WBA55CG** (or **NUCLEO-WBA65RI**) with an **X-NUCLEO-IKS4A1** (or **X-NUCLEO-IKS5A1**) MEMS sensor expansion board online with the Avnet **/IOTCONNECT** platform over **Amazon Sidewalk** (BLE / Link Type 1). When complete, the board streams live accelerometer, gyroscope, temperature, humidity, pressure, orientation, and Qvar (capacitive touch) readings to an /IOTCONNECT dashboard, and you can send commands back to the device.
 
+The demo also uses the **Machine Learning Core (MLC)** built into the shield's motion sensor, the LSM6DSV16X on the IKS4A1 and the ISM6HG256X on the IKS5A1. The MLC runs a small decision-tree classifier inside the sensor itself, so motion is classified without any processing on the microcontroller. It is loaded with an asset-tracking model that reports one of four states: stationary upright, stationary not upright, in motion, or shaken. The result arrives in /IOTCONNECT as the `mlc1_label` attribute.
+
 The firmware is built from source — licensing on the upstream SDK and crypto library prevents this repository from redistributing compiled images (see [`NOTICE.md`](NOTICE.md)). Step 9 covers the build with a one-command helper script; the one-time toolchain setup it needs is in [Build Setup](BUILD_SETUP.md), and the detailed [example README](examples/sidewalk-mems-wba55/README.md) covers the firmware itself.
 
 Because the data travels over Amazon Sidewalk, your device reaches the cloud through any nearby **Sidewalk gateway** (for example, a compatible Amazon Echo) — no local Wi-Fi credentials are programmed onto the board.
