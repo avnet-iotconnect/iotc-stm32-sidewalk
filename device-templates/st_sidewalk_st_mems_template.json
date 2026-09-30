@@ -1,6 +1,6 @@
 {
     "code": "STswMEMS",
-    "name": "Sidewalk ST MEMS",
+    "name": "Sidewalk ST WBA55 + MEMS",
     "authType": 2,
     "attributes": [
         {
@@ -190,23 +190,23 @@
                     "name": "mlc1_label",
                     "displayName": "",
                     "type": "STRING",
-                    "description": "Human-readable mapping of mlc1_raw via the active model's label map (asset_tracking default: 0=stationary_upright, 4=stationary_not_upright, 8=in_motion, 12=shaken). Any other raw value surfaces as transition_N.",
-                    "unit": "",
-                    "attributeColor": ""
-                },
-                {
-                    "name": "mlc1_model_id",
-                    "displayName": "",
-                    "type": "INTEGER",
-                    "description": "Active LSM6DSV16X MLC model id reported by the firmware (TLV tag 0x2B). Selects which label map mlc1_label uses. 0=none, 1=asset_tracking, 2=activity_recognition_for_mobile, 3=activity_recognition_for_wrist, 4=gym_activity_recognition, 5=head_gestures, 6=yoga_pose_recognition.",
-                    "unit": "",
-                    "attributeColor": ""
-                },
-                {
-                    "name": "mlc1_model_name",
-                    "displayName": "",
-                    "type": "STRING",
-                    "description": "Human-readable MLC model name derived from mlc1_model_id (e.g. asset_tracking). Unknown ids surface as unknown_model_N.",
+																																																														 
+							   
+										
+				  
+				 
+											
+									  
+									  
+																																																																														   
+							   
+										
+				  
+				 
+											  
+									  
+									 
+                    "description": "Human-readable mapping of mlc1_raw via the asset_tracking label map: 0=stationary_upright, 4=stationary_not_upright, 8=in_motion, 12=shaken. Any other raw value surfaces as transition_N.",
                     "unit": "",
                     "attributeColor": ""
                 }
@@ -217,9 +217,57 @@
             "name": "decoder_name",
             "displayName": "",
             "type": "STRING",
-            "description": "Name of the /IOTCONNECT decoder that produced the record. Always sidewalk-mems-tlv for this template.",
+            "description": "Name of the /IOTCONNECT decoder that produced the record. Always sidewalk-iks4a1-tlv for this template.",
             "unit": "",
             "attributeColor": "",
+            "aggregateTypes": []
+        },
+        {
+            "name": "location",
+            "displayName": "",
+            "type": "LATLONG",
+            "description": "",
+            "unit": "",
+            "aggregateTypes": []
+        },
+        {
+            "name": "measurement_type",
+            "displayName": "",
+            "type": "STRING",
+            "description": "",
+            "unit": "",
+            "aggregateTypes": []
+        },
+        {
+            "name": "h_accuracy_m",
+            "displayName": "",
+            "type": "DECIMAL",
+            "description": "",
+            "unit": "",
+            "aggregateTypes": []
+        },
+        {
+            "name": "fix_time",
+            "displayName": "",
+            "type": "STRING",
+            "description": "",
+            "unit": "",
+            "aggregateTypes": []
+        },
+        {
+            "name": "alt",
+            "displayName": "",
+            "type": "DECIMAL",
+            "description": "",
+            "unit": "",
+            "aggregateTypes": []
+        },
+        {
+            "name": "sequence_number",
+            "displayName": "",
+            "type": "INTEGER",
+            "description": "",
+            "unit": "",
             "aggregateTypes": []
         }
     ],
@@ -233,8 +281,8 @@
         },
         {
             "name": "SET_INTERVAL",
-            "command": "{     \"command\": \"IKS4A1_SET_INTERVAL\",     \"interval_seconds\": 60 }",
-            "requiredParam": true,
+            "command": "{    \n \"command\": \"IKS4A1_SET_INTERVAL\",     \n \"interval_seconds\": 60 \n}",
+            "requiredParam": false,
             "requiredAck": false,
             "isOTACommand": false
         },
@@ -250,12 +298,14 @@
     "msgCode": "XG4E3M4",
     "capability": "24",
     "c2dOnDemand": 0,
+    "enableGeoLocation": "true",
     "properties": {
         "description": "WBA55 + X-NUCLEO-IKS4A1 sensor uplink (BLE-only)",
         "dataFrequency": "120",
         "fileSupport": false,
         "certRenewalDay": 0,
-        "enableCSR": false
+        "enableCSR": false,
+        "enableGeoLocation": true
     },
     "_meta": {
         "version": "2.0"
