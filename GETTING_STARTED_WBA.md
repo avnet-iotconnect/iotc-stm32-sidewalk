@@ -251,7 +251,7 @@ binaries/sidewalk-mfg/wba-mems-01/
 
    _The MEMS sensor shield stacked on the NUCLEO-WBA55CG; the NUCLEO-WBA65RI hosts the same shield identically._
 
-3. **Connect** the USB Type-C cable from your PC to the board's ST-LINK port.
+3. **Connect** the USB Type-C cable from your PC to the board's USB Type-C ST-LINK port.
 4. Confirm the board powers up (the ST-LINK LED illuminates).
 
 ---
@@ -266,28 +266,27 @@ Complete steps 1 to 3 of [Build Setup](BUILD_SETUP.md) before your first build: 
 
 ### Build the firmware
 
-One run produces the firmware for both sensor shields. For the NUCLEO-WBA55CG:
+One run produces the firmware for both sensor shields.
 
+For the NUCLEO-WBA55CG:
 ```
-python scripts/build-firmware.py
+python iotc-stm32-sidewalk-main/scripts/build-firmware.py
 ```
 
 For the NUCLEO-WBA65RI:
-
 ```
-python scripts/build-firmware.py --board wba65
+python iotc-stm32-sidewalk-main/scripts/build-firmware.py --board wba65
 ```
 
 If the build fails, see [If it fails](BUILD_SETUP.md#if-it-fails) in Build Setup.
 
-Output lands at:
-
+Outputs land here:
 ```
-binaries/sid_ble_wba55_iks4a1.hex     # (WBA65: sid_ble_wba65_iks4a1.hex)
-binaries/sid_ble_wba55_iks5a1.hex     # (WBA65: sid_ble_wba65_iks5a1.hex)
+iotc-stm32-sidewalk-main/binaries/sid_ble_wba55_iks4a1.hex     # (WBA65: sid_ble_wba65_iks4a1.hex)
+iotc-stm32-sidewalk-main/binaries/sid_ble_wba55_iks5a1.hex     # (WBA65: sid_ble_wba65_iks5a1.hex)
 ```
 
-Pick the one that matches your host board + sensor board:
+Take note of the .hex that matches your host board + sensor board combo:
 
 | Physical board | Firmware hex |
 |---|---|
@@ -301,7 +300,8 @@ Pick the one that matches your host board + sensor board:
 [`tools/flash_wba.py`](tools/flash_wba.py) erases the chip, writes the firmware, then writes the manufacturing image. Each step connects under reset and is retried once. It is board-agnostic and finds STM32CubeProgrammer on its own. Pass the firmware hex for your board and shield, and the `mfg.hex` from Step 7:
 
 ```
-python tools/flash_wba.py binaries/sid_ble_wba55_iks4a1.hex binaries/sidewalk-mfg/wba-mems-01/mfg.hex
+cd iotc-stm32-sidewalk-main
+python tools/flash_wba.py binaries/sid_ble_wba55_iks5a1.hex binaries/sidewalk-mfg/<Unique ID>/mfg.hex
 ```
 
 After flashing, **press the black RESET button** (or power-cycle) to start the firmware.
