@@ -179,7 +179,7 @@ The download is available in two places — either works, and both give you the 
 
 **From the device overview page (easiest).** You are already here if you clicked **Save & View** in Step 5. Otherwise open the device from the **Wireless Device** list. The certificate download sits with the device's other actions on this page.
 
-**From the Wireless Device list.** Find your device, look at the **Actions** column on the right, and click the certificate download icon.
+**From the Wireless Device list.** Find your device, look at the **Actions** column on the right, and click the certificate download icon and save it to your **Downloads** folder.
 
 ![Downloading the device certificate from the Actions column of the Wireless Device list](media/device-list-certificate-download.png)
 
@@ -198,16 +198,14 @@ The provisioning logic lives in ST's SDK, so you need a copy of it alongside thi
 
 ```
 Downloads/
+├── certificate.json              <-- Downloaded certificate
 ├── iotc-stm32-sidewalk-main/     <-- this repo
-└── STM32-Sidewalk-SDK-main/      <-- the SDK, extracted alongside it
+└── STM32-Sidewalk-SDK-main/      <-- the ST SDK
 ```
 
-If you keep the SDK somewhere else, add `--sdk-root` and its path to the provisioning command below.
+Open a new Command window in your **Downloads** folder.
 
-> [!NOTE]
-> `could not find the STM32-Sidewalk-SDK` means this step was skipped or the folder is somewhere the script does not look — the error lists every path it tried.
-
-The SDK's provisioning tool needs two Python packages:
+The SDK's provisioning tool needs two Python packages to run correctly. Install them using the following command:
 
 ```
 python -m pip install pyyaml intelhex
@@ -215,41 +213,27 @@ python -m pip install pyyaml intelhex
 
 ### Run the provisioning script
 
-From the repository folder:
+Identify the arguments needed for the script:
 
-```
-python scripts/provision-device.py <device-name> <path-to-cert.json> [chip]
-```
+`python iotc-stm32-sidewalk-main/scripts/provision-device.py <device-name> <path-to-cert.json> [chip]`
 
-* `<device-name>` — the device's **Unique ID** from Step 5 (e.g. `wba-mems-01`). It names the output folder, so using the Unique ID is what lets you match a generated image back to the device it belongs to. It is *not* read from the certificate, so a typo here silently produces a confusingly-named folder rather than an error.
-* `<path-to-cert.json>` — the file you downloaded in Step 6. The browser saves it to your **Downloads** folder as **`certificate.json`**.
+* `<device-name>` — the device's **Unique ID** from Step 5 (e.g. `wba-mems-01`)
+* `<path-to-cert.json>` — path to the file you downloaded in Step 6. The browser saves it to your **Downloads** folder as **`certificate.json`**.
 * `[chip]` — optional; defaults to **`WBA55xG`** (NUCLEO-WBA55CG). Pass **`WBA65xI`** for the NUCLEO-WBA65RI. The script picks the matching mfg flash address automatically.
 
-The commands below assume the certificate is still in your Downloads folder. If you moved or renamed it, use that path instead.
-
-For the NUCLEO-WBA55CG:
-
+Example for WBA55 with the certificate in your downloads folder:
 ```
-python scripts/provision-device.py wba-mems-01 ~/Downloads/certificate.json
+python iotc-stm32-sidewalk-main/scripts/provision-device.py <device-name> certificate.json
 ```
 
-For the NUCLEO-WBA65RI:
-
-```
-python scripts/provision-device.py wba-mems-01 ~/Downloads/certificate.json WBA65xI
-```
-
-This produces (WBA55 shown; on WBA65 the `mfg.bin` flashes @ `0x081FE000`):
+This produces the following directory and files (WBA55 shown):
 
 ```
 binaries/sidewalk-mfg/wba-mems-01/
 ├── cert.json
-├── mfg.bin      <-- flash this @ 0x080FE000  (WBA65: 0x081FE000)
+├── mfg.bin
 └── mfg.hex
 ```
-
-> [!NOTE]
-> Do **not** flash the raw certificate JSON, and do not reuse a `mfg.bin` from anywhere else — each image is bound to one device. Always generate it with the provisioning script (which runs `provision.py st aws --chip WBA55xG`, or `--chip WBA65xI` for the WBA65) first.
 
 ---
 
