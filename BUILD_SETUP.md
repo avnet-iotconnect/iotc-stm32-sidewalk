@@ -22,21 +22,18 @@ Expected layout:
 Downloads/
 ├── iotc-stm32-sidewalk-main/
 ├── STM32-Sidewalk-SDK-main/
-├── STM32CubeExpansion_MEMS1_V…/
+├── x-cube-mems1/
 └── STM32CubeExpansion_Crypto_V…/
 ```
 
 ## 3. Prepare the SDK (once)
 
-The public SDK ships without the sensor drivers, the crypto library, or this demo's sources. One script stages all of it. Run it from PowerShell in the repository folder:
+The public SDK ships without the sensor drivers, the crypto library, or this demo's sources. This script finds the three packages automatically and prints what it used.
+Run it from PowerShell in your working folder (e.g. `Downloads`):
 
 ```
-python scripts/prepare-sdk.py
+python iotc-stm32-sidewalk-main/scripts/prepare-sdk.py
 ```
-
-It finds the three packages automatically and prints what it used. If you keep one somewhere unusual, point at it with `--sdk-root`, `--mems1-root`, or `--cmox-root`. Safe to re-run.
-
-The script needs only Python. It does not need Git or Git Bash.
 
 ## 4. Build
 
