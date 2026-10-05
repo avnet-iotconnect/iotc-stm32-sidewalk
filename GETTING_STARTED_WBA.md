@@ -27,9 +27,6 @@ _Device onboarding: a per-device certificate is provisioned, then the manufactur
 
 _Device connectivity: the board reaches /IOTCONNECT through a nearby Sidewalk gateway and the AWS backend._
 
-> [!NOTE]
-> Amazon Sidewalk coverage is required for the device to connect. Make sure a compatible Sidewalk gateway is powered on, within range, and has Amazon Sidewalk enabled. See [Amazon Sidewalk gateway](#amazon-sidewalk-gateway) in Step 2.
-
 ---
 
 ## Table of Contents
