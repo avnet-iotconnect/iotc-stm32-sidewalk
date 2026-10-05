@@ -62,12 +62,12 @@ _Device connectivity: the board reaches /IOTCONNECT through a nearby Sidewalk ga
 |---|---|
 | PC running Windows 11 (recommended) | Host for the tools below |
 | [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) | Flashing the board (`STM32_Programmer_CLI`) |
-| [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) | Compiling the firmware; the build script drives it, you never open it |
-| [STM32-Sidewalk-SDK](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK) (ST's GitHub repository) | Sidewalk stack and the provisioning tool |
-| [X-CUBE-MEMS1](https://www.st.com/en/embedded-software/x-cube-mems1.html) (free ST account) | Drivers for the sensors on the MEMS shield |
-| [X-CUBE-CRYPTOLIB](https://www.st.com/en/embedded-software/x-cube-cryptolib.html) (free ST account) | Crypto library the Sidewalk SDK links against |
+| [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) | Compiling the firmware |
+| [STM32-Sidewalk-SDK](https://github.com/stm32-hotspot/STM32-Sidewalk-SDK) | Sidewalk stack and the provisioning tool |
+| [X-CUBE-MEMS1](https://www.st.com/en/embedded-software/x-cube-mems1.html) | Drivers for the sensors on the MEMS shield |
+| [X-CUBE-CRYPTOLIB](https://www.st.com/en/embedded-software/x-cube-cryptolib.html) | Cryptographic library for the Sidewalk SDK (free ST account required) |
 | [Python 3.10+](https://www.python.org/downloads/) with the `pyyaml` and `intelhex` packages | Generating the manufacturing image, and the SDK's build steps. Tick **Add python.exe to PATH** in the installer |
-| Serial terminal such as [Tera Term](https://teratermproject.github.io/index-en.html) or [PuTTY](https://www.putty.org/) | Reading the board's log (115200 8N1) |
+| Serial terminal such as [Tera Term](https://teratermproject.github.io/index-en.html) or [PuTTY](https://www.putty.org/) | Reading the board's log |
 
 The SDK is downloaded in Step 7. STM32CubeIDE and the two X-CUBE packages are set up in [Build Setup](BUILD_SETUP.md), which Step 9 sends you to.
 
